@@ -12,7 +12,7 @@
   "navigation": {
     "versions": [
       {
-        "version": "English Version",
+        "version": "EN",
         "languages": [
           {
             "icon": "book",
@@ -178,7 +178,8 @@
             ],
             "language": "Cập nhật tính năng"
           }
-        ]
+        ],
+        "icon": "globe"
       },
       {
         "version": "VN",
