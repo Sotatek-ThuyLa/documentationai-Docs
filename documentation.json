@@ -20,7 +20,7 @@
             "icon": "rocket",
             "pages": [
               {
-                "title": "Tổng quan",
+                "title": "Giới thiệu về NoteX",
                 "path": "introduction",
                 "icon": "home"
               },
