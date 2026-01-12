@@ -187,7 +187,13 @@
           },
           {
             "version": "Mobile App",
-            "pages": [],
+            "pages": [
+              {
+                "title": "Coming soon",
+                "path": "coming-soon",
+                "icon": "lucide-timer"
+              }
+            ],
             "icon": "smartphone"
           }
         ]
