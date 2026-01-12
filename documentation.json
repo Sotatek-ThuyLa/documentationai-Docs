@@ -10,12 +10,12 @@
     }
   },
   "navigation": {
-    "versions": [
+    "languages": [
       {
-        "version": "EN",
-        "languages": [
+        "icon": "globe",
+        "tabs": [
           {
-            "icon": "book",
+            "icon": "globe",
             "groups": [
               {
                 "group": "Chào mừng tới NoteX",
@@ -154,7 +154,7 @@
                 "icon": "circle-fading-plus-icon"
               }
             ],
-            "language": "Hướng dẫn sử dụng"
+            "tab": "Hướng dẫn sử dụng"
           },
           {
             "icon": "help-circle",
@@ -165,7 +165,7 @@
                 "icon": "home"
               }
             ],
-            "language": "Trợ giúp"
+            "tab": "Trợ giúp"
           },
           {
             "icon": "clock",
@@ -176,14 +176,29 @@
                 "icon": "history"
               }
             ],
-            "language": "Cập nhật tính năng"
+            "tab": "Cập nhật tính năng"
+          },
+          {
+            "pages": [],
+            "tab": "EN"
           }
         ],
+        "language": "VN"
+      },
+      {
+        "pages": [],
+        "language": "EN",
         "icon": "globe"
       },
       {
-        "version": "VN",
-        "pages": []
+        "language": "JP",
+        "pages": [],
+        "icon": "globe"
+      },
+      {
+        "language": "KR",
+        "pages": [],
+        "icon": "globe"
       }
     ]
   },
