@@ -199,18 +199,13 @@
         ]
       },
       {
-        "pages": [],
+        "pages": [
+          {
+            "title": "Coming soon",
+            "path": "comingsoon"
+          }
+        ],
         "language": "EN",
-        "icon": "globe"
-      },
-      {
-        "language": "JP",
-        "pages": [],
-        "icon": "globe"
-      },
-      {
-        "language": "KR",
-        "pages": [],
         "icon": "globe"
       }
     ]
