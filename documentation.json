@@ -158,7 +158,7 @@
         "icon": "help-circle",
         "pages": [
           {
-            "title": "Help Center",
+            "title": "Trợ giúp",
             "path": "help-center",
             "icon": "home"
           }
