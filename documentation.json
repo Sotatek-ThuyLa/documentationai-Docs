@@ -58,7 +58,7 @@
                         "icon": "file-down-icon"
                       },
                       {
-                        "title": "Share & Collaboration",
+                        "title": "Cộng tác nhóm",
                         "path": "share-collaboration",
                         "icon": "heart-handshake"
                       }
@@ -199,14 +199,37 @@
         ]
       },
       {
-        "pages": [
-          {
-            "title": "Coming soon",
-            "path": "comingsoon"
-          }
-        ],
         "language": "EN",
-        "icon": "globe"
+        "icon": "globe",
+        "versions": [
+          {
+            "version": "Web Browser",
+            "icon": "lucide-mouse-pointer-click",
+            "groups": [
+              {
+                "group": "Welcome to NoteX",
+                "icon": "lucide-home",
+                "pages": [
+                  {
+                    "title": "Get started",
+                    "path": "get-started",
+                    "icon": "star"
+                  },
+                  {
+                    "title": "Login-en",
+                    "path": "login-en",
+                    "icon": "log-in"
+                  }
+                ]
+              },
+              {
+                "group": "Create Note",
+                "pages": [],
+                "icon": "lucide-sticky-note"
+              }
+            ]
+          }
+        ]
       }
     ]
   },
