@@ -332,6 +332,220 @@
                     "icon": "stars"
                   }
                 ]
+              },
+              {
+                "group": "Create Note",
+                "pages": [
+                  {
+                    "title": "Record",
+                    "path": "record",
+                    "icon": "file-audio-icon"
+                  },
+                  {
+                    "title": "Upload Audio",
+                    "path": "upload-audio",
+                    "icon": "file-audio2"
+                  },
+                  {
+                    "title": "Upload Document",
+                    "path": "upload-document",
+                    "icon": "file"
+                  },
+                  {
+                    "title": "Upload Image",
+                    "path": "upload-image",
+                    "icon": "image-up"
+                  },
+                  {
+                    "title": "Take a Photo",
+                    "path": "take-a-photo",
+                    "icon": "image"
+                  },
+                  {
+                    "title": "Web Link",
+                    "path": "web-link",
+                    "icon": "lucide-link"
+                  },
+                  {
+                    "title": "Input text",
+                    "path": "input-text",
+                    "icon": "a-large-small-icon"
+                  }
+                ]
+              },
+              {
+                "group": "Advance setting",
+                "pages": [
+                  {
+                    "title": "Advanced Settings",
+                    "path": "advanced-settings",
+                    "icon": "settings-icon"
+                  }
+                ]
+              },
+              {
+                "group": "AI Tools",
+                "pages": [
+                  {
+                    "title": "Summary",
+                    "path": "summary",
+                    "icon": "receipt-text"
+                  },
+                  {
+                    "title": "Transcript",
+                    "path": "transcript",
+                    "icon": "lucide-text"
+                  },
+                  {
+                    "title": "Nova AI Chat",
+                    "path": "nova-ai-chat",
+                    "icon": "stars-icon"
+                  },
+                  {
+                    "title": "Translate",
+                    "path": "translate",
+                    "icon": "a-large-small"
+                  }
+                ]
+              },
+              {
+                "group": "Visual Content Creation",
+                "pages": [
+                  {
+                    "title": "Mindmap",
+                    "path": "mindmap-app-en",
+                    "icon": "network"
+                  },
+                  {
+                    "title": "Slideshow",
+                    "path": "slideshow-app-en",
+                    "icon": "file-sliders"
+                  },
+                  {
+                    "title": "Podcast",
+                    "path": "podcast",
+                    "icon": "file-audio"
+                  },
+                  {
+                    "title": "Flashcard",
+                    "path": "flashcard",
+                    "icon": "card-sim"
+                  },
+                  {
+                    "title": "Quiz",
+                    "path": "quiz",
+                    "icon": "puzzle"
+                  },
+                  {
+                    "title": "Short Video",
+                    "path": "short-video",
+                    "icon": "lucide-file-video"
+                  }
+                ]
+              },
+              {
+                "group": "Note Management",
+                "pages": [
+                  {
+                    "title": "Edit note title",
+                    "path": "edit-note-title",
+                    "icon": "edit3"
+                  },
+                  {
+                    "title": "Copy",
+                    "path": "copy",
+                    "icon": "copy"
+                  },
+                  {
+                    "title": "Export Note",
+                    "path": "export-note-app-en",
+                    "icon": "arrow-big-down-dash-icon"
+                  },
+                  {
+                    "title": "Share Note",
+                    "path": "share-note-app-en",
+                    "icon": "handshake"
+                  },
+                  {
+                    "title": "Delete note",
+                    "path": "delete-note",
+                    "icon": "trash2-icon"
+                  }
+                ]
+              },
+              {
+                "group": "Search & Organization",
+                "pages": [
+                  {
+                    "title": "My Folder",
+                    "path": "my-folder",
+                    "icon": "folder-closed"
+                  },
+                  {
+                    "title": "Folder Detail",
+                    "path": "folder-detail",
+                    "icon": "lucide-text-selection"
+                  },
+                  {
+                    "title": "Move to Folder",
+                    "path": "move-to-folder",
+                    "icon": "folder"
+                  },
+                  {
+                    "title": "Search",
+                    "path": "search-spp-en",
+                    "icon": "search-icon"
+                  }
+                ]
+              },
+              {
+                "group": "AI Meeting Bot",
+                "pages": [
+                  {
+                    "title": "AI Meeting Bot",
+                    "path": "ai-meeting-bot",
+                    "icon": "bot-icon"
+                  },
+                  {
+                    "title": "AI Meeting Bot - Webex",
+                    "path": "ai-meeting-bot-webex",
+                    "icon": "bot-message-square"
+                  }
+                ]
+              },
+              {
+                "group": "App Setting",
+                "pages": [
+                  {
+                    "title": "Customize Note Tabs",
+                    "path": "customize-note-tabs"
+                  },
+                  {
+                    "title": "Manage Recordings",
+                    "path": "manage-recordings",
+                    "icon": "book-audio"
+                  },
+                  {
+                    "title": "Recording Schedule",
+                    "path": "recording-schedule",
+                    "icon": "lucide-hand-coins"
+                  }
+                ]
+              },
+              {
+                "group": "Device & Platform Integration",
+                "pages": [
+                  {
+                    "title": "Apple Watch Sync",
+                    "path": "apple-watch-sync",
+                    "icon": "watch"
+                  },
+                  {
+                    "title": "Apple Share Extension",
+                    "path": "apple-share-extension",
+                    "icon": "apple"
+                  }
+                ]
               }
             ]
           }
