@@ -182,6 +182,11 @@
                   }
                 ],
                 "tab": "Cập nhật tính năng"
+              },
+              {
+                "tab": "Blog",
+                "pages": [],
+                "icon": "blocks"
               }
             ]
           },
