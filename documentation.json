@@ -188,7 +188,7 @@
                 "pages": [
                   {
                     "title": "Blog",
-                    "path": "blog-vn",
+                    "path": "blog",
                     "icon": "blocks"
                   }
                 ],
