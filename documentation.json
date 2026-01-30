@@ -188,7 +188,7 @@
                 "pages": [
                   {
                     "title": "Blog",
-                    "path": "blog",
+                    "path": "blog-vn",
                     "icon": "blocks"
                   }
                 ],
@@ -326,6 +326,15 @@
                     "title": "Help center",
                     "path": "help-center-en",
                     "icon": "book-open-check-icon"
+                  }
+                ]
+              },
+              {
+                "tab": "Blog",
+                "pages": [
+                  {
+                    "title": "Blog",
+                    "path": "blog-en"
                   }
                 ]
               }
