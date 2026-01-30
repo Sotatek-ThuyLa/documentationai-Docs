@@ -185,7 +185,13 @@
               },
               {
                 "tab": "Blog",
-                "pages": [],
+                "pages": [
+                  {
+                    "title": "Blog",
+                    "path": "blog",
+                    "icon": "blocks"
+                  }
+                ],
                 "icon": "blocks"
               }
             ]
