@@ -333,17 +333,8 @@
                 "tab": "Blog",
                 "pages": [
                   {
-                    "group": "Blog",
-                    "pages": [
-                      {
-                        "title": "Blog 1",
-                        "path": "blog-1"
-                      }
-                    ]
-                  },
-                  {
                     "title": "Blog",
-                    "path": "blog-eng"
+                    "path": "blog-en"
                   }
                 ]
               }
