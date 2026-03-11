@@ -334,7 +334,8 @@
                 "pages": [
                   {
                     "title": "Blog Overview",
-                    "path": "blog-en"
+                    "path": "blog-en",
+                    "show-sidebar": false
                   },
                   {
                     "title": "NoteX – AI-Powered Meeting Intelligence for Enterprises",
