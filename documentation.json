@@ -333,6 +333,11 @@
                 "tab": "Blog",
                 "pages": [
                   {
+                    "title": "Blog Overview",
+                    "path": "blog-overview",
+                    "show-sidebar": false
+                  },
+                  {
                     "title": "NoteX – AI-Powered Meeting Intelligence for Enterprises",
                     "path": "Intelligence-for-Enterprises",
                     "show-sidebar": false
