@@ -334,7 +334,7 @@
                 "pages": [
                   {
                     "title": "Blog Overview",
-                    "path": "blog-overview",
+                    "path": "blog-en",
                     "show-sidebar": false
                   },
                   {
