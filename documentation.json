@@ -333,6 +333,10 @@
                 "tab": "Blog",
                 "pages": [
                   {
+                    "title": "NoteX App: AI Note-Taking App That Turns Meetings Into Structured Knowledge",
+                    "path": "notex-app-ai-note-taking-app-that-turns-meetings-into-structured-knowledge"
+                  },
+                  {
                     "title": "Blog Overview",
                     "path": "blog-en",
                     "show-sidebar": false
