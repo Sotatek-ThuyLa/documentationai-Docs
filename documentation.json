@@ -333,13 +333,13 @@
                 "tab": "Blog",
                 "pages": [
                   {
-                    "title": "NoteX AI Review: Can This AI Meeting Agent Actually Make Meetings Useful?",
-                    "path": "notex-ai-review-can-this-ai-meeting-agent-actually-make-meetings-useful"
-                  },
-                  {
                     "title": "Blog Overview",
                     "path": "blog-en",
                     "show-sidebar": false
+                  },
+                  {
+                    "title": "NoteX AI Review: Can This AI Meeting Agent Actually Make Meetings Useful?",
+                    "path": "notex-ai-review-can-this-ai-meeting-agent-actually-make-meetings-useful"
                   },
                   {
                     "title": "NoteX – AI-Powered Meeting Intelligence for Enterprises",
