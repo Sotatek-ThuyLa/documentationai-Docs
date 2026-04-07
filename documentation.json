@@ -333,6 +333,10 @@
                 "tab": "Blog",
                 "pages": [
                   {
+                    "title": "NoteX: Your AI-Powered Partner for Intelligent Note-Taking & Knowledge Capture",
+                    "path": "Intelligent-Note-Taking-Knowledge-Capture"
+                  },
+                  {
                     "title": "Blog Overview",
                     "path": "blog-en",
                     "show-sidebar": false
