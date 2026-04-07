@@ -353,6 +353,11 @@
                   {
                     "title": "NoteX: Your AI-Powered Partner for Intelligent Note-Taking & Knowledge Capture",
                     "path": "Intelligent-Note-Taking-Knowledge-Capture"
+                  },
+                  {
+                    "title": "Discover NoteX: Your AI-Powered Solution for Intelligent Note-Taking",
+                    "path": "discover-notex-your-ai-powered-solution-for-intelligent-note-taking",
+                    "show-sidebar": false
                   }
                 ]
               }
