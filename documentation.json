@@ -358,6 +358,10 @@
                     "title": "Discover NoteX: Your AI-Powered Solution for Intelligent Note-Taking",
                     "path": "discover-notex-your-ai-powered-solution-for-intelligent-note-taking",
                     "show-sidebar": false
+                  },
+                  {
+                    "title": "Master Productivity with NoteX Voice to Text: AI-Powered Transcription",
+                    "path": "master-productivity-with-notex-voice-to-text-ai-powered-transcription"
                   }
                 ]
               }
