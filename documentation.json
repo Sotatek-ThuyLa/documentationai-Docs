@@ -333,6 +333,10 @@
                 "tab": "Blog",
                 "pages": [
                   {
+                    "title": "Unlock Your Potential: Discover the Best Productivity Tools for Modern Work",
+                    "path": "unlock-your-potential-discover-the-best-productivity-tools-for-modern-work"
+                  },
+                  {
                     "title": "Blog Overview",
                     "path": "blog-en",
                     "show-sidebar": false
