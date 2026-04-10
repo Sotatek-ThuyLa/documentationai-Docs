@@ -327,7 +327,8 @@
                     "path": "help-center-en",
                     "icon": "book-open-check-icon"
                   }
-                ]
+                ],
+                "icon": "heart"
               },
               {
                 "tab": "Blog",
@@ -399,7 +400,8 @@
                     "title": "Mastering Google Meet Meeting Notes with AI: A Guide for SMBs",
                     "path": "mastering-google-meet-meeting-notes-with-ai-a-guide-for-smbs"
                   }
-                ]
+                ],
+                "icon": "file-pen-line-icon"
               }
             ]
           },
@@ -645,7 +647,8 @@
                   }
                 ]
               }
-            ]
+            ],
+            "icon": "hand-icon"
           }
         ]
       },
