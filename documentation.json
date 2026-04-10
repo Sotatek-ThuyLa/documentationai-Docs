@@ -661,6 +661,10 @@
             "icon": "stars-icon",
             "pages": [
               {
+                "title": "Blog Overview",
+                "path": "blog-overview-portuguese"
+              },
+              {
                 "title": "Domine a Produtividade com o NoteX Voz para Texto: Transcrição com IA",
                 "path": "domine-a-produtividade-com-o-notex-voz-para-texto-transcrio-com-ia"
               },
@@ -701,8 +705,7 @@
                 "path": "maximize-a-eficincia-como-o-resumo-automtico-de-reunies-melhora-o-alinhamento-da-equipe-e-economiza-tempo",
                 "show-sidebar": false
               }
-            ],
-            "path": "desbloqueie-a-eficiencia-como-o-resumo-automatico-de-reunioes-melhora-o-alinhamento-da-equipe-e-economiza-tempo"
+            ]
           }
         ]
       }
