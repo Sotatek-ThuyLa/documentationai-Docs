@@ -660,7 +660,13 @@
           {
             "tab": "Blog",
             "icon": "stars-icon",
-            "pages": []
+            "pages": [
+              {
+                "title": "Maximize a Eficiência: Como o Resumo Automático de Reuniões Melhora o   Alinhamento da Equipe e Economiza Tempo",
+                "path": "maximize-a-eficincia-como-o-resumo-automtico-de-reunies-melhora-o-alinhamento-da-equipe-e-economiza-tempo",
+                "show-sidebar": false
+              }
+            ]
           }
         ]
       }
