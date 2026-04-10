@@ -648,6 +648,18 @@
             ]
           }
         ]
+      },
+      {
+        "language": "PT",
+        "path": "pt",
+        "icon": "globe",
+        "tabs": [
+          {
+            "tab": "Blog",
+            "icon": "stars-icon",
+            "pages": []
+          }
+        ]
       }
     ]
   },
