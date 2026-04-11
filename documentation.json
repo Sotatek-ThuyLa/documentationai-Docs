@@ -662,7 +662,9 @@
             "pages": [
               {
                 "title": "Blog Overview",
-                "path": "blog-overview-portuguese"
+                "path": "blog-overview-portuguese",
+                "show-sidebar": false,
+                "content-width": "wide"
               },
               {
                 "title": "Domine a Produtividade com o NoteX Voz para Texto: Transcrição com IA",
@@ -693,11 +695,11 @@
                 "path": "desbloqueando-a-alta-performance-as-melhores-ferramentas-de-produtividade-com-ia-para-o-trabalho-moderno"
               },
               {
-                "title": "Dominando Ferramentas de Produtividade: Seu Guia para Mais Eficiência com IA' description: 'Explore as melhores ferramentas de produtividade e veja como a IA pode transformar seu fluxo de trabalho, economizar tempo e converter informação em conhecimento utilizável. Experimente o NoteX gratuitamente!",
+                "title": "Dominando Ferramentas de Produtividade: Seu Guia para Mais Eficiência com IA",
                 "path": "dominando-ferramentas-produtividade"
               },
               {
-                "title": "Dominando Reuniões: O Guia Essencial para Ferramentas de Gestão de Reuniões' description",
+                "title": "Dominando Reuniões: O Guia Essencial para Ferramentas de Gestão de Reuniões",
                 "path": "dominando-reunies-o-guia-essencial-para-ferramentas-de-gesto-de-reunies-description"
               },
               {
