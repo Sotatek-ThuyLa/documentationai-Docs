@@ -336,7 +336,8 @@
                   {
                     "title": "Blog Overview",
                     "path": "blog-en",
-                    "show-sidebar": false
+                    "show-sidebar": false,
+                    "content-width": "wide"
                   },
                   {
                     "title": "Unlock Efficiency: How Automatic Meeting Summary Boosts Team Alignment and Saves Time",
