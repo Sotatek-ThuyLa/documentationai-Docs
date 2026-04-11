@@ -334,6 +334,11 @@
                 "tab": "Blog",
                 "pages": [
                   {
+                    "title": "Blog Overview",
+                    "path": "blog-en",
+                    "show-sidebar": false
+                  },
+                  {
                     "title": "Unlock Efficiency: How Automatic Meeting Summary Boosts Team Alignment and Saves Time",
                     "path": "unlock-efficiency-how-automatic-meeting-summary-boosts-team-alignment-and-saves-time"
                   },
@@ -352,11 +357,6 @@
                   {
                     "title": "Unlock Your Potential: Discover the Best Productivity Tools for Modern Work",
                     "path": "unlock-your-potential-discover-the-best-productivity-tools-for-modern-work"
-                  },
-                  {
-                    "title": "Blog Overview",
-                    "path": "blog-en",
-                    "show-sidebar": false
                   },
                   {
                     "title": "NoteX AI Review: Can This AI Meeting Agent Actually Make Meetings Useful?",
