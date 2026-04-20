@@ -711,6 +711,82 @@
             ]
           }
         ]
+      },
+      {
+        "language": "JP",
+        "versions": [
+          {
+            "version": "Web Browser",
+            "icon": "lucide-mouse-pointer",
+            "tabs": [
+              {
+                "icon": "globe",
+                "groups": [
+                  {
+                    "group": "NoteXへようこそ",
+                    "icon": "rocket",
+                    "pages": [
+                      {
+                        "title": "NoteX AI の紹介",
+                        "path": "jp/introduction",
+                        "icon": "home"
+                      },
+                      {
+                        "title": "NoteXへのログイン",
+                        "path": "jp/login",
+                        "icon": "zap"
+                      }
+                    ]
+                  },
+                  {
+                    "group": "ノートを作成",
+                    "icon": "layers",
+                    "pages": [
+                      {
+                        "title": "AI 会議ボット",
+                        "path": "jp/meeting",
+                        "icon": "star"
+                      },
+                      {
+                        "title": "ライブ文字起こしと翻訳",
+                        "path": "jp/live-transcribe",
+                        "icon": "a-large-small"
+                      },
+                      {
+                        "title": "多形式入力ノートを作成する",
+                        "path": "jp/multi-inputs-types-notes",
+                        "icon": "file-down-icon"
+                      },
+                      {
+                        "title": "共有と共同作業",
+                        "path": "jp/share-collaboration",
+                        "icon": "heart-handshake"
+                      }
+                    ]
+                  },
+                  {
+                    "group": "共同作業",
+                    "pages": [
+                      {
+                        "title": "概要",
+                        "path": "jp/overview",
+                        "icon": "album-icon"
+                      },
+                      {
+                        "title": "フォルダ管理",
+                        "path": "jp/folder",
+                        "icon": "folder"
+                      }
+                    ],
+                    "icon": "lucide-heart-handshake"
+                  }
+                ],
+                "tab": "使い方"
+              }
+            ]
+          }
+        ],
+        "icon": "globe"
       }
     ]
   },
