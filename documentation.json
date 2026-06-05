@@ -45,7 +45,7 @@
                       {
                         "title": "Meeting Bot",
                         "path": "meeting",
-                        "icon": "star"
+                        "icon": "bot-icon"
                       },
                       {
                         "title": "Live Transcribe & Translate",
@@ -58,37 +58,42 @@
                         "icon": "file-down-icon"
                       },
                       {
-                        "title": "Cộng tác & Chia sẻ",
-                        "path": "share-collaboration",
-                        "icon": "heart-handshake"
+                        "title": "Quản lý thư mục",
+                        "path": "folder",
+                        "icon": "folder"
                       }
                     ]
                   },
                   {
-                    "group": "Cộng tác nhóm",
+                    "group": "Các Tính Năng",
                     "pages": [
                       {
-                        "title": "Tổng quan",
-                        "path": "overview",
-                        "icon": "album-icon"
+                        "title": "Mindmap (Sơ đồ tư duy)",
+                        "path": "mindmap",
+                        "icon": "lucide-pen"
                       },
                       {
-                        "title": "Quản lý thư mục",
-                        "path": "folder",
-                        "icon": "folder"
+                        "title": "Slideshow (Bài thuyết trình)",
+                        "path": "slideshow",
+                        "icon": "lucide-presentation"
                       },
                       {
-                        "title": "Chia sẻ ghi chú",
-                        "path": "share-note",
-                        "icon": "lucide-share2"
+                        "title": "Podcast / Short",
+                        "path": "podcast-short",
+                        "icon": "file-video"
                       },
                       {
-                        "title": "Quản lý Nhóm",
-                        "path": "team-management",
-                        "icon": "heart-handshake"
+                        "title": "Quizzes (Bộ câu hỏi kiểm tra)",
+                        "path": "quizzes",
+                        "icon": "lucide-puzzle"
+                      },
+                      {
+                        "title": "Flashcards (Thẻ ghi nhớ)",
+                        "path": "flashcards",
+                        "icon": "credit-card-icon"
                       }
                     ],
-                    "icon": "lucide-heart-handshake"
+                    "icon": "app-window"
                   },
                   {
                     "group": "AI Agent",
@@ -102,39 +107,45 @@
                     "icon": "brain-circuit"
                   },
                   {
-                    "group": "Biểu đồ hóa",
+                    "group": "Cộng tác nhóm",
                     "pages": [
                       {
-                        "title": "Mindmap (Sơ đồ tư duy)",
-                        "path": "mindmap",
-                        "icon": "lucide-pen"
+                        "title": "Tổng quan",
+                        "path": "overview",
+                        "icon": "album-icon"
                       },
                       {
-                        "title": "Slideshow (Bài thuyết trình)",
-                        "path": "slideshow",
-                        "icon": "lucide-file-sliders"
+                        "title": "Quản lý nhóm",
+                        "path": "share-collaboration",
+                        "icon": "boxes"
                       },
                       {
-                        "title": "Quizzes (Bộ câu hỏi kiểm tra)",
-                        "path": "quizzes",
-                        "icon": "lucide-puzzle"
-                      },
-                      {
-                        "title": "Podcast / Short",
-                        "path": "podcast-short",
-                        "icon": "lucide-keyboard-music"
-                      },
-                      {
-                        "title": "Flashcards (Thẻ ghi nhớ)",
-                        "path": "flashcards",
-                        "icon": "card-sim-icon"
+                        "title": "Chia sẻ ghi chú",
+                        "path": "share-note",
+                        "icon": "lucide-share2"
                       }
                     ],
-                    "icon": "file-bar-chart-icon"
+                    "icon": "lucide-heart-handshake"
                   },
                   {
-                    "group": "Các tính năng khác",
+                    "group": "Usage Limits",
                     "pages": [
+                      {
+                        "title": "Credits ",
+                        "path": "tn-dng-credits",
+                        "icon": "coins-icon"
+                      }
+                    ],
+                    "icon": "lucide-bitcoin"
+                  },
+                  {
+                    "group": "Khác",
+                    "pages": [
+                      {
+                        "title": "Vocabulary Boosting",
+                        "path": "vocabulary-boosting",
+                        "icon": "activity-square"
+                      },
                       {
                         "title": "Tìm kiếm thông minh",
                         "path": "search",
@@ -148,12 +159,12 @@
                       {
                         "title": "Tải tệp ghi âm",
                         "path": "download-audio",
-                        "icon": "file-audio-icon"
+                        "icon": "file-music-icon"
                       },
                       {
                         "title": "Lưu ghi chú (Export Note)",
                         "path": "export-note",
-                        "icon": "arrow-down-circle-icon"
+                        "icon": "arrow-down-to-line"
                       }
                     ],
                     "icon": "circle-fading-plus-icon"
