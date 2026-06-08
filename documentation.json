@@ -10,10 +10,9 @@
     }
   },
   "navigation": {
-    "languages": [
+    "products": [
       {
         "icon": "globe",
-        "language": "VN",
         "versions": [
           {
             "version": "Web Browser",
@@ -48,7 +47,7 @@
                         "icon": "bot-icon"
                       },
                       {
-                        "title": "Live Transcribe & Translate",
+                        "title": "Phiên âm và dịch trực tiếp",
                         "path": "live-transcribe",
                         "icon": "a-large-small"
                       },
@@ -68,12 +67,12 @@
                     "group": "Các Tính Năng",
                     "pages": [
                       {
-                        "title": "Mindmap (Sơ đồ tư duy)",
+                        "title": "Sơ đồ tư duy (Mindmap)",
                         "path": "mindmap",
                         "icon": "lucide-pen"
                       },
                       {
-                        "title": "Slideshow (Bài thuyết trình)",
+                        "title": "Bài thuyết trình (Slideshow)",
                         "path": "slideshow",
                         "icon": "lucide-presentation"
                       },
@@ -83,12 +82,12 @@
                         "icon": "file-video"
                       },
                       {
-                        "title": "Quizzes (Bộ câu hỏi kiểm tra)",
+                        "title": "Bộ câu hỏi (Quizzes)",
                         "path": "quizzes",
                         "icon": "lucide-puzzle"
                       },
                       {
-                        "title": "Flashcards (Thẻ ghi nhớ)",
+                        "title": "Thẻ ghi nhớ (Flashcards)",
                         "path": "flashcards",
                         "icon": "credit-card-icon"
                       }
@@ -99,7 +98,7 @@
                     "group": "AI Agent",
                     "pages": [
                       {
-                        "title": "Nova Assistant",
+                        "title": "Trợ lý AI (Nova Assistant)",
                         "path": "nova-assistant",
                         "icon": "brain-icon"
                       }
@@ -109,11 +108,6 @@
                   {
                     "group": "Cộng tác nhóm",
                     "pages": [
-                      {
-                        "title": "Tổng quan",
-                        "path": "overview",
-                        "icon": "album-icon"
-                      },
                       {
                         "title": "Quản lý nhóm",
                         "path": "share-collaboration",
@@ -128,7 +122,7 @@
                     "icon": "lucide-heart-handshake"
                   },
                   {
-                    "group": "Usage Limits",
+                    "group": "Giới hạn sử dụng",
                     "pages": [
                       {
                         "title": "Credits ",
@@ -142,7 +136,7 @@
                     "group": "Khác",
                     "pages": [
                       {
-                        "title": "Vocabulary Boosting",
+                        "title": "Tối ưu từ vựng (Vocalbulary Boosting)",
                         "path": "vocabulary-boosting",
                         "icon": "activity-square"
                       },
@@ -150,11 +144,6 @@
                         "title": "Tìm kiếm thông minh",
                         "path": "search",
                         "icon": "search"
-                      },
-                      {
-                        "title": "Yêu cầu AI bổ sung",
-                        "path": "additional-instructions",
-                        "icon": "app-window"
                       },
                       {
                         "title": "Tải tệp ghi âm",
@@ -165,6 +154,11 @@
                         "title": "Lưu ghi chú (Export Note)",
                         "path": "export-note",
                         "icon": "arrow-down-to-line"
+                      },
+                      {
+                        "title": "Yêu cầu AI bổ sung",
+                        "path": "additional-instructions",
+                        "icon": "app-window"
                       }
                     ],
                     "icon": "circle-fading-plus-icon"
@@ -218,10 +212,10 @@
             ],
             "icon": "smartphone"
           }
-        ]
+        ],
+        "product": "VN"
       },
       {
-        "language": "EN",
         "icon": "globe",
         "versions": [
           {
@@ -239,10 +233,10 @@
                       {
                         "title": "Get started",
                         "path": "get-started",
-                        "icon": "star"
+                        "icon": "home"
                       },
                       {
-                        "title": "Login-en",
+                        "title": "Login",
                         "path": "login-en",
                         "icon": "log-in"
                       }
@@ -262,23 +256,48 @@
                         "icon": "lucide-letter-text"
                       },
                       {
-                        "title": "Create Note with multi-inputs",
+                        "title": "Create note with multi-inputs",
                         "path": "create-note-with-multi-inputs",
                         "icon": "file-input"
+                      },
+                      {
+                        "title": "Folder Management",
+                        "path": "folder-subfolder",
+                        "icon": "folder"
                       }
                     ],
                     "icon": "lucide-sticky-note"
                   },
                   {
-                    "group": "Share & Collaboration",
+                    "group": "All Feature",
                     "pages": [
                       {
-                        "title": "Share & Collaboration:",
-                        "path": "share-collaboration-en",
-                        "icon": "handshake-icon"
+                        "title": "Mindmap ",
+                        "path": "Mindmap",
+                        "icon": "edit2"
+                      },
+                      {
+                        "title": "Slideshow ",
+                        "path": "Slideshow",
+                        "icon": "lucide-presentation"
+                      },
+                      {
+                        "title": "Podcast / Short",
+                        "path": "podcast-/-short",
+                        "icon": "lucide-file-video"
+                      },
+                      {
+                        "title": "Quizzes",
+                        "path": "Quizzes",
+                        "icon": "lucide-puzzle"
+                      },
+                      {
+                        "title": "Flashcards",
+                        "path": "Flashcards",
+                        "icon": "lucide-credit-card"
                       }
                     ],
-                    "icon": "lucide-heart-handshake"
+                    "icon": "database"
                   },
                   {
                     "group": "AI Agent",
@@ -292,28 +311,43 @@
                     "icon": "stars-icon"
                   },
                   {
-                    "group": "Data Visualization",
+                    "group": "Collaboration",
                     "pages": [
                       {
-                        "title": "Data Visualization",
-                        "path": "data-visualization",
-                        "icon": "database-icon"
+                        "title": "Team Management",
+                        "path": "share-collaboration-en",
+                        "icon": "boxes"
+                      },
+                      {
+                        "title": "Share Note",
+                        "path": "manage-member",
+                        "icon": "lucide-share2"
                       }
                     ],
-                    "icon": "database"
+                    "icon": "lucide-heart-handshake"
+                  },
+                  {
+                    "group": "Usage Limits",
+                    "pages": [
+                      {
+                        "title": "Credits",
+                        "path": "credits",
+                        "icon": "coins"
+                      }
+                    ]
                   },
                   {
                     "group": "Other features",
                     "pages": [
                       {
-                        "title": "Additional Instructions",
-                        "path": "additional-instructions-en",
-                        "icon": "a-large-small"
+                        "title": "Vocabulary Boosting",
+                        "path": "vocalbulary-boosting",
+                        "icon": "activity-square"
                       },
                       {
-                        "title": "Exporting Notes",
-                        "path": "exporting-notes",
-                        "icon": "file-down"
+                        "title": "Smart search",
+                        "path": "smart-search",
+                        "icon": "search-icon"
                       },
                       {
                         "title": "Downloading Audio",
@@ -321,9 +355,14 @@
                         "icon": "arrow-big-down-dash"
                       },
                       {
-                        "title": "Smart search",
-                        "path": "smart-search",
-                        "icon": "search-icon"
+                        "title": "Exporting Notes",
+                        "path": "exporting-notes",
+                        "icon": "file-down"
+                      },
+                      {
+                        "title": "Additional Instructions",
+                        "path": "additional-instructions-en",
+                        "icon": "a-large-small"
                       }
                     ],
                     "icon": "book-template"
@@ -662,10 +701,10 @@
             ],
             "icon": "hand-icon"
           }
-        ]
+        ],
+        "product": "EN"
       },
       {
-        "language": "PT",
         "icon": "globe",
         "tabs": [
           {
@@ -721,10 +760,10 @@
               }
             ]
           }
-        ]
+        ],
+        "product": "PT"
       },
       {
-        "language": "JP",
         "versions": [
           {
             "version": "Web Browser",
@@ -797,7 +836,8 @@
             ]
           }
         ],
-        "icon": "globe"
+        "icon": "globe",
+        "product": "JP"
       }
     ]
   },
