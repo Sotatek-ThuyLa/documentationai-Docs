@@ -16,210 +16,6 @@
         "versions": [
           {
             "version": "Web Browser",
-            "icon": "lucide-mouse-pointer",
-            "tabs": [
-              {
-                "icon": "globe",
-                "groups": [
-                  {
-                    "group": "Chào mừng tới NoteX",
-                    "icon": "rocket",
-                    "pages": [
-                      {
-                        "title": "Giới thiệu về NoteX",
-                        "path": "introduction",
-                        "icon": "home"
-                      },
-                      {
-                        "title": "Đăng ký & Đăng nhập",
-                        "path": "login",
-                        "icon": "zap"
-                      }
-                    ]
-                  },
-                  {
-                    "group": "Tạo ghi chú (Note)",
-                    "icon": "layers",
-                    "pages": [
-                      {
-                        "title": "Meeting Bot",
-                        "path": "meeting",
-                        "icon": "bot-icon"
-                      },
-                      {
-                        "title": "Phiên âm và dịch trực tiếp",
-                        "path": "live-transcribe",
-                        "icon": "a-large-small"
-                      },
-                      {
-                        "title": "Tạo Ghi Chú Đa Định Dạng",
-                        "path": "multi-inputs-types-notes",
-                        "icon": "file-down-icon"
-                      },
-                      {
-                        "title": "Quản lý thư mục",
-                        "path": "folder",
-                        "icon": "folder"
-                      }
-                    ]
-                  },
-                  {
-                    "group": "Các Tính Năng",
-                    "pages": [
-                      {
-                        "title": "Sơ đồ tư duy (Mindmap)",
-                        "path": "mindmap",
-                        "icon": "lucide-pen"
-                      },
-                      {
-                        "title": "Bài thuyết trình (Slideshow)",
-                        "path": "slideshow",
-                        "icon": "lucide-presentation"
-                      },
-                      {
-                        "title": "Podcast / Short",
-                        "path": "podcast-short",
-                        "icon": "file-video"
-                      },
-                      {
-                        "title": "Bộ câu hỏi (Quizzes)",
-                        "path": "quizzes",
-                        "icon": "lucide-puzzle"
-                      },
-                      {
-                        "title": "Thẻ ghi nhớ (Flashcards)",
-                        "path": "flashcards",
-                        "icon": "credit-card-icon"
-                      }
-                    ],
-                    "icon": "app-window"
-                  },
-                  {
-                    "group": "AI Agent",
-                    "pages": [
-                      {
-                        "title": "Trợ lý AI (Nova Assistant)",
-                        "path": "nova-assistant",
-                        "icon": "brain-icon"
-                      }
-                    ],
-                    "icon": "brain-circuit"
-                  },
-                  {
-                    "group": "Cộng tác nhóm",
-                    "pages": [
-                      {
-                        "title": "Quản lý nhóm",
-                        "path": "share-collaboration",
-                        "icon": "boxes"
-                      },
-                      {
-                        "title": "Chia sẻ ghi chú",
-                        "path": "share-note",
-                        "icon": "lucide-share2"
-                      }
-                    ],
-                    "icon": "lucide-heart-handshake"
-                  },
-                  {
-                    "group": "Giới hạn sử dụng",
-                    "pages": [
-                      {
-                        "title": "Credits ",
-                        "path": "tn-dng-credits",
-                        "icon": "coins-icon"
-                      }
-                    ],
-                    "icon": "lucide-bitcoin"
-                  },
-                  {
-                    "group": "Khác",
-                    "pages": [
-                      {
-                        "title": "Tối ưu từ vựng (Vocalbulary Boosting)",
-                        "path": "vocabulary-boosting",
-                        "icon": "activity-square"
-                      },
-                      {
-                        "title": "Tìm kiếm thông minh",
-                        "path": "search",
-                        "icon": "search"
-                      },
-                      {
-                        "title": "Tải tệp ghi âm",
-                        "path": "download-audio",
-                        "icon": "file-music-icon"
-                      },
-                      {
-                        "title": "Lưu ghi chú (Export Note)",
-                        "path": "export-note",
-                        "icon": "arrow-down-to-line"
-                      },
-                      {
-                        "title": "Yêu cầu AI bổ sung",
-                        "path": "additional-instructions",
-                        "icon": "app-window"
-                      }
-                    ],
-                    "icon": "circle-fading-plus-icon"
-                  }
-                ],
-                "tab": "Hướng dẫn sử dụng"
-              },
-              {
-                "icon": "help-circle",
-                "pages": [
-                  {
-                    "title": "Trợ giúp",
-                    "path": "help-center",
-                    "icon": "home"
-                  }
-                ],
-                "tab": "Trợ giúp"
-              },
-              {
-                "icon": "clock",
-                "pages": [
-                  {
-                    "title": "Release History",
-                    "path": "changelog",
-                    "icon": "history"
-                  }
-                ],
-                "tab": "Cập nhật tính năng"
-              },
-              {
-                "tab": "Blog",
-                "pages": [
-                  {
-                    "title": "Blog",
-                    "path": "blog-vn",
-                    "icon": "blocks"
-                  }
-                ],
-                "icon": "blocks"
-              }
-            ]
-          },
-          {
-            "version": "Mobile App",
-            "pages": [
-              {
-                "title": "Coming soon",
-                "path": "coming-soon",
-                "icon": "lucide-timer"
-              }
-            ],
-            "icon": "smartphone"
-          }
-        ],
-        "product": "VN"
-      },
-      {
-        "icon": "globe",
-        "versions": [
-          {
-            "version": "Web Browser",
             "icon": "lucide-mouse-pointer-click",
             "tabs": [
               {
@@ -706,62 +502,207 @@
       },
       {
         "icon": "globe",
-        "tabs": [
+        "versions": [
           {
-            "tab": "Blog",
-            "icon": "stars-icon",
-            "pages": [
+            "version": "Web Browser",
+            "icon": "lucide-mouse-pointer",
+            "tabs": [
               {
-                "title": "Blog Overview",
-                "path": "blog-overview-portuguese",
-                "show-sidebar": false,
-                "content-width": "wide"
+                "icon": "globe",
+                "groups": [
+                  {
+                    "group": "Chào mừng tới NoteX",
+                    "icon": "rocket",
+                    "pages": [
+                      {
+                        "title": "Giới thiệu về NoteX",
+                        "path": "introduction",
+                        "icon": "home"
+                      },
+                      {
+                        "title": "Đăng ký & Đăng nhập",
+                        "path": "login",
+                        "icon": "zap"
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Tạo ghi chú (Note)",
+                    "icon": "layers",
+                    "pages": [
+                      {
+                        "title": "Meeting Bot",
+                        "path": "meeting",
+                        "icon": "bot-icon"
+                      },
+                      {
+                        "title": "Phiên âm và dịch trực tiếp",
+                        "path": "live-transcribe",
+                        "icon": "a-large-small"
+                      },
+                      {
+                        "title": "Tạo Ghi Chú Đa Định Dạng",
+                        "path": "multi-inputs-types-notes",
+                        "icon": "file-down-icon"
+                      },
+                      {
+                        "title": "Quản lý thư mục",
+                        "path": "folder",
+                        "icon": "folder"
+                      }
+                    ]
+                  },
+                  {
+                    "group": "Các Tính Năng",
+                    "pages": [
+                      {
+                        "title": "Sơ đồ tư duy (Mindmap)",
+                        "path": "mindmap",
+                        "icon": "lucide-pen"
+                      },
+                      {
+                        "title": "Bài thuyết trình (Slideshow)",
+                        "path": "slideshow",
+                        "icon": "lucide-presentation"
+                      },
+                      {
+                        "title": "Podcast / Short",
+                        "path": "podcast-short",
+                        "icon": "file-video"
+                      },
+                      {
+                        "title": "Bộ câu hỏi (Quizzes)",
+                        "path": "quizzes",
+                        "icon": "lucide-puzzle"
+                      },
+                      {
+                        "title": "Thẻ ghi nhớ (Flashcards)",
+                        "path": "flashcards",
+                        "icon": "credit-card-icon"
+                      }
+                    ],
+                    "icon": "app-window"
+                  },
+                  {
+                    "group": "AI Agent",
+                    "pages": [
+                      {
+                        "title": "Trợ lý AI (Nova Assistant)",
+                        "path": "nova-assistant",
+                        "icon": "brain-icon"
+                      }
+                    ],
+                    "icon": "brain-circuit"
+                  },
+                  {
+                    "group": "Cộng tác nhóm",
+                    "pages": [
+                      {
+                        "title": "Quản lý nhóm",
+                        "path": "share-collaboration",
+                        "icon": "boxes"
+                      },
+                      {
+                        "title": "Chia sẻ ghi chú",
+                        "path": "share-note",
+                        "icon": "lucide-share2"
+                      }
+                    ],
+                    "icon": "lucide-heart-handshake"
+                  },
+                  {
+                    "group": "Giới hạn sử dụng",
+                    "pages": [
+                      {
+                        "title": "Credits ",
+                        "path": "tn-dng-credits",
+                        "icon": "coins-icon"
+                      }
+                    ],
+                    "icon": "lucide-bitcoin"
+                  },
+                  {
+                    "group": "Khác",
+                    "pages": [
+                      {
+                        "title": "Tối ưu từ vựng (Vocalbulary Boosting)",
+                        "path": "vocabulary-boosting",
+                        "icon": "activity-square"
+                      },
+                      {
+                        "title": "Tìm kiếm thông minh",
+                        "path": "search",
+                        "icon": "search"
+                      },
+                      {
+                        "title": "Tải tệp ghi âm",
+                        "path": "download-audio",
+                        "icon": "file-music-icon"
+                      },
+                      {
+                        "title": "Lưu ghi chú (Export Note)",
+                        "path": "export-note",
+                        "icon": "arrow-down-to-line"
+                      },
+                      {
+                        "title": "Yêu cầu AI bổ sung",
+                        "path": "additional-instructions",
+                        "icon": "app-window"
+                      }
+                    ],
+                    "icon": "circle-fading-plus-icon"
+                  }
+                ],
+                "tab": "Hướng dẫn sử dụng"
               },
               {
-                "title": "Domine a Produtividade com o NoteX Voz para Texto: Transcrição com IA",
-                "path": "domine-a-produtividade-com-o-notex-voz-para-texto-transcrio-com-ia"
+                "icon": "help-circle",
+                "pages": [
+                  {
+                    "title": "Trợ giúp",
+                    "path": "help-center",
+                    "icon": "home"
+                  }
+                ],
+                "tab": "Trợ giúp"
               },
               {
-                "title": "Transforme Suas Reuniões de Equipe: O Poder do NoteX para Reuniões e Muito Mais",
-                "path": "transforme-suas-reunies-de-equipe-o-poder-do-notex-para-reunies-e-muito-mais"
+                "icon": "clock",
+                "pages": [
+                  {
+                    "title": "Release History",
+                    "path": "changelog",
+                    "icon": "history"
+                  }
+                ],
+                "tab": "Cập nhật tính năng"
               },
               {
-                "title": "Dominando a Recapitulação de Reuniões: Seu Guia para Acompanhamentos Mais Inteligentes",
-                "path": "dominando-a-recapitulao-de-reunies-seu-guia-para-acompanhamentos-mais-inteligentes"
-              },
-              {
-                "title": "Dominando Reuniões: Como o Resumo Automático de Reuniões Promove o Alinhamento da Equipe",
-                "path": "dominando-reunies-como-o-resumo-automtico-de-reunies-promove-o-alinhamento-da-equipe"
-              },
-              {
-                "title": "Dominando as Notas de Reunião do Google Meet com IA: Um Guia para PMEs",
-                "path": "dominando-as-notas-de-reunio-do-google-meet-com-ia-um-guia-para-pmes"
-              },
-              {
-                "title": "Desbloqueie Seu Potencial: Descubra as Melhores Ferramentas de Produtividade para o Trabalho Moderno",
-                "path": "desbloqueie-seu-potencial-descubra-as-melhores-ferramentas-de-produtividade-para-o-trabalho-moderno"
-              },
-              {
-                "title": "Desbloqueando a Alta Performance: As Melhores Ferramentas de Produtividade com IA para o Trabalho Moderno",
-                "path": "desbloqueando-a-alta-performance-as-melhores-ferramentas-de-produtividade-com-ia-para-o-trabalho-moderno"
-              },
-              {
-                "title": "Dominando Ferramentas de Produtividade: Seu Guia para Mais Eficiência com IA",
-                "path": "dominando-ferramentas-produtividade"
-              },
-              {
-                "title": "Dominando Reuniões: O Guia Essencial para Ferramentas de Gestão de Reuniões",
-                "path": "dominando-reunies-o-guia-essencial-para-ferramentas-de-gesto-de-reunies-description"
-              },
-              {
-                "title": "Maximize a Eficiência: Como o Resumo Automático de Reuniões Melhora o   Alinhamento da Equipe e Economiza Tempo",
-                "path": "maximize-a-eficincia-como-o-resumo-automtico-de-reunies-melhora-o-alinhamento-da-equipe-e-economiza-tempo",
-                "show-sidebar": false
+                "tab": "Blog",
+                "pages": [
+                  {
+                    "title": "Blog",
+                    "path": "blog-vn",
+                    "icon": "blocks"
+                  }
+                ],
+                "icon": "blocks"
               }
             ]
+          },
+          {
+            "version": "Mobile App",
+            "pages": [
+              {
+                "title": "Coming soon",
+                "path": "coming-soon",
+                "icon": "lucide-timer"
+              }
+            ],
+            "icon": "smartphone"
           }
         ],
-        "product": "PT"
+        "product": "VN"
       },
       {
         "versions": [
@@ -918,6 +859,65 @@
         ],
         "icon": "globe",
         "product": "JP"
+      },
+      {
+        "icon": "globe",
+        "tabs": [
+          {
+            "tab": "Blog",
+            "icon": "stars-icon",
+            "pages": [
+              {
+                "title": "Blog Overview",
+                "path": "blog-overview-portuguese",
+                "show-sidebar": false,
+                "content-width": "wide"
+              },
+              {
+                "title": "Domine a Produtividade com o NoteX Voz para Texto: Transcrição com IA",
+                "path": "domine-a-produtividade-com-o-notex-voz-para-texto-transcrio-com-ia"
+              },
+              {
+                "title": "Transforme Suas Reuniões de Equipe: O Poder do NoteX para Reuniões e Muito Mais",
+                "path": "transforme-suas-reunies-de-equipe-o-poder-do-notex-para-reunies-e-muito-mais"
+              },
+              {
+                "title": "Dominando a Recapitulação de Reuniões: Seu Guia para Acompanhamentos Mais Inteligentes",
+                "path": "dominando-a-recapitulao-de-reunies-seu-guia-para-acompanhamentos-mais-inteligentes"
+              },
+              {
+                "title": "Dominando Reuniões: Como o Resumo Automático de Reuniões Promove o Alinhamento da Equipe",
+                "path": "dominando-reunies-como-o-resumo-automtico-de-reunies-promove-o-alinhamento-da-equipe"
+              },
+              {
+                "title": "Dominando as Notas de Reunião do Google Meet com IA: Um Guia para PMEs",
+                "path": "dominando-as-notas-de-reunio-do-google-meet-com-ia-um-guia-para-pmes"
+              },
+              {
+                "title": "Desbloqueie Seu Potencial: Descubra as Melhores Ferramentas de Produtividade para o Trabalho Moderno",
+                "path": "desbloqueie-seu-potencial-descubra-as-melhores-ferramentas-de-produtividade-para-o-trabalho-moderno"
+              },
+              {
+                "title": "Desbloqueando a Alta Performance: As Melhores Ferramentas de Produtividade com IA para o Trabalho Moderno",
+                "path": "desbloqueando-a-alta-performance-as-melhores-ferramentas-de-produtividade-com-ia-para-o-trabalho-moderno"
+              },
+              {
+                "title": "Dominando Ferramentas de Produtividade: Seu Guia para Mais Eficiência com IA",
+                "path": "dominando-ferramentas-produtividade"
+              },
+              {
+                "title": "Dominando Reuniões: O Guia Essencial para Ferramentas de Gestão de Reuniões",
+                "path": "dominando-reunies-o-guia-essencial-para-ferramentas-de-gesto-de-reunies-description"
+              },
+              {
+                "title": "Maximize a Eficiência: Como o Resumo Automático de Reuniões Melhora o   Alinhamento da Equipe e Economiza Tempo",
+                "path": "maximize-a-eficincia-como-o-resumo-automtico-de-reunies-melhora-o-alinhamento-da-equipe-e-economiza-tempo",
+                "show-sidebar": false
+              }
+            ]
+          }
+        ],
+        "product": "PT"
       }
     ]
   },
