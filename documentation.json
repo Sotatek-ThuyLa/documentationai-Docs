@@ -528,7 +528,7 @@
                   },
                   {
                     "group": "Tạo ghi chú (Note)",
-                    "icon": "layers",
+                    "icon": "notebook-pen",
                     "pages": [
                       {
                         "title": "Meeting Bot",
@@ -581,7 +581,7 @@
                         "icon": "credit-card-icon"
                       }
                     ],
-                    "icon": "app-window"
+                    "icon": "lucide-stars"
                   },
                   {
                     "group": "AI Agent",
