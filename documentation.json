@@ -130,7 +130,8 @@
                         "path": "credits",
                         "icon": "coins"
                       }
-                    ]
+                    ],
+                    "icon": "bitcoin-icon"
                   },
                   {
                     "group": "Other features",
@@ -161,7 +162,7 @@
                         "icon": "a-large-small"
                       }
                     ],
-                    "icon": "book-template"
+                    "icon": "badge-plus"
                   }
                 ]
               },
