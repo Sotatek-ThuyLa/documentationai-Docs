@@ -104,7 +104,7 @@
                         "icon": "stars"
                       }
                     ],
-                    "icon": "stars-icon"
+                    "icon": "brain-cog-icon"
                   },
                   {
                     "group": "Collaboration",
@@ -784,7 +784,8 @@
                         "path": "flashcardss",
                         "icon": "credit-card"
                       }
-                    ]
+                    ],
+                    "icon": "lucide-sticky-note"
                   },
                   {
                     "group": "AI Agent",
@@ -794,7 +795,8 @@
                         "path": "nova-assistant-tr-l-ai",
                         "icon": "brain-cog-icon"
                       }
-                    ]
+                    ],
+                    "icon": "lucide-stars"
                   },
                   {
                     "group": "チームコラボレーション",
@@ -820,7 +822,8 @@
                         "path": "credits-tn-dng",
                         "icon": "coins"
                       }
-                    ]
+                    ],
+                    "icon": "bitcoin-icon"
                   },
                   {
                     "group": "その他",
@@ -850,7 +853,8 @@
                         "path": "yu-cu-ai-b-sung",
                         "icon": "lucide-menu-square"
                       }
-                    ]
+                    ],
+                    "icon": "alert-circle"
                   }
                 ],
                 "tab": "使い方"
