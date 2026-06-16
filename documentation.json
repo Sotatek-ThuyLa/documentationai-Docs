@@ -688,17 +688,6 @@
                   }
                 ],
                 "tab": "Cập nhật tính năng"
-              },
-              {
-                "tab": "Blog",
-                "pages": [
-                  {
-                    "title": "Blog",
-                    "path": "blog-vn",
-                    "icon": "blocks"
-                  }
-                ],
-                "icon": "blocks"
               }
             ]
           },
