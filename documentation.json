@@ -178,6 +178,17 @@
                 "icon": "heart"
               },
               {
+                "tab": "Release History",
+                "pages": [
+                  {
+                    "title": "Realese History",
+                    "path": "realese-history",
+                    "icon": "history-icon"
+                  }
+                ],
+                "icon": "history-icon"
+              },
+              {
                 "tab": "Blog",
                 "pages": [
                   {
@@ -671,7 +682,7 @@
                 "icon": "clock",
                 "pages": [
                   {
-                    "title": "Release History",
+                    "title": "Lịch sử cập nhật",
                     "path": "changelog",
                     "icon": "history"
                   }
@@ -858,6 +869,17 @@
                   }
                 ],
                 "tab": "使い方"
+              },
+              {
+                "tab": "更新履歴",
+                "pages": [
+                  {
+                    "title": "変更履歴",
+                    "path": "変更履歴",
+                    "icon": "lucide-history"
+                  }
+                ],
+                "icon": "lucide-history"
               }
             ]
           }
