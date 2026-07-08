@@ -543,7 +543,7 @@
                     "icon": "notebook-pen",
                     "pages": [
                       {
-                        "title": "Meeting Bot",
+                        "title": "Live Meeting Bot",
                         "path": "meeting",
                         "icon": "bot-icon"
                       },
@@ -599,7 +599,7 @@
                     "group": "AI Agent",
                     "pages": [
                       {
-                        "title": "Trợ lý AI (Nova Assistant)",
+                        "title": "Trợ lý AI (Nova Agent)",
                         "path": "nova-assistant",
                         "icon": "brain-icon"
                       }
