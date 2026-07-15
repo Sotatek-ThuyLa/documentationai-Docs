@@ -168,7 +168,7 @@
                     "group": "API Keys",
                     "pages": [
                       {
-                        "title": "API Keys",
+                        "title": "Overview",
                         "path": "api-keys",
                         "icon": "key-round"
                       },
