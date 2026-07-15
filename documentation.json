@@ -611,7 +611,6 @@
                   },
                   {
                     "group": "Tạo ghi chú (Note)",
-                    "icon": "notebook-pen",
                     "pages": [
                       {
                         "title": "Live Recording",
@@ -663,8 +662,7 @@
                         "path": "flashcards",
                         "icon": "credit-card-icon"
                       }
-                    ],
-                    "icon": "lucide-stars"
+                    ]
                   },
                   {
                     "group": "AI Agent",
@@ -674,8 +672,7 @@
                         "path": "nova-assistant",
                         "icon": "brain-icon"
                       }
-                    ],
-                    "icon": "brain-circuit"
+                    ]
                   },
                   {
                     "group": "Cộng tác nhóm",
@@ -690,8 +687,7 @@
                         "path": "share-note",
                         "icon": "lucide-share2"
                       }
-                    ],
-                    "icon": "lucide-heart-handshake"
+                    ]
                   },
                   {
                     "group": "Giới hạn sử dụng",
@@ -701,8 +697,7 @@
                         "path": "tn-dng-credits",
                         "icon": "coins-icon"
                       }
-                    ],
-                    "icon": "lucide-bitcoin"
+                    ]
                   },
                   {
                     "group": "Khác",
@@ -732,8 +727,7 @@
                         "path": "additional-instructions",
                         "icon": "app-window"
                       }
-                    ],
-                    "icon": "circle-fading-plus-icon"
+                    ]
                   },
                   {
                     "group": "API Keys",
