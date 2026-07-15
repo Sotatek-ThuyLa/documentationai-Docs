@@ -614,14 +614,14 @@
                     "icon": "notebook-pen",
                     "pages": [
                       {
+                        "title": "Live Recording",
+                        "path": "live-recording",
+                        "icon": "lucide-mic"
+                      },
+                      {
                         "title": "Live Meeting Bot",
                         "path": "meeting",
                         "icon": "bot-icon"
-                      },
-                      {
-                        "title": "Phiên âm và dịch trực tiếp",
-                        "path": "live-transcribe",
-                        "icon": "a-large-small"
                       },
                       {
                         "title": "Tạo Ghi Chú Đa Định Dạng",
