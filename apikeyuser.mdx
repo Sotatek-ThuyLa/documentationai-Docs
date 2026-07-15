@@ -1,0 +1,62 @@
+---
+title: ユーザー
+description: |-
+  プロフィール情報とノート一覧を取得します。どちらのエンドポイントも API Key
+  （X-API-Key または Authorization: Bearer ntx_...）または User JWT に対応しています。
+
+  Base URL: https://api.notexapp.com
+---
+## プロフィールを取得 — `GET /v1/user/profile`
+
+認証済みユーザーのプロフィール情報を返します。
+
+```bash
+curl https://api.notexapp.com/v1/user/profile \
+  -H "X-API-Key: ntx_live_..."
+```
+
+パラメータはありません。
+
+レスポンス例:
+
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "user_id": "665f...",
+    "email": "user@example.com",
+    "name": "Jane Doe",
+    "image": "https://cdn.notexapp.com/avatars/...",
+    "role": "normal_user",
+    "preferences": {
+      "display_language": "en",
+      "transcription_language": "en",
+      "ai_notes_language": "en"
+    },
+    "createdAt": "2026-01-01T00:00:00Z"
+  }
+}
+```
+
+---
+
+## 自分のノート一覧 — `GET /v2/user/notes`
+
+認証済みユーザーのノート一覧をページネーション形式で返します。
+パラメータの詳細は [Notes](./notes.mdx#list-my-notes--get-v2usernotes) を参照してください。
+
+| Parameter    | In    | Type    | Required | Description              |
+| ------------ | ----- | ------- | -------- | ------------------------ |
+| `type`       | query | string  | optional | ノートの種類でフィルタ              |
+| `tab`        | query | string  | optional | タブでフィルタ                  |
+| `limit`      | query | integer | optional | 1ページあたりの件数               |
+| `cursor`     | query | string  | optional | カーソルベースのページネーション用カーソル    |
+| `page`       | query | integer | optional | ページ番号                    |
+| `sort_field` | query | string  | optional | ソート対象の項目（例: `createdAt`） |
+| `sort_order` | query | integer | optional | `1` 昇順、`-1` 降順           |
+
+```bash
+curl "https://api.notexapp.com/v2/user/notes?limit=20&sort_field=createdAt&sort_order=-1" \
+  -H "X-API-Key: ntx_live_..."
+```
+

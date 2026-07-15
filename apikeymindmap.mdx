@@ -1,0 +1,62 @@
+---
+title: マインドマップ
+description: |-
+  既存のノートからマインドマップを生成します。以下のすべてのエンドポイントは API Key
+  （X-API-Key または Authorization: Bearer ntx_...）に対応しています。
+
+  Base URL: https://api.notexapp.com
+---
+## マインドマップを生成 — `POST /v2/create/mindmap`
+
+ノートからマインドマップを生成します。`task_id` が返されますので、
+結果は [Tasks](./tasks.mdx) をポーリングして取得してください。
+
+以下の認証にも対応しています: User JWT、Service Key。
+
+Content-Type: `application/x-www-form-urlencoded`
+
+| Field       | Type    | Required     | Description         |
+| ----------- | ------- | ------------ | ------------------- |
+| `note_id`   | string  | **required** | マインドマップを生成するノートの ID |
+| `community` | boolean | optional     | コミュニティノートから生成       |
+
+```bash
+curl -X POST https://api.notexapp.com/v2/create/mindmap \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..."
+```
+
+Response (`200`) — `task_id` を返します。
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "b3f1a2c4-...",
+    "user_id": "665f..."
+  }
+}
+```
+
+タスクの結果を取得して、生成されたマインドマップを取得します。
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "note_id": "665f...",
+    "mindmap": {
+      "title": "Machine Learning",
+      "children": [
+        {
+          "title": "Supervised Learning",
+          "children": [...]
+        },
+        ...
+      ]
+    }
+  }
+}
+```
+

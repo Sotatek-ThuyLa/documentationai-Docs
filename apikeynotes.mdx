@@ -1,0 +1,160 @@
+---
+title: ノート
+description: |-
+  AI ノートを生成し、自分のノート一覧を取得します。以下のすべてのエンドポイントは API Key
+  （X-API-Key または Authorization: Bearer ntx_...）に対応しています。
+
+  Base URL: https://api.notexapp.com
+---
+## ノートを生成 — `POST /v9/create/note`
+
+Web URL またはアップロード済みファイルからノート・要約を生成します。
+
+以下の認証にも対応しています: User JWT、Device Token。
+
+Content-Type: `application/json`
+
+| Field               | Type      | Required | Description                                          |
+| ------------------- | --------- | -------- | ---------------------------------------------------- |
+| `web_url`           | string    | optional | Web サイトまたは YouTube の URL                             |
+| `file_url`          | string    | optional | アップロード済みファイルの URL（[ファイルをアップロード](#upload-a-file) を参照） |
+| `language_hints`    | string\[] | optional | 出力言語（例: `["en"]`）                                    |
+| `use_ocr`           | boolean   | optional | ドキュメント・画像に OCR を実行                                   |
+| `summary_style`     | string    | optional | 要約スタイル                                               |
+| `writing_style`     | string    | optional | 文体                                                   |
+| `human_style`       | string    | optional | より自然な文章スタイル                                          |
+| `is_record`         | boolean   | optional | ソースが録音かどうか                                           |
+| `bot_id`            | string    | optional | 会議ボット ID                                             |
+| `record_session_id` | string    | optional | 録音セッション ID                                           |
+| `device_meeting_id` | string    | optional | デバイス会議 ID                                            |
+| `target_language`   | string    | optional | 非推奨 — `language_hints` を使用してください                     |
+
+`web_url` または `file_url` のどちらか一方のみ指定してください。
+
+```bash
+# YouTube URL から
+curl -X POST https://api.notexapp.com/v9/create/note \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{ "web_url": "https://youtu.be/xxxx", "language_hints": ["en"] }'
+
+# アップロード済みファイルから
+curl -X POST https://api.notexapp.com/v9/create/note \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{ "file_url": "https://cdn.notexapp.com/uploads/lecture.mp3", "language_hints": ["en"] }'
+```
+
+`task_id` が返されます。[Tasks](./tasks.mdx) をポーリングして完成したノートを取得してください。
+
+---
+
+## 入力を検証 — `POST /v9/create/validate`
+
+ノート生成前にソースを検証します。URL またはファイルがサポートされているかを事前に確認でき、クレジット消費を防げます。
+
+以下の認証にも対応しています: User JWT。
+
+Content-Type: `application/json`
+
+| Field      | Type   | Required | Description          |
+| ---------- | ------ | -------- | -------------------- |
+| `web_url`  | string | optional | 検証する Web URL         |
+| `file_url` | string | optional | 検証するアップロード済みファイル URL |
+
+```bash
+curl -X POST https://api.notexapp.com/v9/create/validate \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{ "web_url": "https://youtu.be/xxxx" }'
+```
+
+---
+
+## 自分のノート一覧 — `GET /v2/user/notes`
+
+認証済みユーザーのノート一覧をページネーション形式で返します。
+
+以下の認証にも対応しています: User JWT。
+
+| Parameter    | In    | Type    | Required | Description                |
+| ------------ | ----- | ------- | -------- | -------------------------- |
+| `type`       | query | string  | optional | ノートタイプでフィルタ                |
+| `tab`        | query | string  | optional | タブでフィルタ                    |
+| `limit`      | query | integer | optional | 1ページあたりの件数                 |
+| `cursor`     | query | string  | optional | カーソルベースページネーション            |
+| `page`       | query | integer | optional | ページ番号                      |
+| `sort_field` | query | string  | optional | ソート対象フィールド（例: `createdAt`） |
+| `sort_order` | query | integer | optional | ソート順 (`1` 昇順、`-1` 降順)      |
+
+```bash
+curl "https://api.notexapp.com/v2/user/notes?limit=20&sort_field=createdAt&sort_order=-1" \
+  -H "X-API-Key: ntx_live_..."
+```
+
+---
+
+## ファイルをアップロード
+
+ローカルファイルからノートを生成する前に、ファイルをアップロードして `file_url` を取得する必要があります。
+
+### Presigned URL を取得 — `GET /v1/presigned-url`
+
+以下の認証にも対応しています: User JWT、Device/Service Credentials。
+
+| Parameter   | In    | Type    | Required     | Description   |
+| ----------- | ----- | ------- | ------------ | ------------- |
+| `file_name` | query | string  | **required** | アップロードするファイル名 |
+| `is_public` | query | boolean | optional     | 公開アクセスを許可するか  |
+
+```bash
+curl "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
+  -H "X-API-Key: ntx_live_..."
+```
+
+Response:
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "presigned_url": "https://...",
+    "file_name": "lecture.mp3",
+    "full_path": "audio/<user_id>/lecture.mp3"
+  }
+}
+```
+
+### アップロード手順
+
+```bash
+# Step 1 — アップロード URL を取得
+RESPONSE=$(curl -s "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
+  -H "X-API-Key: ntx_live_...")
+
+PRESIGNED_URL=$(echo $RESPONSE | jq -r '.data.presigned_url')
+FULL_PATH=$(echo $RESPONSE | jq -r '.data.full_path')
+
+# Step 2 — ファイルを直接アップロード（認証ヘッダー不要）
+curl -X PUT "$PRESIGNED_URL" \
+  -H "Content-Type: audio/mpeg" \
+  --data-binary @lecture.mp3
+
+# Step 3 — ノートを生成
+curl -X POST https://api.notexapp.com/v9/create/note \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/json" \
+  -d "{\"file_url\": \"$FULL_PATH\", \"language_hints\": [\"en\"]}"
+```
+
+対応ファイル形式: 音声（`.mp3`、`.wav`、`.m4a` など）、ドキュメント（`.pdf`、`.docx`、`.txt` など）、画像（`.jpg`、`.png`、`.pdf` など）。
+
+---
+
+## 一般的な流れ
+
+1. （ファイルの場合のみ）上記手順でファイルをアップロードし、`file_url` を取得します。
+2. `POST /v9/create/note` → `task_id` を取得します。
+3. [Tasks](./tasks.mdx) をポーリングし、`status` が `SUCCESS` になるまで待ちます。
+4. 返された `note_id` を flashcards、quiz、mindmap など他の機能で利用します。
+

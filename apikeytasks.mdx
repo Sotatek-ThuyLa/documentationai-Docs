@@ -1,0 +1,68 @@
+---
+title: タスク
+description: |-
+  非同期処理の結果を取得します。すべての作成系エンドポイント （notes、flashcards、
+  quiz、mindmap、slide、podcast、shorts、translate）は非同期で動作し、 `task_id` を返します。
+  このエンドポイントを使用して処理結果を確認します。
+
+  API Key（X-API-Key または Authorization: Bearer ntx_...）、User JWT、 または
+  Service Key に対応しています。
+
+  Base URL: https://api.notexapp.com
+---
+## タスク結果を取得 — `GET /v1/create/tasks/{task_id}/result`
+
+| Parameter | In   | Required     | Description            |
+| --------- | ---- | ------------ | ---------------------- |
+| `task_id` | path | **required** | 作成系エンドポイントから返されるタスク ID |
+
+```bash
+curl https://api.notexapp.com/v1/create/tasks/<task_id>/result \
+  -H "X-API-Key: ntx_live_..."
+```
+
+### Responses
+
+処理中:
+
+```json
+{ "status": "PROCESSING" }
+```
+
+正常に完了:
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "note_id": "665f...",
+    "title": "Introduction to Machine Learning",
+    "summary": "..."
+  }
+}
+```
+
+失敗:
+
+```json
+{
+  "status": "FAILURE",
+  "error": "Unsupported file format"
+}
+```
+
+### ポーリングのガイド
+
+- 推奨間隔: **3～5秒** ごと。
+- ほとんどの処理は、元データの長さに応じて **30～120秒** で完了します。
+- `status` が `SUCCESS` または `FAILURE` になったらポーリングを停止してください。
+
+### ステータス一覧
+
+| Status       | Meaning                   |
+| ------------ | ------------------------- |
+| `PENDING`    | タスクはキューに登録済みで、まだ開始されていません |
+| `PROCESSING` | タスクを実行中                   |
+| `SUCCESS`    | タスク完了 — 結果は `data` にあります  |
+| `FAILURE`    | タスク失敗 — 理由は `error` にあります |
+

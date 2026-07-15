@@ -1,0 +1,169 @@
+---
+title: API キー
+description: ユーザーが作成した API Key を使用して AI NoteX API にプログラムからアクセスします。
+---
+## 概要
+
+API Key を使用すると、ログイン/JWT フローを経由せずに、自分のアカウントとして
+API を呼び出すことができます。スクリプト、システム連携、サーバー間通信による自動化に最適です。
+
+- API Key はアカウントから作成・管理できます（[API Key の管理](#managing-keys) を参照）。
+- API Key は**所有者本人**として動作し、そのユーザーが持つ権限とまったく同じ権限を持ちます。
+- API Key の完全な値は作成時に**一度だけ**表示されます。安全に保管してください。一度失うと再表示できません。
+- API Key は**有効期限**を設定できます。デフォルトでは無期限です。
+
+Base URL: `https://api.notexapp.com`
+
+> このドキュメントでは、API Key に対応した各エンドポイントの**最新バージョンのみ**を掲載しています。
+> 同じエンドポイントの旧バージョン（例: `/v1/create/note`）は引き続き利用できますが、
+> このドキュメントには記載されていません。
+
+## API Key による認証
+
+すべてのリクエストで、以下**いずれか**のヘッダーを使用して API Key を送信してください。
+
+```typescript
+X-API-Key: ntx_live_xxxxxxxxxxxxxxxxxxxx
+```
+
+または
+
+```typescript
+Authorization: Bearer ntx_live_xxxxxxxxxxxxxxxxxxxx
+```
+
+API Key は必ず `ntx_` プレフィックス（例: `ntx_live_...`, `ntx_stg_...`,
+`ntx_test_...`。環境によって異なります）で始まります。このプレフィックスによって、
+サーバーは API Key と通常のユーザー JWT を区別します。
+
+API Key に対応しているエンドポイントは、以下の機能ごとに分類されています。
+
+- [Notes](./notes.mdx) — URL/ファイルからノートを作成、ファイルのアップロード、ノート一覧の取得
+- [Tasks](./tasks.mdx) — 非同期処理の結果を取得
+- [Flashcards](./flashcards.mdx) — ノートからフラッシュカードを生成
+- [Quiz](./quiz.mdx) — ノートからクイズを生成
+- [Mindmap](./mindmap.mdx) — ノートからマインドマップを生成
+- [Slide](./slide.mdx) — ノートからスライドデッキを生成
+- [Podcast](./podcast.mdx) — ノートからポッドキャスト音声を生成
+- [Shorts & Quiz Video](./shorts.mdx) — ノートからショート動画またはクイズ動画を生成
+- [Translate](./translate.mdx) — ノートを別の言語へ翻訳
+- [Credits](./credits.mdx) — クレジット残高と利用枠を取得
+- [User](./user.mdx) — プロフィールとノート一覧を取得
+
+これらのエンドポイントの一部は、ユーザー JWT または（一部のみ）デバイス/サービス認証にも対応しています。
+このドキュメントに記載されているエンドポイントでは、API Key を有効な認証方法として利用できます。
+
+## Scopes
+
+各 API Key には `scopes` の一覧があります。
+
+- **空のリスト \*\*\*\*****`[]`**（または `scopes` を省略した場合）は**フルアクセス**を意味し、
+  API Key は所有者が実行できるすべての操作を実行できます。
+- 空でないリストは、特定の Scope にアクセスを**制限**するためのものです
+  （例: `note:read`, `note:write`, `credit:read`, `folder:read`, `folder:write`）。
+
+> **現在の状況:** Scope の _強制適用はまだ実装されていません_。
+> Scope は参照用として保存・返却されますが、現在は `scopes` の値に関係なく、
+> すべての API Key がフルアクセスとして動作します。アクセス制御にはまだ利用しないでください。
+
+## API Key の管理
+
+API Key 管理エンドポイントには **ユーザー JWT** (`Authorization: Bearer <jwt>`) が必要です。
+**API Key から API Key を管理することはできません**。API Key を使って作成・一覧取得・削除はできません。
+
+### API Key を作成 — `POST /v1/api-keys`
+
+Request body:
+
+| Field        | Type           | Required | Description          |
+| ------------ | -------------- | -------- | -------------------- |
+| `name`       | string         | optional | 人が識別しやすい名前（最大100文字）  |
+| `scopes`     | string\[]      | optional | 権限スコープ。`[]` = フルアクセス |
+| `expires_at` | datetime (UTC) | optional | 有効期限。省略すると無期限        |
+
+```bash
+curl -X POST https://api.notexapp.com/v1/api-keys \
+  -H "Authorization: Bearer <your-jwt>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My API key",
+    "scopes": [],
+    "expires_at": null
+  }'
+```
+
+Response (`201`) — 完全な API Key が返される**唯一のタイミング**です。
+
+```json
+{
+  "statusCode": 201,
+  "message": "API key created. Store it now — it will not be shown again.",
+  "data": {
+    "id": "665f...",
+    "name": "My API key",
+    "key_prefix": "ntx_live_9f8a",
+    "scopes": [],
+    "last_used_at": null,
+    "expires_at": null,
+    "created_at": "2026-07-14T12:00:00Z",
+    "api_key": "ntx_live_9f8a1c...full-secret..."
+  }
+}
+```
+
+### API Key 一覧 — `GET /v1/api-keys`
+
+メタデータのみを返します（シークレットは返されません）。
+
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "items": [
+      {
+        "id": "665f...",
+        "name": "My API key",
+        "key_prefix": "ntx_live_9f8a",
+        "scopes": [],
+        "last_used_at": "2026-07-14T12:30:00Z",
+        "expires_at": null,
+        "created_at": "2026-07-14T12:00:00Z"
+      }
+    ],
+    "total": 1
+  }
+}
+```
+
+### API Key を削除 — `DELETE /v1/api-keys/{api_key_id}`
+
+API Key を完全に削除します（ハードデリート）。削除後、API Key はすぐに無効になります
+（キャッシュの影響で最大60秒程度かかる場合があります）。
+
+```json
+{
+  "statusCode": 200,
+  "message": "API key deleted",
+  "data": { "id": "665f...", "deleted": true }
+}
+```
+
+## エラー
+
+| Status | `error_key`          | Meaning                           |
+| ------ | -------------------- | --------------------------------- |
+| 401    | `invalid_api_key`    | API Key が存在しない、削除された、または有効期限切れ    |
+| 401    | `not_authenticated`  | 認証情報が提供されていません                    |
+| 403    | `permission_denied`  | 認証済みですがアクセス権限がありません（例：無料プランの制限）   |
+| 400    | `invalid_expiration` | `expires_at` が過去日時です（API Key 作成時） |
+
+Example:
+
+```json
+{
+  "statusCode": 401,
+  "message": "Invalid API key",
+  "error_key": "invalid_api_key"
+}
+```
+

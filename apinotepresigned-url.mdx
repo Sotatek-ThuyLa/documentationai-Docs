@@ -1,0 +1,63 @@
+---
+title: 署名付きURL
+description: |-
+  ノートを作成する前にファイル（音声やドキュメントなど）をアップロードするための Presigned URL を取得します。
+
+  API Key（X-API-Key または Authorization: Bearer ntx_...）、User JWT、
+  Device/Service Credentials に対応しています。
+
+  Base URL: https://api.notexapp.com
+---
+## Presigned URL を取得 — `GET /v1/presigned-url`
+
+| Parameter   | In    | Type    | Required     | Description                                |
+| ----------- | ----- | ------- | ------------ | ------------------------------------------ |
+| `file_name` | query | string  | **required** | アップロードするファイル名                              |
+| `is_public` | query | boolean | optional     | ファイルを公開アクセス可能にするか                          |
+| `user_id`   | query | string  | optional     | 対象ユーザー ID（Device/Service Credentials のみ使用） |
+
+```bash
+curl "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
+  -H "X-API-Key: ntx_live_..."
+```
+
+Response:
+
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "upload_url": "https://...",
+    "file_url": "https://cdn.notexapp.com/uploads/lecture.mp3"
+  }
+}
+```
+
+---
+
+## アップロード手順
+
+1. `GET /v1/presigned-url?file_name=lecture.mp3` → `upload_url` と `file_url` を取得します。
+2. `PUT <upload_url>` にファイル本体を送信します（認証ヘッダーは不要です）。
+3. [`POST /v9/create/note`](./notes.mdx#create-note--post-v9createnote) の `file_url` フィールドに取得した `file_url` を指定します。
+
+```bash
+# Step 1 — アップロード URL を取得
+RESPONSE=$(curl -s "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
+  -H "X-API-Key: ntx_live_...")
+
+UPLOAD_URL=$(echo $RESPONSE | jq -r '.data.upload_url')
+FILE_URL=$(echo $RESPONSE | jq -r '.data.file_url')
+
+# Step 2 — ファイルをアップロード
+curl -X PUT "$UPLOAD_URL" \
+  -H "Content-Type: audio/mpeg" \
+  --data-binary @lecture.mp3
+
+# Step 3 — ノートを作成
+curl -X POST https://api.notexapp.com/v9/create/note \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/json" \
+  -d "{\"file_url\": \"$FILE_URL\", \"language_hints\": [\"en\"]}"
+```
+

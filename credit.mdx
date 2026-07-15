@@ -1,0 +1,31 @@
+---
+title: クレジット
+description: |-
+  クレジット残高と利用枠を取得します。どちらのエンドポイントも API Key
+  （X-API-Key または Authorization: Bearer ntx_...）または User JWT に対応しています。
+
+  Base URL: https://api.notexapp.com
+---
+## クレジット情報 — `GET /v2/credits/me`
+
+認証済みユーザーのクレジット情報（残高、プラン/ユーザー種別など）を返します。
+
+```bash
+curl https://api.notexapp.com/v2/credits/me \
+  -H "X-API-Key: ntx_live_..."
+```
+
+パラメータはありません。
+
+---
+
+## 利用枠 — `GET /v2/credits/quota`
+
+認証済みユーザーの現在の利用枠使用状況を返します。
+
+```bash
+curl https://api.notexapp.com/v2/credits/quota \
+  -H "X-API-Key: ntx_live_..."
+```
+
+パラメータはありません。

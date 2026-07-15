@@ -1,0 +1,96 @@
+---
+title: ショート動画・クイズ動画
+description: |-
+  既存のノートからショート動画またはクイズ動画を生成します。以下のすべての エンドポイントは API Key に対応しています。
+  （X-API-Key または Authorization: Bearer ntx_...）
+
+  Base URL: https://api.notexapp.com
+---
+## Shorts を生成 — `POST /v2/create/shorts`
+
+ノートからショート動画を生成します。`task_id` が返されるため、
+結果は [Tasks](./tasks.mdx) をポーリングして取得してください。
+
+以下の認証にも対応しています: User JWT、Service Key。
+
+Content-Type: `application/x-www-form-urlencoded`
+
+| Field           | Type    | Required     | Description   |
+| --------------- | ------- | ------------ | ------------- |
+| `note_id`       | string  | **required** | 生成元となるノートの ID |
+| `voice_id`      | string  | **required** | ナレーション音声 ID   |
+| `clip_duration` | integer | optional     | 希望する動画の長さ（秒）  |
+| `is_audio_only` | boolean | optional     | 音声のみを生成（動画なし） |
+| `bg_id`         | string  | optional     | 背景動画/画像 ID    |
+
+```bash
+curl -X POST https://api.notexapp.com/v2/create/shorts \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..." \
+  --data-urlencode "voice_id=en-US-Standard-A" \
+  --data-urlencode "clip_duration=60"
+```
+
+Response (`200`) — `task_id` を返します。
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "b3f1a2c4-...",
+    "user_id": "665f..."
+  }
+}
+```
+
+---
+
+## Quiz Video を生成 — `POST /v2/create/quiz-video`
+
+ノートからクイズ形式の動画を生成します。`task_id` が返されるため、
+結果は [Tasks](./tasks.mdx) をポーリングして取得してください。
+
+以下の認証にも対応しています: User JWT、Service Key。
+
+Content-Type: `application/x-www-form-urlencoded`
+
+| Field         | Type   | Required     | Description   |
+| ------------- | ------ | ------------ | ------------- |
+| `note_id`     | string | **required** | 生成元となるノートの ID |
+| `voice_id`    | string | **required** | ナレーション音声 ID   |
+| `bg_id`       | string | optional     | 背景動画/画像 ID    |
+| `template_id` | string | optional     | 動画テンプレート ID   |
+
+```bash
+curl -X POST https://api.notexapp.com/v2/create/quiz-video \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..." \
+  --data-urlencode "voice_id=en-US-Standard-A"
+```
+
+Response (`200`) — `task_id` を返します。
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "b3f1a2c4-...",
+    "user_id": "665f..."
+  }
+}
+```
+
+タスクの結果をポーリングして、生成された動画の URL を取得します。
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "note_id": "665f...",
+    "video_url": "https://cdn.notexapp.com/videos/..."
+  }
+}
+```
+

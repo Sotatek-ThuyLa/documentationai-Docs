@@ -1,0 +1,57 @@
+---
+title: 翻訳
+description: |-
+  ノートを別の言語へ翻訳します。以下のすべてのエンドポイントは API Key
+  （X-API-Key または Authorization: Bearer ntx_...）に対応しています。
+
+  Base URL: https://api.notexapp.com
+---
+## ノートを翻訳 — `POST /v2/create/translate`
+
+既存のノートの内容を指定した言語へ翻訳します。`task_id` が返されるため、
+結果は [Tasks](./tasks.mdx) をポーリングして取得してください。
+
+以下の認証にも対応しています: User JWT。
+
+Content-Type: `application/x-www-form-urlencoded`
+
+| Field          | Type    | Required     | Description                        |
+| -------------- | ------- | ------------ | ---------------------------------- |
+| `note_id`      | string  | **required** | 翻訳するノートの ID                        |
+| `language`     | string  | **required** | 翻訳先の言語コード（例: `"vi"`、`"ja"`、`"fr"`） |
+| `only_summary` | boolean | optional     | 要約部分のみを翻訳                          |
+| `community`    | boolean | optional     | コミュニティノートを翻訳                       |
+
+```bash
+curl -X POST https://api.notexapp.com/v2/create/translate \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..." \
+  --data-urlencode "language=vi"
+```
+
+Response (`200`) — `task_id` を返します。
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "b3f1a2c4-...",
+    "user_id": "665f..."
+  }
+}
+```
+
+タスクの結果をポーリングして、翻訳されたノートを取得します。
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "note_id": "665f...",
+    "title": "Giới thiệu về Machine Learning",
+    "summary": "..."
+  }
+}
+```
+

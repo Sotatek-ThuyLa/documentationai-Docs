@@ -996,6 +996,76 @@
                       }
                     ],
                     "icon": "alert-circle"
+                  },
+                  {
+                    "group": "API キー",
+                    "pages": [
+                      {
+                        "title": "概要",
+                        "path": "概要",
+                        "icon": "key-round"
+                      },
+                      {
+                        "title": "クレジット",
+                        "path": "credit",
+                        "icon": "lucide-hand-coins"
+                      },
+                      {
+                        "title": "マインドマップ",
+                        "path": "apikeymindmap",
+                        "icon": "activity"
+                      },
+                      {
+                        "title": "スライド",
+                        "path": "apikeyslideshow",
+                        "icon": "airplay"
+                      },
+                      {
+                        "title": "ポッドキャスト",
+                        "path": "apikeypodcast",
+                        "icon": "lucide-mic2"
+                      },
+                      {
+                        "title": "ショート動画",
+                        "path": "apikeyshorts",
+                        "icon": "file-video-icon"
+                      },
+                      {
+                        "title": "クイズ",
+                        "path": "apikeyquiz",
+                        "icon": "lucide-message-circle-question"
+                      },
+                      {
+                        "title": "フラッシュカード",
+                        "path": "apikeyflashcards",
+                        "icon": "credit-card"
+                      },
+                      {
+                        "title": "翻訳",
+                        "path": "apikeytranslate",
+                        "icon": "lucide-notebook-pen"
+                      },
+                      {
+                        "title": "タスク",
+                        "path": "apikeytasks",
+                        "icon": "check-square-icon"
+                      },
+                      {
+                        "title": "ユーザー",
+                        "path": "apikeyuser",
+                        "icon": "lucide-hand-heart"
+                      },
+                      {
+                        "title": "ノート",
+                        "path": "apikeynotes",
+                        "icon": "lucide-sticky-note"
+                      },
+                      {
+                        "title": "署名付きURL",
+                        "path": "apinotepresigned-url",
+                        "icon": "curly-braces"
+                      }
+                    ]
                   }
                 ],
                 "tab": "使い方"
