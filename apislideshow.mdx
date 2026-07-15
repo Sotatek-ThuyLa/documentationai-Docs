@@ -1,0 +1,62 @@
+---
+title: Slide
+description: >-
+  Generate a slide deck from an existing note. All endpoints below accept an API
+  key
+
+  (X-API-Key or Authorization: Bearer ntx_...).
+
+
+  Base URL: https://api.notexapp.com
+---
+## Generate slide — `POST /v2/create/slide`
+
+Create a slide presentation from a note. Returns a `task_id` — poll
+[Tasks](./tasks.mdx) for the result.
+
+Also accepts: user JWT, service key.
+
+Content-Type: `application/x-www-form-urlencoded`
+
+| Field               | Type    | Required     | Description                                    |
+| ------------------- | ------- | ------------ | ---------------------------------------------- |
+| `note_id`           | string  | **required** | ID of the note to generate a slide from        |
+| `template_id`       | string  | **required** | Slide template id                              |
+| `language`          | string  | optional     | Output language for the slide content          |
+| `slide_count_range` | string  | optional     | Desired number-of-slides range (e.g. `"5-10"`) |
+| `community`         | boolean | optional     | Generate from a community note                 |
+
+```bash
+curl -X POST https://api.notexapp.com/v2/create/slide \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..." \
+  --data-urlencode "template_id=default" \
+  --data-urlencode "language=en"
+```
+
+Response (`200`) — returns a `task_id`:
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "b3f1a2c4-...",
+    "user_id": "665f..."
+  }
+}
+```
+
+Poll the task result to get the slide URLs:
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "note_id": "665f...",
+    "slide_url": "https://cdn.notexapp.com/slides/...",
+    "slide_pdf_url": "https://cdn.notexapp.com/slides/....pdf"
+  }
+}
+```
+

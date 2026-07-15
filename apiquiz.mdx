@@ -1,0 +1,70 @@
+---
+title: Quiz
+description: >-
+  Generate quiz sets from an existing note. All endpoints below accept an API
+  key
+
+  (X-API-Key or Authorization: Bearer ntx_...).
+
+
+  Base URL: https://api.notexapp.com
+---
+## Generate quiz — `POST /v6/create/quiz`
+
+Create a quiz set from a note. Returns a `task_id` — poll
+[Tasks](./tasks.mdx) for the result.
+
+Also accepts: user JWT, service key.
+
+Content-Type: `application/x-www-form-urlencoded`
+
+| Field           | Type    | Required     | Description                                 |
+| --------------- | ------- | ------------ | ------------------------------------------- |
+| `note_id`       | string  | **required** | ID of the note to generate a quiz from      |
+| `num_questions` | string  | optional     | Number of questions to generate             |
+| `set_name`      | string  | optional     | Name for the quiz set                       |
+| `difficulty`    | string  | optional     | Difficulty level (`easy`, `medium`, `hard`) |
+| `custom_prompt` | string  | optional     | Custom instruction for the AI               |
+| `community`     | boolean | optional     | Generate from a community note              |
+
+```bash
+curl -X POST https://api.notexapp.com/v6/create/quiz \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..." \
+  --data-urlencode "num_questions=10" \
+  --data-urlencode "difficulty=medium"
+```
+
+Response (`200`) — returns a `task_id`:
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "b3f1a2c4-...",
+    "user_id": "665f..."
+  }
+}
+```
+
+Poll the task result to get the generated quiz:
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "quiz_set_id": "665f...",
+    "set_name": "Machine Learning Quiz",
+    "questions": [
+      {
+        "question": "Which algorithm is used for classification?",
+        "options": ["Linear Regression", "Decision Tree", "K-Means", "PCA"],
+        "answer": "Decision Tree"
+      },
+      ...
+    ]
+  }
+}
+```
+

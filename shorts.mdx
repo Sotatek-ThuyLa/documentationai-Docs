@@ -1,0 +1,99 @@
+---
+title: Shorts & Quiz Video
+description: >-
+  Generate short video clips or quiz video content from an existing note. All
+  endpoints
+
+  below accept an API key (X-API-Key or Authorization: Bearer ntx_...).
+
+
+  Base URL: https://api.notexapp.com
+---
+## Generate shorts — `POST /v2/create/shorts`
+
+Create a short-form video clip from a note. Returns a `task_id` — poll
+[Tasks](./tasks.mdx) for the result.
+
+Also accepts: user JWT, service key.
+
+Content-Type: `application/x-www-form-urlencoded`
+
+| Field           | Type    | Required     | Description                     |
+| --------------- | ------- | ------------ | ------------------------------- |
+| `note_id`       | string  | **required** | ID of the note to generate from |
+| `voice_id`      | string  | **required** | Narration voice id              |
+| `clip_duration` | integer | optional     | Target clip duration in seconds |
+| `is_audio_only` | boolean | optional     | Produce audio only (no video)   |
+| `bg_id`         | string  | optional     | Background video/image id       |
+
+```bash
+curl -X POST https://api.notexapp.com/v2/create/shorts \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..." \
+  --data-urlencode "voice_id=en-US-Standard-A" \
+  --data-urlencode "clip_duration=60"
+```
+
+Response (`200`) — returns a `task_id`:
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "b3f1a2c4-...",
+    "user_id": "665f..."
+  }
+}
+```
+
+---
+
+## Generate quiz video — `POST /v2/create/quiz-video`
+
+Create a quiz-style video from a note. Returns a `task_id` — poll
+[Tasks](./tasks.mdx) for the result.
+
+Also accepts: user JWT, service key.
+
+Content-Type: `application/x-www-form-urlencoded`
+
+| Field         | Type   | Required     | Description                     |
+| ------------- | ------ | ------------ | ------------------------------- |
+| `note_id`     | string | **required** | ID of the note to generate from |
+| `voice_id`    | string | **required** | Narration voice id              |
+| `bg_id`       | string | optional     | Background video/image id       |
+| `template_id` | string | optional     | Video template id               |
+
+```bash
+curl -X POST https://api.notexapp.com/v2/create/quiz-video \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..." \
+  --data-urlencode "voice_id=en-US-Standard-A"
+```
+
+Response (`200`) — returns a `task_id`:
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "b3f1a2c4-...",
+    "user_id": "665f..."
+  }
+}
+```
+
+Poll the task result to get the video URL:
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "note_id": "665f...",
+    "video_url": "https://cdn.notexapp.com/videos/..."
+  }
+}
+```
+

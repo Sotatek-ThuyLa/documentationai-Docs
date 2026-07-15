@@ -1,0 +1,76 @@
+---
+title: Tasks
+description: >-
+  Poll for the result of any asynchronous operation. All create endpoints
+  (notes, flashcards,
+
+  quiz, mindmap, slide, podcast, shorts, translate) are asynchronous and return
+  a task_id.
+
+  Use this endpoint to check the outcome.
+
+
+  Accepts an API key (X-API-Key or Authorization: Bearer ntx_...), a user JWT,
+  or a
+
+  service key.
+
+
+  Base URL: https://api.notexapp.com
+---
+## Poll task result — `GET /v1/create/tasks/{task_id}/result`
+
+| Parameter | In   | Required     | Description                             |
+| --------- | ---- | ------------ | --------------------------------------- |
+| `task_id` | path | **required** | Task id returned by any create endpoint |
+
+```bash
+curl https://api.notexapp.com/v1/create/tasks/<task_id>/result \
+  -H "X-API-Key: ntx_live_..."
+```
+
+### Responses
+
+Still processing:
+
+```json
+{ "status": "PROCESSING" }
+```
+
+Completed successfully:
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "note_id": "665f...",
+    "title": "Introduction to Machine Learning",
+    "summary": "..."
+  }
+}
+```
+
+Failed:
+
+```json
+{
+  "status": "FAILURE",
+  "error": "Unsupported file format"
+}
+```
+
+### Polling guidance
+
+- Recommended interval: every **3–5 seconds**.
+- Most operations complete within **30–120 seconds** depending on source length.
+- Stop polling once `status` is `SUCCESS` or `FAILURE`.
+
+### Status values
+
+| Status       | Meaning                              |
+| ------------ | ------------------------------------ |
+| `PENDING`    | Task queued, not yet started         |
+| `PROCESSING` | Task is running                      |
+| `SUCCESS`    | Task completed — result is in `data` |
+| `FAILURE`    | Task failed — reason is in `error`   |
+

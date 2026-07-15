@@ -1,0 +1,57 @@
+---
+title: Translate
+description: |-
+  Translate a note into another language. All endpoints below accept an API key
+  (X-API-Key or Authorization: Bearer ntx_...).
+
+  Base URL: https://api.notexapp.com
+---
+## Translate note — `POST /v2/create/translate`
+
+Translate the content of an existing note into a target language. Returns a `task_id` —
+poll [Tasks](./tasks.mdx) for the result.
+
+Also accepts: user JWT.
+
+Content-Type: `application/x-www-form-urlencoded`
+
+| Field          | Type    | Required     | Description                                        |
+| -------------- | ------- | ------------ | -------------------------------------------------- |
+| `note_id`      | string  | **required** | ID of the note to translate                        |
+| `language`     | string  | **required** | Target language code (e.g. `"vi"`, `"ja"`, `"fr"`) |
+| `only_summary` | boolean | optional     | Translate only the summary section                 |
+| `community`    | boolean | optional     | Translate a community note                         |
+
+```bash
+curl -X POST https://api.notexapp.com/v2/create/translate \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..." \
+  --data-urlencode "language=vi"
+```
+
+Response (`200`) — returns a `task_id`:
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "b3f1a2c4-...",
+    "user_id": "665f..."
+  }
+}
+```
+
+Poll the task result to get the translated note:
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "note_id": "665f...",
+    "title": "Giới thiệu về Machine Learning",
+    "summary": "..."
+  }
+}
+```
+

@@ -1,0 +1,66 @@
+---
+title: Flashcards
+description: >-
+  Generate flashcard sets from an existing note. All endpoints below accept an
+  API key
+
+  (X-API-Key or Authorization: Bearer ntx_...).
+
+
+  Base URL: https://api.notexapp.com
+---
+## Generate flashcards — `POST /v6/create/flashcards`
+
+Create a flashcard set from a note. Returns a `task_id` — poll
+[Tasks](./tasks.mdx) for the result.
+
+Also accepts: user JWT, service key.
+
+Content-Type: `application/x-www-form-urlencoded`
+
+| Field           | Type    | Required     | Description                                 |
+| --------------- | ------- | ------------ | ------------------------------------------- |
+| `note_id`       | string  | **required** | ID of the note to generate flashcards from  |
+| `num_cards`     | string  | optional     | Number of cards to generate                 |
+| `set_name`      | string  | optional     | Name for the flashcard set                  |
+| `difficulty`    | string  | optional     | Difficulty level (`easy`, `medium`, `hard`) |
+| `custom_prompt` | string  | optional     | Custom instruction for the AI               |
+| `community`     | boolean | optional     | Generate from a community note              |
+
+```bash
+curl -X POST https://api.notexapp.com/v6/create/flashcards \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..." \
+  --data-urlencode "num_cards=10" \
+  --data-urlencode "difficulty=medium"
+```
+
+Response (`200`) — returns a `task_id`:
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "b3f1a2c4-...",
+    "user_id": "665f..."
+  }
+}
+```
+
+Poll the task result to get the generated flashcard set:
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "flashcard_set_id": "665f...",
+    "set_name": "Machine Learning Basics",
+    "cards": [
+      { "front": "What is supervised learning?", "back": "..." },
+      ...
+    ]
+  }
+}
+```
+

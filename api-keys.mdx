@@ -1,0 +1,169 @@
+---
+title: API Keys
+description: Programmatic access to the AI NoteX API using user-generated API keys.
+---
+## Overview
+
+An API key lets you call the API on behalf of your own account without a login/JWT
+flow — ideal for scripts, integrations, and server-to-server automation.
+
+- Keys are created and managed from your account (see [Managing keys](#managing-keys)).
+- A key acts **as its owner** — it has exactly the access that user has.
+- The raw key is shown **once**, at creation. Store it securely; it cannot be retrieved again.
+- Keys can optionally **expire**; by default they never expire.
+
+Base URL: `https://api.notexapp.com`
+
+> This documentation covers **only the latest version** of each endpoint that accepts
+> API keys. Older versions of the same endpoint (e.g. `/v1/create/note`) remain available
+> but are not documented here.
+
+## Authenticating with an API key
+
+Send your key on every request using **either** header:
+
+```typescript
+X-API-Key: ntx_live_xxxxxxxxxxxxxxxxxxxx
+```
+
+or
+
+```typescript
+Authorization: Bearer ntx_live_xxxxxxxxxxxxxxxxxxxx
+```
+
+A key always starts with the prefix `ntx_` (e.g. `ntx_live_...`, `ntx_stg_...`,
+`ntx_test_...` depending on environment). That prefix is how the server tells an API key
+apart from a normal user JWT.
+
+Endpoints that accept API keys are grouped by feature:
+
+- [Notes](./notes.mdx) — create notes from URLs/files, upload files, list notes
+- [Tasks](./tasks.mdx) — poll the result of any async operation
+- [Flashcards](./flashcards.mdx) — generate flashcard sets from a note
+- [Quiz](./quiz.mdx) — generate quiz sets from a note
+- [Mindmap](./mindmap.mdx) — generate mindmaps from a note
+- [Slide](./slide.mdx) — generate slide decks from a note
+- [Podcast](./podcast.mdx) — generate podcast audio from a note
+- [Shorts & Quiz Video](./shorts.mdx) — generate short video clips or quiz videos from a note
+- [Translate](./translate.mdx) — translate a note into another language
+- [Credits](./credits.mdx) — read credit balance and quota
+- [User](./user.mdx) — read profile and list notes
+
+Some of these endpoints also accept a user JWT or (for a few) device/service credentials.
+Wherever this documentation shows an endpoint, an API key is a valid credential for it.
+
+## Scopes
+
+Each key has a `scopes` list.
+
+- An **empty list&#x20;****`[]`** (or omitting `scopes`) means **full access** — the key can do
+  anything its owner can.
+- A non-empty list is intended to **restrict** the key to specific scopes
+  (e.g. `note:read`, `note:write`, `credit:read`, `folder:read`, `folder:write`).
+
+> **Current status:** scope _enforcement is not yet implemented_. Scopes are stored and
+> returned for reference, but every key currently behaves as full-access regardless of the
+> `scopes` value. Do not rely on scopes for access control yet.
+
+## Managing keys
+
+Key management endpoints require a **user JWT** (`Authorization: Bearer <jwt>`).
+**API keys cannot manage API keys** — you cannot create, list, or delete keys using an API key.
+
+### Create a key — `POST /v1/api-keys`
+
+Request body:
+
+| Field        | Type           | Required | Description                                        |
+| ------------ | -------------- | -------- | -------------------------------------------------- |
+| `name`       | string         | optional | Human-readable label (max 100 chars)               |
+| `scopes`     | string\[]      | optional | Permission scopes. `[]` = full access              |
+| `expires_at` | datetime (UTC) | optional | Expiration date; omit for a key that never expires |
+
+```bash
+curl -X POST https://api.notexapp.com/v1/api-keys \
+  -H "Authorization: Bearer <your-jwt>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My API key",
+    "scopes": [],
+    "expires_at": null
+  }'
+```
+
+Response (`201`) — the **only** time the full key is returned:
+
+```json
+{
+  "statusCode": 201,
+  "message": "API key created. Store it now — it will not be shown again.",
+  "data": {
+    "id": "665f...",
+    "name": "My API key",
+    "key_prefix": "ntx_live_9f8a",
+    "scopes": [],
+    "last_used_at": null,
+    "expires_at": null,
+    "created_at": "2026-07-14T12:00:00Z",
+    "api_key": "ntx_live_9f8a1c...full-secret..."
+  }
+}
+```
+
+### List keys — `GET /v1/api-keys`
+
+Returns metadata only (never the secret):
+
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "items": [
+      {
+        "id": "665f...",
+        "name": "My API key",
+        "key_prefix": "ntx_live_9f8a",
+        "scopes": [],
+        "last_used_at": "2026-07-14T12:30:00Z",
+        "expires_at": null,
+        "created_at": "2026-07-14T12:00:00Z"
+      }
+    ],
+    "total": 1
+  }
+}
+```
+
+### Delete a key — `DELETE /v1/api-keys/{api_key_id}`
+
+Permanently deletes the key (hard delete). The key stops working immediately (within a
+short cache window of up to 60s).
+
+```json
+{
+  "statusCode": 200,
+  "message": "API key deleted",
+  "data": { "id": "665f...", "deleted": true }
+}
+```
+
+## Errors
+
+| Status | `error_key`          | Meaning                                                     |
+| ------ | -------------------- | ----------------------------------------------------------- |
+| 401    | `invalid_api_key`    | Key is unknown, revoked (deleted), or expired               |
+| 401    | `not_authenticated`  | No credential provided                                      |
+| 403    | `permission_denied`  | Authenticated, but not allowed (e.g. free-plan restriction) |
+| 400    | `invalid_expiration` | `expires_at` is in the past (on key creation)               |
+
+Example:
+
+```json
+{
+  "statusCode": 401,
+  "message": "Invalid API key",
+  "error_key": "invalid_api_key"
+}
+```
+

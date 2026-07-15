@@ -1,0 +1,62 @@
+---
+title: User
+description: |-
+  Read your profile and note list. Both endpoints accept an API key
+  (X-API-Key or Authorization: Bearer ntx_...) or a user JWT.
+
+  Base URL: https://api.notexapp.com
+---
+## Get profile — `GET /v1/user/profile`
+
+Returns the authenticated user's profile.
+
+```bash
+curl https://api.notexapp.com/v1/user/profile \
+  -H "X-API-Key: ntx_live_..."
+```
+
+No parameters.
+
+Example response:
+
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "user_id": "665f...",
+    "email": "user@example.com",
+    "name": "Jane Doe",
+    "image": "https://cdn.notexapp.com/avatars/...",
+    "role": "normal_user",
+    "preferences": {
+      "display_language": "en",
+      "transcription_language": "en",
+      "ai_notes_language": "en"
+    },
+    "createdAt": "2026-01-01T00:00:00Z"
+  }
+}
+```
+
+---
+
+## List my notes — `GET /v2/user/notes`
+
+Returns a paginated list of notes belonging to the authenticated user.
+See [Notes](./notes.mdx#list-my-notes--get-v2usernotes) for full parameter reference.
+
+| Parameter    | In    | Type    | Required | Description                         |
+| ------------ | ----- | ------- | -------- | ----------------------------------- |
+| `type`       | query | string  | optional | Filter by note type                 |
+| `tab`        | query | string  | optional | Tab filter                          |
+| `limit`      | query | integer | optional | Page size                           |
+| `cursor`     | query | string  | optional | Cursor for cursor-based pagination  |
+| `page`       | query | integer | optional | Page number                         |
+| `sort_field` | query | string  | optional | Field to sort by (e.g. `createdAt`) |
+| `sort_order` | query | integer | optional | `1` asc, `-1` desc                  |
+
+```bash
+curl "https://api.notexapp.com/v2/user/notes?limit=20&sort_field=createdAt&sort_order=-1" \
+  -H "X-API-Key: ntx_live_..."
+```
+

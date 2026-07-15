@@ -1,0 +1,75 @@
+---
+title: Podcast
+description: >-
+  Generate a podcast audio episode from an existing note. All endpoints below
+  accept an API key
+
+  (X-API-Key or Authorization: Bearer ntx_...).
+
+
+  Base URL: https://api.notexapp.com
+---
+## Generate podcast — `POST /v1/create/podcast`
+
+Create a spoken podcast episode from a note. Returns a `task_id` — poll
+[Tasks](./tasks.mdx) for the result.
+
+Also accepts: user JWT, service key.
+
+Content-Type: `application/x-www-form-urlencoded`
+
+| Field       | Type    | Required     | Description                                   |
+| ----------- | ------- | ------------ | --------------------------------------------- |
+| `note_id`   | string  | **required** | ID of the note to generate a podcast from     |
+| `duration`  | integer | **required** | Target duration in seconds                    |
+| `speakers`  | integer | optional     | Number of speakers (`1` or `2`)               |
+| `voice`     | string  | optional     | Voice id for single-speaker episodes          |
+| `voice1`    | string  | optional     | Voice id for the first speaker (two-speaker)  |
+| `voice2`    | string  | optional     | Voice id for the second speaker (two-speaker) |
+| `community` | boolean | optional     | Generate from a community note                |
+
+```bash
+# Single-speaker, ~3 minutes
+curl -X POST https://api.notexapp.com/v1/create/podcast \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..." \
+  --data-urlencode "duration=180" \
+  --data-urlencode "speakers=1" \
+  --data-urlencode "voice=en-US-Standard-A"
+
+# Two-speaker dialogue
+curl -X POST https://api.notexapp.com/v1/create/podcast \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..." \
+  --data-urlencode "duration=300" \
+  --data-urlencode "speakers=2" \
+  --data-urlencode "voice1=en-US-Standard-A" \
+  --data-urlencode "voice2=en-US-Standard-B"
+```
+
+Response (`200`) — returns a `task_id`:
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "b3f1a2c4-...",
+    "user_id": "665f..."
+  }
+}
+```
+
+Poll the task result to get the podcast audio URL:
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "note_id": "665f...",
+    "podcast_url": "https://cdn.notexapp.com/podcasts/..."
+  }
+}
+```
+

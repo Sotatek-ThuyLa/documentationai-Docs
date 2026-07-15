@@ -1,0 +1,65 @@
+---
+title: Mindmap
+description: >-
+  Generate a mindmap from an existing note. All endpoints below accept an API
+  key
+
+  (X-API-Key or Authorization: Bearer ntx_...).
+
+
+  Base URL: https://api.notexapp.com
+---
+## Generate mindmap — `POST /v2/create/mindmap`
+
+Create a mindmap from a note. Returns a `task_id` — poll
+[Tasks](./tasks.mdx) for the result.
+
+Also accepts: user JWT, service key.
+
+Content-Type: `application/x-www-form-urlencoded`
+
+| Field       | Type    | Required     | Description                               |
+| ----------- | ------- | ------------ | ----------------------------------------- |
+| `note_id`   | string  | **required** | ID of the note to generate a mindmap from |
+| `community` | boolean | optional     | Generate from a community note            |
+
+```bash
+curl -X POST https://api.notexapp.com/v2/create/mindmap \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..."
+```
+
+Response (`200`) — returns a `task_id`:
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "b3f1a2c4-...",
+    "user_id": "665f..."
+  }
+}
+```
+
+Poll the task result to get the generated mindmap:
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "note_id": "665f...",
+    "mindmap": {
+      "title": "Machine Learning",
+      "children": [
+        {
+          "title": "Supervised Learning",
+          "children": [...]
+        },
+        ...
+      ]
+    }
+  }
+}
+```
+

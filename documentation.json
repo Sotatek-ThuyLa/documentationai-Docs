@@ -163,6 +163,77 @@
                       }
                     ],
                     "icon": "badge-plus"
+                  },
+                  {
+                    "group": "API Keys",
+                    "pages": [
+                      {
+                        "title": "API Keys",
+                        "path": "api-keys",
+                        "icon": "key-round"
+                      },
+                      {
+                        "title": "Credits",
+                        "path": "apikeyscredits",
+                        "icon": "hand-coins"
+                      },
+                      {
+                        "title": "Mindmap",
+                        "path": "apikeysmindmap",
+                        "icon": "activity-icon"
+                      },
+                      {
+                        "title": "Slideshow",
+                        "path": "apislideshow",
+                        "icon": "airplay"
+                      },
+                      {
+                        "title": "Podcast",
+                        "path": "apipodcast",
+                        "icon": "mic-vocal-icon"
+                      },
+                      {
+                        "title": "Shorts",
+                        "path": "shorts",
+                        "icon": "file-video-icon"
+                      },
+                      {
+                        "title": "Quiz",
+                        "path": "apiquiz",
+                        "icon": "lucide-message-circle-question-mark"
+                      },
+                      {
+                        "title": "Flashcards",
+                        "path": "APIflashcards",
+                        "icon": "credit-card"
+                      },
+                      {
+                        "title": "Translate",
+                        "path": "apitranslate",
+                        "icon": "notebook-pen-icon"
+                      },
+                      {
+                        "title": "Tasks",
+                        "path": "tasks",
+                        "icon": "check-square-icon"
+                      },
+                      {
+                        "title": "User",
+                        "path": "user",
+                        "icon": "hand-heart-icon"
+                      },
+                      {
+                        "title": "Notes",
+                        "path": "notes",
+                        "icon": "lucide-sticky-note"
+                      },
+                      {
+                        "title": "Presigned URL",
+                        "path": "presigned-url",
+                        "icon": "curly-braces"
+                      }
+                    ],
+                    "icon": "key-round"
                   }
                 ]
               },
@@ -535,6 +606,11 @@
                         "title": "Đăng ký & Đăng nhập",
                         "path": "login",
                         "icon": "zap"
+                      },
+                      {
+                        "title": "API Key",
+                        "path": "api-key",
+                        "icon": "key-round"
                       }
                     ]
                   },

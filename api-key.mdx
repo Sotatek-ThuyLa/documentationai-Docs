@@ -1,0 +1,209 @@
+---
+title: API Keys
+description: Programmatic access to the AI NoteX API using user-generated API keys.
+---
+# API Keys
+
+Programmatic access to the AI NoteX API using user-generated API keys.
+
+## Overview
+
+An API key lets you call the API on behalf of your own account without a login/JWT flow — ideal for scripts, integrations, and server-to-server automation.
+
+- Keys are created and managed from your account (see **Managing keys**).
+- A key acts as its owner — it has exactly the access that user has.
+- The raw key is shown once, at creation. Store it securely; it cannot be retrieved again.
+- Keys can optionally expire; by default they never expire.
+
+**Base URL**
+
+```text
+https://api.notexapp.com
+```
+
+> This documentation covers only the latest version of each endpoint that accepts API keys. Older versions of the same endpoint (e.g. `/v1/create/note`) remain available but are not documented here.
+
+---
+
+## Authenticating with an API key
+
+Send your key on every request using either header:
+
+### X-API-Key
+
+```http
+X-API-Key: ntx_live_xxxxxxxxxxxxxxxxxxxx
+```
+
+### Authorization
+
+```http
+Authorization: Bearer ntx_live_xxxxxxxxxxxxxxxxxxxx
+```
+
+A key always starts with the prefix `ntx_` (e.g. `ntx_live_...`, `ntx_stg_...`, `ntx_test_...` depending on environment). That prefix is how the server tells an API key apart from a normal user JWT.
+
+---
+
+## Supported endpoints
+
+Endpoints that accept API keys are grouped by feature:
+
+- Notes — create notes from URLs/files, upload files, list notes
+- Tasks — poll async operation results
+- Flashcards — generate flashcards from a note
+- Quiz — generate quizzes from a note
+- Mindmap — generate mind maps from a note
+- Slide — generate slide decks from a note
+- Podcast — generate podcast audio from a note
+- Shorts & Quiz Video — generate short videos or quiz videos
+- Translate — translate a note
+- Credits — read credits and quota
+- User — read profile and list notes
+
+Some endpoints also accept a user JWT or device/service credentials. Wherever this documentation shows an endpoint, an API key is also a valid credential.
+
+---
+
+## Scopes
+
+Each API key contains a list of scopes.
+
+- `[]` (or omitted) means **full access**.
+- A non-empty list is intended to limit permissions (for example `note:read`, `note:write`, `credit:read`, `folder:read`, `folder:write`).
+
+> **Current status:** Scope enforcement is **not yet implemented**. Scopes are stored and returned for reference only. Every API key currently has full access regardless of its scopes.
+
+---
+
+# Managing keys
+
+> **Authentication:** These endpoints require a **User JWT** (`Authorization: Bearer <jwt>`). API keys **cannot** create, list or delete other API keys.
+
+---
+
+## Create API Key
+
+```http
+POST /v1/api-keys
+```
+
+### Request Body
+
+| Field        | Type           | Required | Description                            |
+| ------------ | -------------- | -------- | -------------------------------------- |
+| `name`       | string         | No       | Human-readable label (max 100 chars)   |
+| `scopes`     | string\[]      | No       | Permission scopes. `[]` = full access  |
+| `expires_at` | datetime (UTC) | No       | Expiration date. Omit for never expire |
+
+### Example
+
+```bash
+curl -X POST https://api.notexapp.com/v1/api-keys \
+  -H "Authorization: Bearer <your-jwt>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My API key",
+    "scopes": [],
+    "expires_at": null
+  }'
+```
+
+### Response `201 Created`
+
+> The **only time** the complete API key is returned.
+
+```json
+{
+  "statusCode": 201,
+  "message": "API key created. Store it now — it will not be shown again.",
+  "data": {
+    "id": "665f...",
+    "name": "My API key",
+    "key_prefix": "ntx_live_9f8a",
+    "scopes": [],
+    "last_used_at": null,
+    "expires_at": null,
+    "created_at": "2026-07-14T12:00:00Z",
+    "api_key": "ntx_live_9f8a1c...full-secret..."
+  }
+}
+```
+
+---
+
+## List API Keys
+
+```http
+GET /v1/api-keys
+```
+
+Returns metadata only (never the secret).
+
+### Response `200 OK`
+
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "items": [
+      {
+        "id": "665f...",
+        "name": "My API key",
+        "key_prefix": "ntx_live_9f8a",
+        "scopes": [],
+        "last_used_at": "2026-07-14T12:30:00Z",
+        "expires_at": null,
+        "created_at": "2026-07-14T12:00:00Z"
+      }
+    ],
+    "total": 1
+  }
+}
+```
+
+---
+
+## Delete API Key
+
+```http
+DELETE /v1/api-keys/{api_key_id}
+```
+
+Permanently deletes the key.
+
+> The key stops working immediately (allow up to **60 seconds** for cache propagation).
+
+### Response `200 OK`
+
+```json
+{
+  "statusCode": 200,
+  "message": "API key deleted",
+  "data": {
+    "id": "665f...",
+    "deleted": true
+  }
+}
+```
+
+---
+
+# Errors
+
+| HTTP Status | error\_key           | Meaning                                 |
+| ----------- | -------------------- | --------------------------------------- |
+| `401`       | `invalid_api_key`    | API key is unknown, revoked, or expired |
+| `401`       | `not_authenticated`  | No authentication credential provided   |
+| `403`       | `permission_denied`  | Authenticated but access is not allowed |
+| `400`       | `invalid_expiration` | `expires_at` is in the past             |
+
+### Example
+
+```json
+{
+  "statusCode": 401,
+  "message": "Invalid API key",
+  "error_key": "invalid_api_key"
+}
+```

@@ -1,0 +1,68 @@
+---
+title: Presigned URL
+description: >-
+  Obtain a presigned URL to upload a file (e.g. audio/document) before creating
+  a note.
+
+
+  Accepts an API key (X-API-Key or Authorization: Bearer ntx_...), a user JWT,
+  and also
+
+  device/service credentials.
+
+
+  Base URL: https://api.notexapp.com
+---
+## Get presigned URL — `GET /v1/presigned-url`
+
+| Parameter   | In    | Type    | Required     | Description                                         |
+| ----------- | ----- | ------- | ------------ | --------------------------------------------------- |
+| `file_name` | query | string  | **required** | Name of the file to upload                          |
+| `is_public` | query | boolean | optional     | Whether the object should be publicly accessible    |
+| `user_id`   | query | string  | optional     | Target user id (used with service/device auth only) |
+
+```bash
+curl "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
+  -H "X-API-Key: ntx_live_..."
+```
+
+Response:
+
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "upload_url": "https://...",
+    "file_url": "https://cdn.notexapp.com/uploads/lecture.mp3"
+  }
+}
+```
+
+---
+
+## Upload flow
+
+1. `GET /v1/presigned-url?file_name=lecture.mp3` → receive `upload_url` and `file_url`.
+2. `PUT <upload_url>` with your file as the request body (no auth header needed).
+3. Pass `file_url` as the `file_url` field in [`POST /v9/create/note`](./notes.mdx#create-note--post-v9createnote).
+
+```bash
+# Step 1 — get upload URL
+RESPONSE=$(curl -s "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
+  -H "X-API-Key: ntx_live_...")
+
+UPLOAD_URL=$(echo $RESPONSE | jq -r '.data.upload_url')
+FILE_URL=$(echo $RESPONSE | jq -r '.data.file_url')
+
+# Step 2 — upload the file
+curl -X PUT "$UPLOAD_URL" \
+  -H "Content-Type: audio/mpeg" \
+  --data-binary @lecture.mp3
+
+# Step 3 — create the note
+curl -X POST https://api.notexapp.com/v9/create/note \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/json" \
+  -d "{\"file_url\": \"$FILE_URL\", \"language_hints\": [\"en\"]}"
+```
+
