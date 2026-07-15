@@ -606,11 +606,6 @@
                         "title": "Đăng ký & Đăng nhập",
                         "path": "login",
                         "icon": "zap"
-                      },
-                      {
-                        "title": "API Key",
-                        "path": "api-key",
-                        "icon": "key-round"
                       }
                     ]
                   },
@@ -739,6 +734,16 @@
                       }
                     ],
                     "icon": "circle-fading-plus-icon"
+                  },
+                  {
+                    "group": "API Keys",
+                    "pages": [
+                      {
+                        "title": "Overview",
+                        "path": "api-key",
+                        "icon": "key-round"
+                      }
+                    ]
                   }
                 ],
                 "tab": "Hướng dẫn sử dụng"
