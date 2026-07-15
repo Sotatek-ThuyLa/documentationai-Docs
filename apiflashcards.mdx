@@ -1,0 +1,66 @@
+---
+title: Thẻ ghi nhớ
+description: >-
+  Tạo bộ flashcard từ một ghi chú đã có. Tất cả các endpoint bên dưới đều hỗ trợ
+  API Key
+
+  (X-API-Key hoặc Authorization: Bearer ntx_...).
+
+
+  Base URL: https://api.notexapp.com
+---
+## Tạo Flashcards — `POST /v6/create/flashcards`
+
+Tạo một bộ flashcard từ ghi chú. Trả về `task_id` — theo dõi
+[Tasks](./tasks.mdx) để lấy kết quả.
+
+Cũng hỗ trợ: User JWT, Service Key.
+
+Content-Type: `application/x-www-form-urlencoded`
+
+| Field           | Type    | Required     | Description                           |
+| --------------- | ------- | ------------ | ------------------------------------- |
+| `note_id`       | string  | **required** | ID của ghi chú dùng để tạo flashcard  |
+| `num_cards`     | string  | optional     | Số lượng thẻ cần tạo                  |
+| `set_name`      | string  | optional     | Tên của bộ flashcard                  |
+| `difficulty`    | string  | optional     | Mức độ khó (`easy`, `medium`, `hard`) |
+| `custom_prompt` | string  | optional     | Yêu cầu tùy chỉnh dành cho AI         |
+| `community`     | boolean | optional     | Tạo từ ghi chú cộng đồng              |
+
+```bash
+curl -X POST https://api.notexapp.com/v6/create/flashcards \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..." \
+  --data-urlencode "num_cards=10" \
+  --data-urlencode "difficulty=medium"
+```
+
+Response (`200`) — trả về `task_id`:
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "b3f1a2c4-...",
+    "user_id": "665f..."
+  }
+}
+```
+
+Theo dõi kết quả tác vụ để lấy bộ flashcard đã tạo:
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "flashcard_set_id": "665f...",
+    "set_name": "Machine Learning Basics",
+    "cards": [
+      { "front": "What is supervised learning?", "back": "..." },
+      ...
+    ]
+  }
+}
+```
+

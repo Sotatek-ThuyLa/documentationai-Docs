@@ -1,0 +1,67 @@
+---
+title: Presigned URL
+description: >-
+  Lấy Presigned URL để tải tệp lên (ví dụ: âm thanh hoặc tài liệu) trước khi tạo
+  ghi chú.
+
+
+  Hỗ trợ API Key (X-API-Key hoặc Authorization: Bearer ntx_...), User JWT, và cả
+
+  Device/Service Credentials.
+
+
+  Base URL: https://api.notexapp.com
+---
+## Lấy Presigned URL — `GET /v1/presigned-url`
+
+| Parameter   | In    | Type    | Required     | Description                                                  |
+| ----------- | ----- | ------- | ------------ | ------------------------------------------------------------ |
+| `file_name` | query | string  | **required** | Tên của tệp cần tải lên                                      |
+| `is_public` | query | boolean | optional     | Tệp có được truy cập công khai hay không                     |
+| `user_id`   | query | string  | optional     | ID người dùng đích (chỉ dùng với Device/Service Credentials) |
+
+```bash
+curl "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
+  -H "X-API-Key: ntx_live_..."
+```
+
+Response:
+
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "upload_url": "https://...",
+    "file_url": "https://cdn.notexapp.com/uploads/lecture.mp3"
+  }
+}
+```
+
+---
+
+## Quy trình tải tệp
+
+1. `GET /v1/presigned-url?file_name=lecture.mp3` → nhận `upload_url` và `file_url`.
+2. `PUT <upload_url>` với nội dung yêu cầu là tệp của bạn (không cần header xác thực).
+3. Truyền `file_url` vào trường `file_url` của [`POST /v9/create/note`](./notes.mdx#create-note--post-v9createnote).
+
+```bash
+# Bước 1 — lấy URL tải lên
+RESPONSE=$(curl -s "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
+  -H "X-API-Key: ntx_live_...")
+
+UPLOAD_URL=$(echo $RESPONSE | jq -r '.data.upload_url')
+FILE_URL=$(echo $RESPONSE | jq -r '.data.file_url')
+
+# Bước 2 — tải tệp lên
+curl -X PUT "$UPLOAD_URL" \
+  -H "Content-Type: audio/mpeg" \
+  --data-binary @lecture.mp3
+
+# Bước 3 — tạo ghi chú
+curl -X POST https://api.notexapp.com/v9/create/note \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/json" \
+  -d "{\"file_url\": \"$FILE_URL\", \"language_hints\": [\"en\"]}"
+```
+

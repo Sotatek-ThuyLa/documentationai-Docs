@@ -1,0 +1,65 @@
+---
+title: Người dùng (User)
+description: >-
+  Đọc thông tin hồ sơ và danh sách ghi chú của bạn. Cả hai endpoint đều hỗ trợ
+  API Key
+
+  (X-API-Key hoặc Authorization: Bearer ntx_...) hoặc User JWT.
+
+
+  Base URL: https://api.notexapp.com
+---
+## Lấy thông tin hồ sơ — `GET /v1/user/profile`
+
+Trả về thông tin hồ sơ của người dùng đã xác thực.
+
+```bash
+curl https://api.notexapp.com/v1/user/profile \
+  -H "X-API-Key: ntx_live_..."
+```
+
+Không có tham số.
+
+Ví dụ phản hồi:
+
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "user_id": "665f...",
+    "email": "user@example.com",
+    "name": "Jane Doe",
+    "image": "https://cdn.notexapp.com/avatars/...",
+    "role": "normal_user",
+    "preferences": {
+      "display_language": "en",
+      "transcription_language": "en",
+      "ai_notes_language": "en"
+    },
+    "createdAt": "2026-01-01T00:00:00Z"
+  }
+}
+```
+
+---
+
+## Danh sách ghi chú của tôi — `GET /v2/user/notes`
+
+Trả về danh sách ghi chú của người dùng đã xác thực theo dạng phân trang.
+Xem [Notes](./notes.mdx#list-my-notes--get-v2usernotes) để biết đầy đủ các tham số.
+
+| Parameter    | In    | Type    | Required | Description                                 |
+| ------------ | ----- | ------- | -------- | ------------------------------------------- |
+| `type`       | query | string  | optional | Lọc theo loại ghi chú                       |
+| `tab`        | query | string  | optional | Lọc theo tab                                |
+| `limit`      | query | integer | optional | Số lượng kết quả mỗi trang                  |
+| `cursor`     | query | string  | optional | Cursor dùng cho phân trang theo cursor      |
+| `page`       | query | integer | optional | Số trang                                    |
+| `sort_field` | query | string  | optional | Trường dùng để sắp xếp (ví dụ: `createdAt`) |
+| `sort_order` | query | integer | optional | `1` tăng dần, `-1` giảm dần                 |
+
+```bash
+curl "https://api.notexapp.com/v2/user/notes?limit=20&sort_field=createdAt&sort_order=-1" \
+  -H "X-API-Key: ntx_live_..."
+```
+

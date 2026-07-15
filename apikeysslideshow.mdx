@@ -1,0 +1,62 @@
+---
+title: Bản Trình Chiếu
+description: >-
+  Tạo bộ slide trình chiếu từ một ghi chú đã có. Tất cả các endpoint bên dưới
+  đều hỗ trợ API Key
+
+  (X-API-Key hoặc Authorization: Bearer ntx_...).
+
+
+  Base URL: https://api.notexapp.com
+---
+## Tạo Slide — `POST /v2/create/slide`
+
+Tạo một bài thuyết trình từ ghi chú. Trả về `task_id` — theo dõi
+[Tasks](./tasks.mdx) để lấy kết quả.
+
+Cũng hỗ trợ: User JWT, Service Key.
+
+Content-Type: `application/x-www-form-urlencoded`
+
+| Field               | Type    | Required     | Description                                       |
+| ------------------- | ------- | ------------ | ------------------------------------------------- |
+| `note_id`           | string  | **required** | ID của ghi chú dùng để tạo slide                  |
+| `template_id`       | string  | **required** | ID của mẫu slide                                  |
+| `language`          | string  | optional     | Ngôn ngữ đầu ra của nội dung slide                |
+| `slide_count_range` | string  | optional     | Khoảng số lượng slide mong muốn (ví dụ: `"5-10"`) |
+| `community`         | boolean | optional     | Tạo từ ghi chú cộng đồng                          |
+
+```bash
+curl -X POST https://api.notexapp.com/v2/create/slide \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..." \
+  --data-urlencode "template_id=default" \
+  --data-urlencode "language=en"
+```
+
+Response (`200`) — trả về `task_id`:
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "b3f1a2c4-...",
+    "user_id": "665f..."
+  }
+}
+```
+
+Theo dõi kết quả tác vụ để lấy URL của slide:
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "note_id": "665f...",
+    "slide_url": "https://cdn.notexapp.com/slides/...",
+    "slide_pdf_url": "https://cdn.notexapp.com/slides/....pdf"
+  }
+}
+```
+

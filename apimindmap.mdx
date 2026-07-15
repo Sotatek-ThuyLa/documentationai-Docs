@@ -1,0 +1,65 @@
+---
+title: Sơ đồ tư duy
+description: >-
+  Tạo sơ đồ tư duy từ một ghi chú đã có. Tất cả các endpoint bên dưới đều hỗ trợ
+  API Key
+
+  (X-API-Key hoặc Authorization: Bearer ntx_...).
+
+
+  Base URL: https://api.notexapp.com
+---
+## Tạo Mindmap — `POST /v2/create/mindmap`
+
+Tạo sơ đồ tư duy từ một ghi chú. Trả về `task_id` — theo dõi
+[Tasks](./tasks.mdx) để lấy kết quả.
+
+Cũng hỗ trợ: User JWT, Service Key.
+
+Content-Type: `application/x-www-form-urlencoded`
+
+| Field       | Type    | Required     | Description                             |
+| ----------- | ------- | ------------ | --------------------------------------- |
+| `note_id`   | string  | **required** | ID của ghi chú dùng để tạo sơ đồ tư duy |
+| `community` | boolean | optional     | Tạo từ ghi chú cộng đồng                |
+
+```bash
+curl -X POST https://api.notexapp.com/v2/create/mindmap \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..."
+```
+
+Response (`200`) — trả về `task_id`:
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "b3f1a2c4-...",
+    "user_id": "665f..."
+  }
+}
+```
+
+Theo dõi kết quả tác vụ để lấy sơ đồ tư duy đã tạo:
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "note_id": "665f...",
+    "mindmap": {
+      "title": "Machine Learning",
+      "children": [
+        {
+          "title": "Supervised Learning",
+          "children": [...]
+        },
+        ...
+      ]
+    }
+  }
+}
+```
+

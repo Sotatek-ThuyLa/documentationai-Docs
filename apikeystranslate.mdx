@@ -1,0 +1,60 @@
+---
+title: Dịch ghi chú
+description: >-
+  Dịch một ghi chú sang ngôn ngữ khác. Tất cả các endpoint bên dưới đều hỗ trợ
+  API Key
+
+  (X-API-Key hoặc Authorization: Bearer ntx_...).
+
+
+  Base URL: https://api.notexapp.com
+---
+## Dịch ghi chú — `POST /v2/create/translate`
+
+Dịch nội dung của một ghi chú hiện có sang ngôn ngữ đích. Trả về `task_id` —
+theo dõi [Tasks](./tasks.mdx) để lấy kết quả.
+
+Cũng hỗ trợ: User JWT.
+
+Content-Type: `application/x-www-form-urlencoded`
+
+| Field          | Type    | Required     | Description                                      |
+| -------------- | ------- | ------------ | ------------------------------------------------ |
+| `note_id`      | string  | **required** | ID của ghi chú cần dịch                          |
+| `language`     | string  | **required** | Mã ngôn ngữ đích (ví dụ: `"vi"`, `"ja"`, `"fr"`) |
+| `only_summary` | boolean | optional     | Chỉ dịch phần tóm tắt                            |
+| `community`    | boolean | optional     | Dịch ghi chú cộng đồng                           |
+
+```bash
+curl -X POST https://api.notexapp.com/v2/create/translate \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..." \
+  --data-urlencode "language=vi"
+```
+
+Response (`200`) — trả về `task_id`:
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "b3f1a2c4-...",
+    "user_id": "665f..."
+  }
+}
+```
+
+Theo dõi kết quả tác vụ để lấy ghi chú đã được dịch:
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "note_id": "665f...",
+    "title": "Giới thiệu về Machine Learning",
+    "summary": "..."
+  }
+}
+```
+

@@ -1,0 +1,164 @@
+---
+title: Ghi chú (Notes)
+description: >-
+  Tạo ghi chú bằng AI và xem danh sách ghi chú của bạn. Tất cả các endpoint bên
+  dưới đều hỗ trợ API Key
+
+  (X-API-Key hoặc Authorization: Bearer ntx_...).
+
+
+  Base URL: https://api.notexapp.com
+---
+## Tạo ghi chú — `POST /v9/create/note`
+
+Tạo ghi chú/tóm tắt từ một URL hoặc một tệp đã tải lên.
+
+Cũng hỗ trợ: User JWT, Device Token.
+
+Content-Type: `application/json`
+
+| Field               | Type      | Required | Description                                                |
+| ------------------- | --------- | -------- | ---------------------------------------------------------- |
+| `web_url`           | string    | optional | URL trang web hoặc YouTube nguồn                           |
+| `file_url`          | string    | optional | URL của tệp đã tải lên (xem [Tải tệp lên](#upload-a-file)) |
+| `language_hints`    | string\[] | optional | Ngôn ngữ đầu ra ưu tiên, ví dụ: `["en"]`                   |
+| `use_ocr`           | boolean   | optional | Chạy OCR cho tài liệu hoặc hình ảnh                        |
+| `summary_style`     | string    | optional | Kiểu tóm tắt                                               |
+| `writing_style`     | string    | optional | Kiểu viết                                                  |
+| `human_style`       | string    | optional | Tùy chọn văn phong tự nhiên hơn                            |
+| `is_record`         | boolean   | optional | Nguồn có phải là bản ghi âm hay không                      |
+| `bot_id`            | string    | optional | ID bot cuộc họp (đối với bản ghi từ bot)                   |
+| `record_session_id` | string    | optional | ID phiên ghi âm                                            |
+| `device_meeting_id` | string    | optional | ID cuộc họp từ thiết bị                                    |
+| `target_language`   | string    | optional | Đã ngừng sử dụng — hãy dùng `language_hints` thay thế      |
+
+Phải cung cấp **một trong hai** `web_url` hoặc `file_url` (không được cung cấp cả hai).
+
+```bash
+# Từ URL YouTube
+curl -X POST https://api.notexapp.com/v9/create/note \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{ "web_url": "https://youtu.be/xxxx", "language_hints": ["en"] }'
+
+# Từ tệp đã tải lên
+curl -X POST https://api.notexapp.com/v9/create/note \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{ "file_url": "https://cdn.notexapp.com/uploads/lecture.mp3", "language_hints": ["en"] }'
+```
+
+Trả về `task_id`. Theo dõi [Tasks](./tasks.mdx) để lấy ghi chú đã hoàn thành.
+
+---
+
+## Xác thực đầu vào — `POST /v9/create/validate`
+
+Kiểm tra nguồn trước khi tạo ghi chú — hữu ích để xác nhận URL hoặc tệp có được hỗ trợ trước khi sử dụng credit.
+
+Cũng hỗ trợ: User JWT.
+
+Content-Type: `application/json`
+
+| Field      | Type   | Required | Description                         |
+| ---------- | ------ | -------- | ----------------------------------- |
+| `web_url`  | string | optional | URL nguồn cần xác thực              |
+| `file_url` | string | optional | URL của tệp đã tải lên cần xác thực |
+
+```bash
+curl -X POST https://api.notexapp.com/v9/create/validate \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{ "web_url": "https://youtu.be/xxxx" }'
+```
+
+---
+
+## Danh sách ghi chú của tôi — `GET /v2/user/notes`
+
+Trả về danh sách ghi chú của người dùng đã xác thực theo dạng phân trang.
+
+Cũng hỗ trợ: User JWT.
+
+| Parameter    | In    | Type    | Required | Description                                 |
+| ------------ | ----- | ------- | -------- | ------------------------------------------- |
+| `type`       | query | string  | optional | Lọc theo loại ghi chú                       |
+| `tab`        | query | string  | optional | Lọc theo tab                                |
+| `limit`      | query | integer | optional | Số lượng kết quả mỗi trang                  |
+| `cursor`     | query | string  | optional | Cursor dùng cho phân trang theo cursor      |
+| `page`       | query | integer | optional | Số trang (phân trang theo trang)            |
+| `sort_field` | query | string  | optional | Trường dùng để sắp xếp (ví dụ: `createdAt`) |
+| `sort_order` | query | integer | optional | Thứ tự sắp xếp: `1` tăng dần, `-1` giảm dần |
+
+```bash
+curl "https://api.notexapp.com/v2/user/notes?limit=20&sort_field=createdAt&sort_order=-1" \
+  -H "X-API-Key: ntx_live_..."
+```
+
+---
+
+## Tải tệp lên
+
+Trước khi tạo ghi chú từ tệp trên máy, bạn phải tải tệp lên và lấy `file_url`.
+
+### Lấy Presigned URL — `GET /v1/presigned-url`
+
+Cũng hỗ trợ: User JWT, Device/Service Credentials.
+
+| Parameter   | In    | Type    | Required     | Description                              |
+| ----------- | ----- | ------- | ------------ | ---------------------------------------- |
+| `file_name` | query | string  | **required** | Tên tệp cần tải lên                      |
+| `is_public` | query | boolean | optional     | Tệp có được truy cập công khai hay không |
+
+```bash
+curl "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
+  -H "X-API-Key: ntx_live_..."
+```
+
+Response:
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "presigned_url": "https://...",
+    "file_name": "lecture.mp3",
+    "full_path": "audio/<user_id>/lecture.mp3"
+  }
+}
+```
+
+### Quy trình tải tệp đầy đủ
+
+```bash
+# Bước 1 — lấy URL tải lên
+RESPONSE=$(curl -s "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
+  -H "X-API-Key: ntx_live_...")
+
+PRESIGNED_URL=$(echo $RESPONSE | jq -r '.data.presigned_url')
+FULL_PATH=$(echo $RESPONSE | jq -r '.data.full_path')
+
+# Bước 2 — tải tệp trực tiếp (không cần header xác thực)
+curl -X PUT "$PRESIGNED_URL" \
+  -H "Content-Type: audio/mpeg" \
+  --data-binary @lecture.mp3
+
+# Bước 3 — tạo ghi chú
+curl -X POST https://api.notexapp.com/v9/create/note \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/json" \
+  -d "{\"file_url\": \"$FULL_PATH\", \"language_hints\": [\"en\"]}"
+```
+
+Các định dạng tệp được hỗ trợ: âm thanh (`.mp3`, `.wav`, `.m4a`, …), tài liệu (`.pdf`, `.docx`, `.txt`, …),
+và hình ảnh (`.jpg`, `.png`, `.pdf`, …).
+
+---
+
+## Quy trình thông thường
+
+1. _(Chỉ với nguồn là tệp)_ Tải tệp lên theo các bước trên để lấy `file_url`.
+2. `POST /v9/create/note` → nhận `task_id`.
+3. Theo dõi [Tasks](./tasks.mdx) cho đến khi `status` là `SUCCESS`.
+4. Sử dụng `note_id` nhận được với các endpoint tính năng khác (flashcards, quiz, mindmap, v.v.).
+

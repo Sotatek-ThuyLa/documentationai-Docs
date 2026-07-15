@@ -1,0 +1,74 @@
+---
+title: Podcast
+description: >-
+  Tạo một tập podcast từ một ghi chú đã có. Tất cả các endpoint bên dưới đều hỗ
+  trợ API Key
+
+  (X-API-Key hoặc Authorization: Bearer ntx_...).
+
+
+  Base URL: https://api.notexapp.com
+---
+## Tạo Podcast — `POST /v1/create/podcast`
+
+Tạo một tập podcast từ ghi chú. Trả về `task_id` — theo dõi
+[Tasks](./tasks.mdx) để lấy kết quả.
+
+Cũng hỗ trợ: User JWT, Service Key.
+
+Content-Type: `application/x-www-form-urlencoded`
+
+| Field       | Type    | Required     | Description                                         |
+| ----------- | ------- | ------------ | --------------------------------------------------- |
+| `note_id`   | string  | **required** | ID của ghi chú dùng để tạo podcast                  |
+| `duration`  | integer | **required** | Thời lượng mục tiêu (tính bằng giây)                |
+| `speakers`  | integer | optional     | Số lượng người nói (`1` hoặc `2`)                   |
+| `voice`     | string  | optional     | ID giọng đọc cho podcast một người nói              |
+| `voice1`    | string  | optional     | ID giọng đọc của người nói thứ nhất (hai người nói) |
+| `voice2`    | string  | optional     | ID giọng đọc của người nói thứ hai (hai người nói)  |
+| `community` | boolean | optional     | Tạo từ ghi chú cộng đồng                            |
+
+```bash
+# Một người nói, ~3 phút
+curl -X POST https://api.notexapp.com/v1/create/podcast \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..." \
+  --data-urlencode "duration=180" \
+  --data-urlencode "speakers=1" \
+  --data-urlencode "voice=en-US-Standard-A"
+
+# Hội thoại hai người nói
+curl -X POST https://api.notexapp.com/v1/create/podcast \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  --data-urlencode "note_id=665f..." \
+  --data-urlencode "duration=300" \
+  --data-urlencode "speakers=2" \
+  --data-urlencode "voice1=en-US-Standard-A" \
+  --data-urlencode "voice2=en-US-Standard-B"
+```
+
+Response (`200`) — trả về `task_id`:
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "b3f1a2c4-...",
+    "user_id": "665f..."
+  }
+}
+```
+
+Theo dõi kết quả tác vụ để lấy URL podcast:
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "note_id": "665f...",
+    "podcast_url": "https://cdn.notexapp.com/podcasts/..."
+  }
+}
+```

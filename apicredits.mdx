@@ -1,0 +1,31 @@
+---
+title: Credits
+description: |-
+  Xem số dư Credits và hạn mức sử dụng. Cả hai endpoint đều hỗ trợ API Key
+  (X-API-Key hoặc Authorization: Bearer ntx_...) hoặc User JWT.
+
+  Base URL: https://api.notexapp.com
+---
+## Credits của tôi — `GET /v2/credits/me`
+
+Trả về thông tin Credits của người dùng đã xác thực (số dư, gói/người dùng, v.v.).
+
+```bash
+curl https://api.notexapp.com/v2/credits/me \
+  -H "X-API-Key: ntx_live_..."
+```
+
+Không có tham số.
+
+---
+
+## Hạn mức — `GET /v2/credits/quota`
+
+Trả về mức sử dụng hạn mức hiện tại của người dùng đã xác thực.
+
+```bash
+curl https://api.notexapp.com/v2/credits/quota \
+  -H "X-API-Key: ntx_live_..."
+```
+
+Không có tham số.

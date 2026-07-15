@@ -1,0 +1,74 @@
+---
+title: Tasks
+description: >-
+  Theo dõi kết quả của mọi tác vụ bất đồng bộ. Tất cả các endpoint tạo nội dung
+  (notes, flashcards,
+
+  quiz, mindmap, slide, podcast, shorts, translate) đều hoạt động bất đồng bộ và
+  trả về một `task_id`.
+
+  Sử dụng endpoint này để kiểm tra kết quả.
+
+
+  Hỗ trợ API Key (X-API-Key hoặc Authorization: Bearer ntx_...), User JWT, hoặc
+
+  Service Key.
+
+
+  Base URL: https://api.notexapp.com
+---
+## Theo dõi kết quả tác vụ — `GET /v1/create/tasks/{task_id}/result`
+
+| Parameter | In   | Required     | Description                                      |
+| --------- | ---- | ------------ | ------------------------------------------------ |
+| `task_id` | path | **required** | ID tác vụ được trả về từ bất kỳ endpoint tạo nào |
+
+```bash
+curl https://api.notexapp.com/v1/create/tasks/<task_id>/result \
+  -H "X-API-Key: ntx_live_..."
+```
+
+### Responses
+
+Đang xử lý:
+
+```json
+{ "status": "PROCESSING" }
+```
+
+Hoàn thành thành công:
+
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "note_id": "665f...",
+    "title": "Introduction to Machine Learning",
+    "summary": "..."
+  }
+}
+```
+
+Thất bại:
+
+```json
+{
+  "status": "FAILURE",
+  "error": "Unsupported file format"
+}
+```
+
+### Hướng dẫn theo dõi
+
+- Khoảng thời gian khuyến nghị: mỗi **3–5 giây**.
+- Hầu hết các tác vụ hoàn thành trong **30–120 giây** tùy thuộc vào độ dài của nội dung nguồn.
+- Dừng theo dõi khi `status` là `SUCCESS` hoặc `FAILURE`.
+
+### Giá trị trạng thái
+
+| Status       | Meaning                                         |
+| ------------ | ----------------------------------------------- |
+| `PENDING`    | Tác vụ đã được xếp hàng, chưa bắt đầu           |
+| `PROCESSING` | Tác vụ đang được xử lý                          |
+| `SUCCESS`    | Tác vụ hoàn thành — kết quả nằm trong `data`    |
+| `FAILURE`    | Tác vụ thất bại — nguyên nhân nằm trong `error` |

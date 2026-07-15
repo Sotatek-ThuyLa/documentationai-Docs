@@ -168,7 +168,7 @@
                     "group": "API Keys",
                     "pages": [
                       {
-                        "title": "Overview",
+                        "title": "API Keys",
                         "path": "api-keys",
                         "icon": "key-round"
                       },
@@ -739,9 +739,69 @@
                     "group": "API Keys",
                     "pages": [
                       {
-                        "title": "Overview",
-                        "path": "api-key",
+                        "title": "Tổng quan",
+                        "path": "apioverview",
                         "icon": "key-round"
+                      },
+                      {
+                        "title": "Credits",
+                        "path": "apicredits",
+                        "icon": "lucide-hand-coins"
+                      },
+                      {
+                        "title": "Sơ đồ tư duy",
+                        "path": "apimindmap",
+                        "icon": "activity"
+                      },
+                      {
+                        "title": "Bản Trình Chiếu",
+                        "path": "apikeysslideshow",
+                        "icon": "airplay"
+                      },
+                      {
+                        "title": "Podcast",
+                        "path": "apikeyspodcast",
+                        "icon": "lucide-mic2"
+                      },
+                      {
+                        "title": "Video Ngắn",
+                        "path": "apishorts",
+                        "icon": "file-video-icon"
+                      },
+                      {
+                        "title": "Quiz",
+                        "path": "apikeysquiz",
+                        "icon": "lucide-message-circle-question"
+                      },
+                      {
+                        "title": "Thẻ ghi nhớ",
+                        "path": "apiflashcards",
+                        "icon": "credit-card"
+                      },
+                      {
+                        "title": "Dịch ghi chú",
+                        "path": "apikeystranslate",
+                        "icon": "notebook-pen"
+                      },
+                      {
+                        "title": "Tasks",
+                        "path": "apitasks",
+                        "icon": "check-square-icon"
+                      },
+                      {
+                        "title": "Người dùng",
+                        "path": "apiuser",
+                        "icon": "lucide-hand-heart"
+                      },
+                      {
+                        "title": "Ghi chú",
+                        "path": "apinotes",
+                        "icon": "sticky-note"
+                      },
+                      {
+                        "title": "Presigned URL",
+                        "path": "apipresigned-url",
+                        "icon": "curly-braces"
                       }
                     ]
                   }

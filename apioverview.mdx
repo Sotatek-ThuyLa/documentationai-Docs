@@ -1,0 +1,168 @@
+---
+title: API Keys
+description: Truy cập AI NoteX API theo lập trình bằng API Key do người dùng tạo.
+---
+## Tổng quan
+
+API Key cho phép bạn gọi API thay mặt cho chính tài khoản của mình mà không cần quy trình
+đăng nhập/JWT — lý tưởng cho script, tích hợp và tự động hóa server-to-server.
+
+- API Key được tạo và quản lý từ tài khoản của bạn (xem [Quản lý API Key](#managing-keys)).
+- Một API Key hoạt động **với quyền của chủ sở hữu** — nó có chính xác các quyền mà người dùng đó có.
+- Giá trị đầy đủ của API Key chỉ được hiển thị **một lần**, tại thời điểm tạo. Hãy lưu trữ an toàn; bạn sẽ không thể xem lại.
+- API Key có thể **hết hạn**; mặc định chúng sẽ không bao giờ hết hạn.
+
+Base URL: `https://api.notexapp.com`
+
+> Tài liệu này chỉ bao gồm **phiên bản mới nhất** của mỗi endpoint hỗ trợ
+> API Key. Các phiên bản cũ của cùng endpoint (ví dụ: `/v1/create/note`) vẫn khả dụng
+> nhưng không được tài liệu hóa tại đây.
+
+## Xác thực bằng API Key
+
+Gửi API Key của bạn trong mọi request bằng **một trong hai** header sau:
+
+```typescript
+X-API-Key: ntx_live_xxxxxxxxxxxxxxxxxxxx
+```
+
+hoặc
+
+```typescript
+Authorization: Bearer ntx_live_xxxxxxxxxxxxxxxxxxxx
+```
+
+Một API Key luôn bắt đầu bằng tiền tố `ntx_` (ví dụ: `ntx_live_...`, `ntx_stg_...`,
+`ntx_test_...` tùy theo môi trường). Tiền tố này giúp máy chủ phân biệt API Key
+với JWT người dùng thông thường.
+
+Các endpoint hỗ trợ API Key được chia theo từng tính năng:
+
+- [Notes](./notes.mdx) — tạo ghi chú từ URL/tệp, tải tệp lên, lấy danh sách ghi chú
+- [Tasks](./tasks.mdx) — theo dõi kết quả của các tác vụ bất đồng bộ
+- [Flashcards](./flashcards.mdx) — tạo bộ Flashcard từ ghi chú
+- [Quiz](./quiz.mdx) — tạo bộ câu hỏi trắc nghiệm từ ghi chú
+- [Mindmap](./mindmap.mdx) — tạo sơ đồ tư duy từ ghi chú
+- [Slide](./slide.mdx) — tạo bộ slide trình chiếu từ ghi chú
+- [Podcast](./podcast.mdx) — tạo podcast từ ghi chú
+- [Shorts & Quiz Video](./shorts.mdx) — tạo video ngắn hoặc video trắc nghiệm từ ghi chú
+- [Translate](./translate.mdx) — dịch ghi chú sang ngôn ngữ khác
+- [Credits](./credits.mdx) — xem số dư và hạn mức Credits
+- [User](./user.mdx) — xem hồ sơ và danh sách ghi chú
+
+Một số endpoint này cũng chấp nhận User JWT hoặc (đối với một vài endpoint) thông tin xác thực thiết bị/dịch vụ.
+Ở bất kỳ đâu tài liệu này hiển thị một endpoint, API Key đều là một phương thức xác thực hợp lệ.
+
+## Scopes
+
+Mỗi API Key có một danh sách `scopes`.
+
+- **Danh sách rỗng \*\*\*\***`` (hoặc không truyền `scopes`) có nghĩa là **toàn quyền** — API Key có thể thực hiện
+  mọi thao tác mà chủ sở hữu của nó có quyền thực hiện.
+- Danh sách không rỗng được dùng để **giới hạn** API Key theo các scope cụ thể
+  (ví dụ: `note:read`, `note:write`, `credit:read`, `folder:read`, `folder:write`).
+
+> **Trạng thái hiện tại:** việc _thực thi scope vẫn chưa được triển khai_. Các scope được lưu trữ và
+> trả về để tham khảo, nhưng hiện tại mọi API Key đều hoạt động với toàn quyền bất kể
+> giá trị `scopes`. Chưa nên dựa vào scopes để kiểm soát quyền truy cập.
+
+## Quản lý API Key
+
+Các endpoint quản lý API Key yêu cầu **User JWT** (`Authorization: Bearer <jwt>`).
+**API Key không thể quản lý API Key** — bạn không thể tạo, liệt kê hoặc xóa API Key bằng chính API Key.
+
+### Tạo API Key — `POST /v1/api-keys`
+
+Request body:
+
+| Field        | Type           | Required | Description                                        |
+| ------------ | -------------- | -------- | -------------------------------------------------- |
+| `name`       | string         | optional | Tên hiển thị dễ đọc (tối đa 100 ký tự)             |
+| `scopes`     | string\[]      | optional | Danh sách quyền. `[]` = toàn quyền                 |
+| `expires_at` | datetime (UTC) | optional | Thời gian hết hạn; bỏ qua để API Key không hết hạn |
+
+```bash
+curl -X POST https://api.notexapp.com/v1/api-keys \
+  -H "Authorization: Bearer <your-jwt>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "My API key",
+    "scopes": [],
+    "expires_at": null
+  }'
+```
+
+Response (`201`) — **lần duy nhất** giá trị đầy đủ của API Key được trả về:
+
+```json
+{
+  "statusCode": 201,
+  "message": "API key created. Store it now — it will not be shown again.",
+  "data": {
+    "id": "665f...",
+    "name": "My API key",
+    "key_prefix": "ntx_live_9f8a",
+    "scopes": [],
+    "last_used_at": null,
+    "expires_at": null,
+    "created_at": "2026-07-14T12:00:00Z",
+    "api_key": "ntx_live_9f8a1c...full-secret..."
+  }
+}
+```
+
+### Danh sách API Key — `GET /v1/api-keys`
+
+Chỉ trả về metadata (không bao giờ trả về giá trị bí mật):
+
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "items": [
+      {
+        "id": "665f...",
+        "name": "My API key",
+        "key_prefix": "ntx_live_9f8a",
+        "scopes": [],
+        "last_used_at": "2026-07-14T12:30:00Z",
+        "expires_at": null,
+        "created_at": "2026-07-14T12:00:00Z"
+      }
+    ],
+    "total": 1
+  }
+}
+```
+
+### Xóa API Key — `DELETE /v1/api-keys/{api_key_id}`
+
+Xóa vĩnh viễn API Key (hard delete). API Key sẽ ngừng hoạt động ngay lập tức (trong khoảng
+thời gian cache tối đa 60 giây).
+
+```json
+{
+  "statusCode": 200,
+  "message": "API key deleted",
+  "data": { "id": "665f...", "deleted": true }
+}
+```
+
+## Mã lỗi
+
+| Status | `error_key`          | Meaning                                                                   |
+| ------ | -------------------- | ------------------------------------------------------------------------- |
+| 401    | `invalid_api_key`    | API Key không tồn tại, đã bị thu hồi (xóa) hoặc đã hết hạn                |
+| 401    | `not_authenticated`  | Không cung cấp thông tin xác thực                                         |
+| 403    | `permission_denied`  | Đã xác thực nhưng không được phép truy cập (ví dụ: giới hạn gói miễn phí) |
+| 400    | `invalid_expiration` | `expires_at` nằm trong quá khứ (khi tạo API Key)                          |
+
+Ví dụ:
+
+```json
+{
+  "statusCode": 401,
+  "message": "Invalid API key",
+  "error_key": "invalid_api_key"
+}
+```
