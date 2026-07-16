@@ -870,6 +870,11 @@
                     "icon": "layers",
                     "pages": [
                       {
+                        "title": "ライブ録音",
+                        "path": "recordd",
+                        "icon": "lucide-mic"
+                      },
+                      {
                         "title": "AI 会議ボット",
                         "path": "jp/meeting",
                         "icon": "lucide-bot"
