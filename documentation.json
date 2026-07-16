@@ -42,14 +42,14 @@
                     "group": "Create Note",
                     "pages": [
                       {
+                        "title": "Live Recording",
+                        "path": "llive-recording",
+                        "icon": "lucide-mic"
+                      },
+                      {
                         "title": "Meeting Bot",
                         "path": "meeting-bot",
                         "icon": "bot"
-                      },
-                      {
-                        "title": "Live Transcribe & Translate",
-                        "path": "live-transcribe-translate",
-                        "icon": "lucide-letter-text"
                       },
                       {
                         "title": "Create note with multi-inputs",
@@ -613,7 +613,7 @@
                     "group": "Tạo ghi chú (Note)",
                     "pages": [
                       {
-                        "title": "Live Recording",
+                        "title": "Ghi âm trực tiếp",
                         "path": "live-recording",
                         "icon": "lucide-mic"
                       },
@@ -873,11 +873,6 @@
                         "title": "AI 会議ボット",
                         "path": "jp/meeting",
                         "icon": "lucide-bot"
-                      },
-                      {
-                        "title": "ライブ文字起こしと翻訳",
-                        "path": "jp/live-transcribe",
-                        "icon": "a-large-small"
                       },
                       {
                         "title": "多形式入力ノートを作成する",
