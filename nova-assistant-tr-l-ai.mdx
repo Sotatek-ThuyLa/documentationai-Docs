@@ -1,56 +1,96 @@
 ---
-title: Nova アシスタント
+title: Nova Agent（AIアシスタント）
 description: >-
-  Nova AssistantはNoteXに内蔵されたAIアシスタントであり、ノートデータ全体を理解し
-  分析する能力を持っています。何時間も資料を読み直す代わりに、 Novaと対話することで即座に情報を抽出できます。
+  Nova Agent は NoteX に標準搭載された AI
+  アシスタントです。ワークスペース内のすべてのノートを理解・分析し、必要な情報をすばやく抽出できます。長時間資料を読み返すことなく、Nova
+  と対話するだけで情報を取得したり、AI を使ってノートを検索したりできます。
 ---
-## **1. Nova アシスタントとは？どのような場合に使用しますか？**
+## **1. Nova Agent とは？どのような場面で利用できますか？**
 
-- **タスク管理 (Action)：** TODOリストの作成、保留事項の追跡、会議での決定事項の呼び出し。
+**代表的なユースケース:**
 
-- **知識管理 (Knowledge)：** 講義内容の要約、数値や引用の抽出、複数ソースからの知識の統合。
-
-- **分析とレポート (Analytics)：** 週報の自動作成、ワークロードの分析、計画のギャップ検出。
-
----
-
-## **2. Nova アシスタントの使用方法**
-
-### **1つのノートとチャットする (Nova chat with 1 Note)**
-
-特定のノート（例：直近の会議議事録）の内容を深く処理する必要がある場合に使用します。
-
-1. 作業が必要な **ノートを開きます**。
-
-2. **Novaを起動：** 画面下のチャットバーをクリックします。
-
-3. **質問する：** そのノートに関する具体的な質問を入力します。
-
-   - *例：* 「この会議におけるジョンのTODOと期限をリストアップして。」
-
-### **すべてのノートとチャットする (Nova chat with all Notes)**
-
-全体像を把握したり、異なるソースからの情報を連結したりする場合に使用します。
-
-1. **メイン画面（Home）** で、画面右側の **Chat with AI** をクリックします。
-
-2. **情報の統合：** 情報の連結を依頼します。
-
-   - *例：* 「先月のノートに基づき、最も多く議論されたトピックは何ですか？」
+- **タスク管理（Action）:**
+  - To-do リストの作成
+  - 未解決の課題の追跡や、会議での意思決定内容の振り返り（Decision Recall）
+- **ナレッジ管理（Knowledge）:**
+  - 講義内容の要約、数値・引用の抽出、複数ソースからの知識の統合（Cross-source Synthesis）
+- **分析・レポート（Analytics）:**
+  - 週次レポートの自動作成
+  - 作業負荷（Workload）の分析や計画の抜け漏れ（Gap Detection）の発見
+- **振り返り（Reflection）:**
+  - 過去のアイデアを探したり、日々の記録からインサイトを抽出したりする
 
 ---
 
-## **3. 出典の引用 (Source Citation)**
+## **2. Nova Agent の使い方（Step-by-Step）**
 
-Nova Assistantが質問に答える際、どのノートから情報を取得したかを正確に示す機能です。
+### **1つのノートとチャット（Nova Chat with 1 Note）**
+
+特定のノートだけを対象に、内容を深く分析・活用したい場合に利用します。（例：直近の会議議事録）
+
+1. **対象のノートを開きます。**
+2. **Nova を起動します。** 画面下部のチャットバーをクリックしてください。
+   <Image src="https://blob-cdn.documentation.ai/org-baa369a2-6e04-46a8-b542-1fe4ce88714a/doc-9ea43233-156f-43f1-a7d0-c4a0b1ff5122/1784200998398-wdnaoard2so-JP1.png?fm=auto&auto=compress%2Cformat" width="1440" height="900" alt="" />
+3. **質問を入力します。**
+   - **例:** 「この会議で John の担当 To-do と締め切りを要約してください。」
+
+
+
+<Callout kind="tip" collapsed="false">
+  質問を入力するだけでなく、入力欄の下にある **Action Item**、**Email**、**Blog Post** などのクイックアクションを選択して、Nova にすぐ処理を依頼することもできます。
+</Callout>
+
+### **すべてのノートとチャット（Nova Chat with All Notes）**
+
+複数のノートを横断して情報を検索・分析したい場合に利用します。
+
+1. \*\*ホーム（Home）\*\*画面で、右下にある **Nova Agent** をクリックします。
+
+<Image src="https://blob-cdn.documentation.ai/org-baa369a2-6e04-46a8-b542-1fe4ce88714a/doc-9ea43233-156f-43f1-a7d0-c4a0b1ff5122/1784201092340-ogoil5cs48-JP2.png?fm=auto&auto=compress%2Cformat" width="1440" height="900" alt="" />
+
+2. **候補を選択するか、質問を入力します。** 用意されたプロンプトを使うことも、自分で自由に入力することもできます。
+   **例:** _「最近のマーケティング会議のノートを探してください。」_
+
+<Image src="https://blob-cdn.documentation.ai/org-baa369a2-6e04-46a8-b542-1fe4ce88714a/doc-9ea43233-156f-43f1-a7d0-c4a0b1ff5122/1784201162444-al1ftogo809-JP3.png?fm=auto&auto=compress%2Cformat" width="1440" height="900" alt="" />
+
+3. **複数のノートを対象にした質問を入力します。**
+
+- **例:** 「先月のノートをもとに、最も多く議論されたテーマは何ですか？」または「今週の作業内容、意思決定、未解決事項を含む週次レポートを作成してください。」
+
+<Callout kind="tip" collapsed="false">
+  **ヒント:** チャットウィンドウは拡大・縮小が可能なので、より快適に Nova Agent を利用できます。
+</Callout>
 
 ---
 
-## **4. サポート情報**
+## **3. ソース引用**
 
-- サポート・不具合報告 (**Product support & bug reports):** \[<a href="mailto:support@notexapp.com" target="_blank" rel="noopener noreferrer">support\@notexapp.com</a>]\(mailto:<a href="mailto:support@notexapp.com" target="_blank" rel="noopener noreferrer">support\@notexapp.com</a>)
+**ソース引用（Source Citation）** は、Nova Agent が回答を生成する際に、どのノートから情報を取得したのかを明確に表示する機能です。これにより、管理者や営業担当者は手動で探すことなく、情報の正確性をすぐに確認できます。
 
-- 提携・その他のお問い合わせ **(Partnerships & general inquiries):** \[<a href="mailto:hello@notexapp.com" target="_blank" rel="noopener noreferrer">hello\@notexapp.com</a>]\(mailto:<a href="mailto:hello@notexapp.com" target="_blank" rel="noopener noreferrer">hello\@notexapp.com</a>)
+**代表的なユースケース:**
 
-- **サポートコミュニティ：**<a href="https://discord.gg/x7zXwzDv" target="_blank" rel="noopener noreferrer"><u>Discord Community</u></a>
+- **情報の検証:** レポート内の数値や重要な意思決定の出典を確認する。
+- **文脈の確認:** 引用元をクリックして、元のノート全体の内容や背景を確認する。
+
+---
+
+## **4. FAQ：よくある質問 & エッジケース**
+
+### **Q: 2つのノートに矛盾した情報がある場合、Nova はどのように処理しますか？**
+
+A: **Conflict Detection** 機能を利用できます。例えば「今週のマーケティング部門と開発部門の意思決定に矛盾はありますか？」と質問すると、Nova が相違点を一覧表示します。
+
+### **Q: Nova が要約できるノート数に制限はありますか？**
+
+A: 大量のノートを処理できますが、より正確な結果を得るために、「過去1週間」や「最新5件のノート」のように期間や範囲を指定することをおすすめします。
+
+---
+
+## **5. お問い合わせ**
+
+ご利用中に問題が発生した場合は、以下までお気軽にお問い合わせください。
+
+- **製品サポート・不具合報告:** [support@notexapp.com](mailto:support@notexapp.com)
+- **パートナーシップ・一般のお問い合わせ:** [hello@notexapp.com](mailto:hello@notexapp.com)
+- **コミュニティ:** [<u>Discord Community</u>](https://discord.gg/x7zXwzDv)
 
