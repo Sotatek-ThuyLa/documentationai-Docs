@@ -102,6 +102,11 @@
                         "title": "Nova Assistant",
                         "path": "nova-assistant-en",
                         "icon": "stars"
+                      },
+                      {
+                        "title": "Smart Search",
+                        "path": "smart-searchh",
+                        "icon": "search"
                       }
                     ],
                     "icon": "brain-cog-icon"
@@ -671,6 +676,11 @@
                         "title": "Trợ lý AI (Nova Agent)",
                         "path": "nova-assistant",
                         "icon": "brain-icon"
+                      },
+                      {
+                        "title": "Tìm kiếm thông minh",
+                        "path": "tm-kiem-thong-minh",
+                        "icon": "search"
                       }
                     ]
                   },
@@ -929,6 +939,11 @@
                         "title": "AIアシスタント",
                         "path": "nova-assistant-tr-l-ai",
                         "icon": "brain-cog-icon"
+                      },
+                      {
+                        "title": "スマート検索",
+                        "path": "スマート検索",
+                        "icon": "search"
                       }
                     ],
                     "icon": "lucide-stars"
