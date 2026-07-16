@@ -43,7 +43,7 @@ Response:
 
 1. `GET /v1/presigned-url?file_name=lecture.mp3` → nhận `upload_url` và `file_url`.
 2. `PUT <upload_url>` với nội dung yêu cầu là tệp của bạn (không cần header xác thực).
-3. Truyền `file_url` vào trường `file_url` của [`POST /v9/create/note`](./notes.mdx#create-note--post-v9createnote).
+3. Truyền `file_url` vào trường `file_url` của `POST /v9/create/note`
 
 ```bash
 # Bước 1 — lấy URL tải lên

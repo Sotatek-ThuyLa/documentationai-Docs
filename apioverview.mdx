@@ -7,7 +7,7 @@ description: Truy cập AI NoteX API theo lập trình bằng API Key do ngườ
 API Key cho phép bạn gọi API thay mặt cho chính tài khoản của mình mà không cần quy trình
 đăng nhập/JWT — lý tưởng cho script, tích hợp và tự động hóa server-to-server.
 
-- API Key được tạo và quản lý từ tài khoản của bạn (xem [Quản lý API Key](#managing-keys)).
+- API Key được tạo và quản lý từ tài khoản của bạn (xem **Quản lý API Key&#x20;**&#x62;ên dưới).
 - Một API Key hoạt động **với quyền của chủ sở hữu** — nó có chính xác các quyền mà người dùng đó có.
 - Giá trị đầy đủ của API Key chỉ được hiển thị **một lần**, tại thời điểm tạo. Hãy lưu trữ an toàn; bạn sẽ không thể xem lại.
 - API Key có thể **hết hạn**; mặc định chúng sẽ không bao giờ hết hạn.
@@ -38,17 +38,17 @@ với JWT người dùng thông thường.
 
 Các endpoint hỗ trợ API Key được chia theo từng tính năng:
 
-- [Notes](./notes.mdx) — tạo ghi chú từ URL/tệp, tải tệp lên, lấy danh sách ghi chú
-- [Tasks](./tasks.mdx) — theo dõi kết quả của các tác vụ bất đồng bộ
-- [Flashcards](./flashcards.mdx) — tạo bộ Flashcard từ ghi chú
-- [Quiz](./quiz.mdx) — tạo bộ câu hỏi trắc nghiệm từ ghi chú
-- [Mindmap](./mindmap.mdx) — tạo sơ đồ tư duy từ ghi chú
-- [Slide](./slide.mdx) — tạo bộ slide trình chiếu từ ghi chú
-- [Podcast](./podcast.mdx) — tạo podcast từ ghi chú
-- [Shorts & Quiz Video](./shorts.mdx) — tạo video ngắn hoặc video trắc nghiệm từ ghi chú
-- [Translate](./translate.mdx) — dịch ghi chú sang ngôn ngữ khác
-- [Credits](./credits.mdx) — xem số dư và hạn mức Credits
-- [User](./user.mdx) — xem hồ sơ và danh sách ghi chú
+- [Notes](/apinotes) — tạo ghi chú từ URL/tệp, tải tệp lên, lấy danh sách ghi chú
+- [Tasks](/apitasks) — theo dõi kết quả của các tác vụ bất đồng bộ
+- [Flashcards](/apiflashcards) — tạo bộ Flashcard từ ghi chú
+- [Quiz](/apikeysquiz) — tạo bộ câu hỏi trắc nghiệm từ ghi chú
+- [Mindmap](/apimindmap) — tạo sơ đồ tư duy từ ghi chú
+- [Slide](/apikeysslideshow) — tạo bộ slide trình chiếu từ ghi chú
+- [Podcast](/apikeyspodcast) — tạo podcast từ ghi chú
+- [Shorts & Quiz Video](/apishorts) — tạo video ngắn hoặc video trắc nghiệm từ ghi chú
+- [Translate](/apikeystranslate) — dịch ghi chú sang ngôn ngữ khác
+- [Credits](/apicredits) — xem số dư và hạn mức Credits
+- [User](/apiuser) — xem hồ sơ và danh sách ghi chú
 
 Một số endpoint này cũng chấp nhận User JWT hoặc (đối với một vài endpoint) thông tin xác thực thiết bị/dịch vụ.
 Ở bất kỳ đâu tài liệu này hiển thị một endpoint, API Key đều là một phương thức xác thực hợp lệ.
@@ -57,7 +57,7 @@ Một số endpoint này cũng chấp nhận User JWT hoặc (đối với một
 
 Mỗi API Key có một danh sách `scopes`.
 
-- **Danh sách rỗng \*\*\*\***`` (hoặc không truyền `scopes`) có nghĩa là **toàn quyền** — API Key có thể thực hiện
+- **Danh sách rỗng \*\*\*\*****`[]`** (hoặc không truyền `scopes`) có nghĩa là **toàn quyền** — API Key có thể thực hiện
   mọi thao tác mà chủ sở hữu của nó có quyền thực hiện.
 - Danh sách không rỗng được dùng để **giới hạn** API Key theo các scope cụ thể
   (ví dụ: `note:read`, `note:write`, `credit:read`, `folder:read`, `folder:write`).
@@ -166,3 +166,4 @@ Ví dụ:
   "error_key": "invalid_api_key"
 }
 ```
+
