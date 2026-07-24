@@ -1,8 +1,8 @@
 ---
-
 title: Tasks
 description: Theo dõi trạng thái và lấy kết quả của các tác vụ bất đồng bộ bằng API Key.
-----------------------------------------------------------------------------------------
+---
+---
 
 # Tasks
 
@@ -12,14 +12,14 @@ Thay vì chờ kết quả hoàn tất trong request đầu tiên, API sẽ tr�
 
 Các tính năng thường trả về `task_id` gồm:
 
-* Tạo note
-* Flashcards
-* Quiz
-* Mindmap
-* Slide
-* Podcast
-* Shorts
-* Translate
+- Tạo note
+- Flashcards
+- Quiz
+- Mindmap
+- Slide
+- Podcast
+- Shorts
+- Translate
 
 Luồng xử lý cơ bản:
 
@@ -206,10 +206,10 @@ Nên kiểm tra trạng thái task theo chu kỳ thay vì gọi liên tục.
 
 Không nên:
 
-* Poll API nhiều lần mỗi giây.
-* Tiếp tục polling sau khi task đã hoàn tất.
-* Coi timeout phía client là task đã thất bại.
-* Tạo lại task ngay khi request polling tạm thời gặp lỗi mạng.
+- Poll API nhiều lần mỗi giây.
+- Tiếp tục polling sau khi task đã hoàn tất.
+- Coi timeout phía client là task đã thất bại.
+- Tạo lại task ngay khi request polling tạm thời gặp lỗi mạng.
 
 > Timeout của ứng dụng chỉ có nghĩa là ứng dụng đã ngừng chờ. Task trên Notex có thể vẫn đang tiếp tục xử lý.
 
@@ -383,63 +383,7 @@ console.log(result.note_id);
 
 ## TypeScript types
 
-<details>
-<summary>View TypeScript types</summary>
-
-```typescript
-export type TaskStatus =
-  | 'PENDING'
-  | 'PROCESSING'
-  | 'SUCCESS'
-  | 'FAILURE'
-  | 'FAIL';
-
-export interface PollTaskResultPathParams {
-  task_id: string;
-}
-
-export interface TaskProcessingResponse {
-  status: 'PENDING' | 'PROCESSING';
-  step?: string;
-  progress?: number;
-  estimated_time?: number;
-}
-
-export interface TaskSuccessResultData {
-  note_id?: string;
-  title?: string;
-  summary?: string;
-  type?: string;
-  audio_url?: string;
-  youtube_url?: string;
-  views?: string;
-  [key: string]: unknown;
-}
-
-export interface TaskSuccessResponse<
-  T = TaskSuccessResultData,
-> {
-  status: 'SUCCESS';
-  data: T;
-  message?: string;
-}
-
-export interface TaskFailureResponse {
-  status: 'FAILURE' | 'FAIL';
-  error?: string;
-  error_key?: string;
-  message?: string;
-}
-
-export type TaskResultResponse<
-  T = TaskSuccessResultData,
-> =
-  | TaskProcessingResponse
-  | TaskSuccessResponse<T>
-  | TaskFailureResponse;
-```
-
-</details>
+<details><p><summary>View TypeScript types</summary></p></details>
 
 ---
 
@@ -464,12 +408,12 @@ Thứ tự xử lý nên là:
 
 ## Important notes
 
-* `data` có cấu trúc khác nhau tùy loại task.
-* Không phải task nào cũng trả về `progress` hoặc `estimated_time`.
-* Hỗ trợ cả hai trạng thái lỗi `FAILURE` và `FAIL`.
-* Không tiếp tục polling sau trạng thái cuối.
-* Không đặt polling interval quá ngắn.
-* Nên có timeout và cơ chế hủy ở phía client.
-* Khi request polling gặp lỗi mạng, có thể retry thay vì kết luận task thất bại.
-* Chỉ gọi Tasks API từ backend hoặc server được kiểm soát.
-* Không đưa API Key vào frontend hoặc mã nguồn công khai.
+- `data` có cấu trúc khác nhau tùy loại task.
+- Không phải task nào cũng trả về `progress` hoặc `estimated_time`.
+- Hỗ trợ cả hai trạng thái lỗi `FAILURE` và `FAIL`.
+- Không tiếp tục polling sau trạng thái cuối.
+- Không đặt polling interval quá ngắn.
+- Nên có timeout và cơ chế hủy ở phía client.
+- Khi request polling gặp lỗi mạng, có thể retry thay vì kết luận task thất bại.
+- Chỉ gọi Tasks API từ backend hoặc server được kiểm soát.
+- Không đưa API Key vào frontend hoặc mã nguồn công khai.
