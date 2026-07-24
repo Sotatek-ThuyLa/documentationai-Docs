@@ -1,18 +1,20 @@
 ---
-
 title: Notes
-description: Tạo ghi chú bằng AI từ URL hoặc tệp, kiểm tra đầu vào và lấy danh sách ghi chú bằng API Key.
----------------------------------------------------------------------------------------------------------
+description: >-
+  Tạo ghi chú bằng AI từ URL hoặc tệp, kiểm tra đầu vào và lấy danh sách ghi chú
+  bằng API Key.
+---
+---
 
 # Notes
 
 Notes API cho phép bạn:
 
-* Tạo ghi chú từ website hoặc video YouTube.
-* Tạo ghi chú từ tệp audio, tài liệu hoặc hình ảnh.
-* Kiểm tra đầu vào trước khi bắt đầu xử lý.
-* Lấy danh sách ghi chú của tài khoản.
-* Theo dõi tiến độ tạo ghi chú thông qua Tasks API.
+- Tạo ghi chú từ website hoặc video YouTube.
+- Tạo ghi chú từ tệp audio, tài liệu hoặc hình ảnh.
+- Kiểm tra đầu vào trước khi bắt đầu xử lý.
+- Lấy danh sách ghi chú của tài khoản.
+- Theo dõi tiến độ tạo ghi chú thông qua Tasks API.
 
 Base URL:
 
@@ -66,8 +68,8 @@ Content-Type: application/json
 
 Bạn phải truyền **một trong hai** field:
 
-* `web_url`: dùng cho website hoặc YouTube.
-* `file_url`: dùng cho tệp đã upload.
+- `web_url`: dùng cho website hoặc YouTube.
+- `file_url`: dùng cho tệp đã upload.
 
 Không truyền đồng thời cả hai field trong cùng một request.
 
@@ -148,44 +150,7 @@ curl -X POST https://api.notexapp.com/v9/create/note \
 
 Sau khi nhận `task_id`, sử dụng [Tasks API](./tasks.mdx) để kiểm tra cho đến khi tác vụ có trạng thái `SUCCESS` hoặc `FAIL`.
 
-<details>
-<summary>TypeScript types</summary>
-
-```typescript
-export interface CreateNoteV9RequestBody {
-  web_url?: string;
-  file_url?: string;
-  language_hints?: string[];
-  use_ocr?: boolean;
-  summary_style?: string;
-  writing_style?: string;
-  human_style?: string | null;
-  is_record?: boolean;
-  duration?: number;
-  bot_id?: string;
-  record_session_id?: string;
-  device_meeting_id?: string;
-  target_language?: string;
-}
-
-export interface CreateNoteResType {
-  status: TaskStatus | null;
-  data: {
-    task_id: string;
-    user_id: string;
-    note_id?: string;
-    step?: string;
-    progress?: number;
-    estimated_time?: number;
-    timestamp?: number;
-    stream_sse?: string;
-  };
-  folder_id?: string;
-  stream_sse?: string;
-}
-```
-
-</details>
+<details><p><summary>TypeScript types</summary></p></details>
 
 ---
 
@@ -199,10 +164,10 @@ Kiểm tra URL hoặc đường dẫn file trước khi tạo note.
 
 Endpoint này hữu ích khi bạn muốn:
 
-* Kiểm tra nguồn có được Notex hỗ trợ hay không.
-* Xác định loại nội dung đầu vào.
-* Đọc metadata như thời lượng video hoặc ngôn ngữ phụ đề.
-* Tránh gửi tác vụ không hợp lệ và tiêu tốn tài nguyên không cần thiết.
+- Kiểm tra nguồn có được Notex hỗ trợ hay không.
+- Xác định loại nội dung đầu vào.
+- Đọc metadata như thời lượng video hoặc ngôn ngữ phụ đề.
+- Tránh gửi tác vụ không hợp lệ và tiêu tốn tài nguyên không cần thiết.
 
 ### Request body
 
@@ -265,31 +230,7 @@ curl -X POST https://api.notexapp.com/v9/create/validate \
 | `metadata.has_captions`        | `boolean`  | Nguồn có phụ đề hay không            |
 | `metadata.available_languages` | `string[]` | Các ngôn ngữ có sẵn                  |
 
-<details>
-<summary>TypeScript types</summary>
-
-```typescript
-export interface ValidateLinkBodyType {
-  web_url?: string;
-  file_url?: string;
-}
-
-export interface ValidateLinkResType {
-  is_valid: boolean;
-  input_type: string;
-  error_key?: string;
-  error_message?: string;
-  metadata?: {
-    video_id?: string;
-    status?: string;
-    duration?: number;
-    has_captions?: boolean;
-    available_languages?: string[];
-  };
-}
-```
-
-</details>
+<details><p><summary>TypeScript types</summary></p></details>
 
 ---
 
@@ -347,26 +288,7 @@ curl "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
 | `data.full_path`     | `string`             | Đường dẫn truyền vào `file_url` khi tạo note |
 | `data.presigned_url` | `string`             | URL tạm thời dùng để upload file bằng `PUT`  |
 
-<details>
-<summary>TypeScript types</summary>
-
-```typescript
-export interface GetPresignedUrlQueryParams {
-  file_name: string;
-  is_public?: boolean;
-}
-
-export interface PresignedUrlResType {
-  status: TaskStatus | null;
-  data: {
-    file_name: string;
-    full_path: string;
-    presigned_url: string;
-  };
-}
-```
-
-</details>
+<details><p><summary>TypeScript types</summary></p></details>
 
 ### Upload file bằng presigned URL
 
@@ -490,39 +412,7 @@ curl "https://api.notexapp.com/v2/user/notes?limit=20&sort_field=createdAt&sort_
 | `createdAt`             | `string`         | Thời điểm tạo theo ISO 8601 UTC                |
 | `updatedAt`             | `string`         | Thời điểm cập nhật gần nhất theo ISO 8601 UTC  |
 
-<details>
-<summary>TypeScript types</summary>
-
-```typescript
-export interface ListMyNotesQueryParams {
-  type?: string;
-  tab?: string;
-  limit?: number;
-  cursor?: string;
-  page?: number;
-  sort_field?: string;
-  sort_order?: 1 | -1;
-}
-
-export interface NoteItemData {
-  note_id: string;
-  title: string;
-  folder_id: string | null;
-  type: string;
-  duration?: number;
-  short_summary?: string;
-  is_public?: boolean;
-  is_password_protected?: boolean;
-  share_link?: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export type ListMyNotesResponse =
-  ApiResponse<NoteItemData[]>;
-```
-
-</details>
+<details><p><summary>TypeScript types</summary></p></details>
 
 Xem thêm chi tiết tại [User API](./user.mdx#list-my-notes).
 
@@ -562,11 +452,11 @@ Receive note_id
 
 ## Notes
 
-* Chỉ truyền một trong hai field `web_url` hoặc `file_url`.
-* Nên gọi Validate API trước khi xử lý URL từ người dùng.
-* Không gửi API Key tới `presigned_url`.
-* Khi tạo note từ file, dùng `full_path`, không dùng `presigned_url`.
-* `target_language` đã deprecated; dùng `language_hints`.
-* Một số tác vụ có thể hoàn thành ngay và trả về `note_id`, nhưng tích hợp vẫn nên hỗ trợ luồng bất đồng bộ qua `task_id`.
-* Các field trạng thái và tiến độ có thể không xuất hiện trong mọi response.
-* Chỉ gọi Notex API từ backend hoặc server được kiểm soát.
+- Chỉ truyền một trong hai field `web_url` hoặc `file_url`.
+- Nên gọi Validate API trước khi xử lý URL từ người dùng.
+- Không gửi API Key tới `presigned_url`.
+- Khi tạo note từ file, dùng `full_path`, không dùng `presigned_url`.
+- `target_language` đã deprecated; dùng `language_hints`.
+- Một số tác vụ có thể hoàn thành ngay và trả về `note_id`, nhưng tích hợp vẫn nên hỗ trợ luồng bất đồng bộ qua `task_id`.
+- Các field trạng thái và tiến độ có thể không xuất hiện trong mọi response.
+- Chỉ gọi Notex API từ backend hoặc server được kiểm soát.

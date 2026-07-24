@@ -1,16 +1,16 @@
 ---
-
 title: User
 description: Lấy thông tin tài khoản và danh sách ghi chú bằng API Key.
------------------------------------------------------------------------
+---
+---
 
 # User
 
 User API cho phép bạn:
 
-* Lấy thông tin tài khoản đang sở hữu API Key.
-* Lấy danh sách ghi chú của tài khoản đó.
-* Lọc, sắp xếp và phân trang danh sách ghi chú.
+- Lấy thông tin tài khoản đang sở hữu API Key.
+- Lấy danh sách ghi chú của tài khoản đó.
+- Lọc, sắp xếp và phân trang danh sách ghi chú.
 
 Base URL:
 
@@ -50,9 +50,9 @@ Lấy thông tin tài khoản đang được API Key đại diện.
 
 Endpoint này hữu ích khi bạn cần:
 
-* Kiểm tra API Key thuộc tài khoản nào.
-* Hiển thị thông tin người dùng trong hệ thống tích hợp.
-* Đọc các thiết lập ngôn ngữ của tài khoản.
+- Kiểm tra API Key thuộc tài khoản nào.
+- Hiển thị thông tin người dùng trong hệ thống tích hợp.
+- Đọc các thiết lập ngôn ngữ của tài khoản.
 
 ### Request
 
@@ -104,31 +104,7 @@ curl https://api.notexapp.com/v1/user/profile \
 | `transcription_language` | `string` | Ngôn ngữ mặc định khi phiên âm          |
 | `ai_notes_language`      | `string` | Ngôn ngữ mặc định của ghi chú do AI tạo |
 
-<details>
-<summary>TypeScript types</summary>
-
-```typescript
-export interface UserPreferences {
-  display_language: string;
-  transcription_language: string;
-  ai_notes_language: string;
-}
-
-export interface UserProfileData {
-  user_id: string;
-  email: string;
-  name: string;
-  image: string | null;
-  role: string;
-  preferences: UserPreferences;
-  createdAt: string;
-}
-
-export type GetUserProfileResponse =
-  ApiResponse<UserProfileData>;
-```
-
-</details>
+<details><p><summary>TypeScript types</summary></p></details>
 
 ---
 
@@ -142,10 +118,10 @@ Lấy danh sách ghi chú thuộc tài khoản đang sử dụng API Key.
 
 Endpoint hỗ trợ:
 
-* Lọc theo loại ghi chú.
-* Lọc theo tab.
-* Sắp xếp danh sách.
-* Phân trang theo số trang hoặc cursor.
+- Lọc theo loại ghi chú.
+- Lọc theo tab.
+- Sắp xếp danh sách.
+- Phân trang theo số trang hoặc cursor.
 
 ### Request
 
@@ -224,49 +200,7 @@ Tùy theo cơ chế phân trang, response có thể bao gồm:
 | `page`        | `number`         | Trang hiện tại                       |
 | `limit`       | `number`         | Số item trên mỗi trang               |
 
-<details>
-<summary>TypeScript types</summary>
-
-```typescript
-export interface ListMyNotesQueryParams {
-  type?: string;
-  tab?: string;
-  limit?: number;
-  cursor?: string;
-  page?: number;
-  sort_field?: string;
-  sort_order?: 1 | -1;
-}
-
-export interface NoteItemData {
-  note_id: string;
-  title: string;
-  folder_id: string | null;
-  type: string;
-  duration?: number;
-  short_summary?: string;
-  is_public?: boolean;
-  is_password_protected?: boolean;
-  share_link?: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ListMyNotesData {
-  notes: NoteItemData[];
-  total_notes?: number;
-  next_cursor?: string | null;
-  has_more?: boolean;
-  page?: number;
-  limit?: number;
-}
-
-export type ListMyNotesResponse =
-  | ApiResponse<NoteItemData[]>
-  | ApiResponse<ListMyNotesData>;
-```
-
-</details>
+<details><p><summary>TypeScript types</summary></p></details>
 
 ## Pagination
 
@@ -281,8 +215,8 @@ Không nên truyền đồng thời `page` và `cursor` trong cùng một reques
 
 ## Notes
 
-* Chỉ gọi API từ backend hoặc server được kiểm soát.
-* Không đưa API Key vào frontend hoặc mã nguồn công khai.
-* Dùng `sort_order=-1` để lấy ghi chú mới nhất trước.
-* Các field tùy chọn có thể không xuất hiện trong mọi ghi chú.
-* Giá trị hợp lệ của `type` và `tab` phụ thuộc vào các loại nội dung Notex đang hỗ trợ.
+- Chỉ gọi API từ backend hoặc server được kiểm soát.
+- Không đưa API Key vào frontend hoặc mã nguồn công khai.
+- Dùng `sort_order=-1` để lấy ghi chú mới nhất trước.
+- Các field tùy chọn có thể không xuất hiện trong mọi ghi chú.
+- Giá trị hợp lệ của `type` và `tab` phụ thuộc vào các loại nội dung Notex đang hỗ trợ.

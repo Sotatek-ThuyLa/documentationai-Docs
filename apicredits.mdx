@@ -1,8 +1,10 @@
 ---
-
 title: Credits
-description: Kiểm tra số dư Credits, gói tài khoản, hạn mức sử dụng và quyền truy cập tính năng bằng API Key.
--------------------------------------------------------------------------------------------------------------
+description: >-
+  Kiểm tra số dư Credits, gói tài khoản, hạn mức sử dụng và quyền truy cập tính
+  năng bằng API Key.
+---
+---
 
 # Credits
 
@@ -10,11 +12,11 @@ Credits API giúp bạn kiểm tra tài khoản còn đủ tài nguyên để th
 
 Bạn có thể sử dụng API này để:
 
-* Hiển thị số Credits hiện có.
-* Xác định gói tài khoản hiện tại.
-* Theo dõi lượng tài nguyên đã sử dụng.
-* Kiểm tra giới hạn của từng loại tác vụ.
-* Xác định tính năng nào được bật trong gói hiện tại.
+- Hiển thị số Credits hiện có.
+- Xác định gói tài khoản hiện tại.
+- Theo dõi lượng tài nguyên đã sử dụng.
+- Kiểm tra giới hạn của từng loại tác vụ.
+- Xác định tính năng nào được bật trong gói hiện tại.
 
 Base URL:
 
@@ -54,11 +56,11 @@ Trả về thông tin tổng quan về gói tài khoản và số Credits hiện
 
 Endpoint này phù hợp khi bạn cần:
 
-* Hiển thị số dư Credits.
-* Kiểm tra tài khoản có phải người dùng trả phí hay không.
-* Xác định gói đang sử dụng.
-* Kiểm tra thời điểm gia hạn tiếp theo.
-* Kiểm tra trước khi gửi một tác vụ cần dùng Credits.
+- Hiển thị số dư Credits.
+- Kiểm tra tài khoản có phải người dùng trả phí hay không.
+- Xác định gói đang sử dụng.
+- Kiểm tra thời điểm gia hạn tiếp theo.
+- Kiểm tra trước khi gửi một tác vụ cần dùng Credits.
 
 ### Request
 
@@ -116,37 +118,7 @@ Một số mã gói phổ biến:
 
 Hệ thống có thể bổ sung thêm mã gói mới trong tương lai. Không nên giới hạn logic tích hợp chỉ trong danh sách trên.
 
-<details>
-<summary>TypeScript types</summary>
-
-```typescript
-export type KnownPlanCode =
-  | 'free'
-  | 'pro_lite'
-  | 'pro'
-  | 'business'
-  | 'plus'
-  | 'business_plus'
-  | 'lifetime';
-
-export type PlanCode = KnownPlanCode | (string & {});
-
-export interface UserCreditsMeData {
-  plan_code: PlanCode;
-  plan_name?: string;
-  total_credits: number;
-  reward_credits?: number;
-  purchased_credits?: number;
-  has_purchased: boolean;
-  is_paid_user: boolean;
-  renew_date?: string | null;
-}
-
-export type GetCreditsMeResponse =
-  ApiResponse<UserCreditsMeData>;
-```
-
-</details>
+<details><p><summary>TypeScript types</summary></p></details>
 
 ---
 
@@ -160,11 +132,11 @@ Trả về hạn mức, mức sử dụng và quyền truy cập tính năng c�
 
 Endpoint này phù hợp khi bạn cần:
 
-* Kiểm tra tài khoản còn bao nhiêu lượt hoặc phút sử dụng.
-* Hiển thị tiến độ sử dụng quota.
-* Kiểm tra giới hạn tối đa cho một note.
-* Xác định tính năng nào được gói hiện tại hỗ trợ.
-* Ngăn request vượt quá giới hạn trước khi gửi lên Notex.
+- Kiểm tra tài khoản còn bao nhiêu lượt hoặc phút sử dụng.
+- Hiển thị tiến độ sử dụng quota.
+- Kiểm tra giới hạn tối đa cho một note.
+- Xác định tính năng nào được gói hiện tại hỗ trợ.
+- Ngăn request vượt quá giới hạn trước khi gửi lên Notex.
 
 ### Request
 
@@ -348,95 +320,7 @@ Hai field sau mô tả chu kỳ quota hiện tại:
 
 Cả hai sử dụng định dạng ISO 8601 UTC.
 
-<details>
-<summary>TypeScript types</summary>
-
-```typescript
-export type PeriodQuotaBucket =
-  | 'notes'
-  | 'notes_with_multiple_files'
-  | 'recording_minutes'
-  | 'meeting_minutes'
-  | 'live_meeting'
-  | 'nova_chat_single_note'
-  | 'nova_chat_all_notes';
-
-export type PerNoteQuotaBucket =
-  | 'create_mindmap'
-  | 'create_slideshow'
-  | 'create_flashcards_sets'
-  | 'create_quizzes_sets'
-  | 'create_shorts'
-  | 'create_podcast'
-  | 'regenerate_summary'
-  | 'note_translation';
-
-export type LifetimeQuotaBucket =
-  | 'live_transcribe';
-
-export type PerNoteCapKey =
-  | 'recording_minutes_per_note'
-  | 'meeting_minutes_per_note'
-  | 'youtube_max_duration'
-  | 'document_max_megabytes'
-  | 'images_max_input'
-  | 'short_max_seconds'
-  | 'podcast_max_seconds';
-
-export type FeatureFlag =
-  | 'integrate_notion'
-  | 'integrate_google_docs'
-  | 'live_transcribe'
-  | 'bot_auto_join'
-  | 'share_note_public'
-  | 'share_note_specific'
-  | 'share_note_organization'
-  | 'summary_note_with_template'
-  | 'connect_google_calendar'
-  | 'connect_outlook_calendar';
-
-export type QuotaSnapshot =
-  Partial<Record<PeriodQuotaBucket, number>>;
-
-export type QuotaPerNoteSnapshot =
-  Partial<Record<PerNoteQuotaBucket, number>>;
-
-export type QuotaLifetimeSnapshot =
-  Partial<Record<LifetimeQuotaBucket, number>>;
-
-export type PerNoteCapsSnapshot =
-  Partial<Record<PerNoteCapKey, number>>;
-
-export type FeaturesSnapshot =
-  Partial<Record<FeatureFlag, boolean>>;
-
-export interface PeriodUsageCounter {
-  recording_minutes_used?: number;
-  meeting_minutes_used?: number;
-  notes_created?: number;
-  live_meeting?: number;
-  nova_chat_single_note?: number;
-  nova_chat_all_notes?: number;
-}
-
-export interface QuotaData {
-  plan_code: PlanCode;
-  quota_snapshot: QuotaSnapshot;
-  quota_per_note_snapshot: QuotaPerNoteSnapshot;
-  quota_lifetime_snapshot: QuotaLifetimeSnapshot;
-  per_note_caps: PerNoteCapsSnapshot;
-  period_usage_counter: PeriodUsageCounter;
-  periodStartDate?: string;
-  resetDate?: string;
-  features_snapshot: FeaturesSnapshot;
-  hasPurchased?: boolean;
-}
-
-export type GetQuotaResponse =
-  ApiResponse<QuotaData>;
-```
-
-</details>
+<details><p><summary>TypeScript types</summary></p></details>
 
 ## Credits và quota khác nhau như thế nào?
 
@@ -453,10 +337,10 @@ Trong phần lớn tích hợp, bạn chỉ cần:
 
 ## Notes
 
-* Các field quota là tùy chọn và có thể khác nhau giữa các gói.
-* Không nên hard-code hạn mức trong ứng dụng.
-* Luôn sử dụng dữ liệu mới nhất từ API trước các tác vụ quan trọng.
-* `total_credits` không thay thế cho quota của từng tính năng.
-* Một tài khoản còn Credits vẫn có thể đạt giới hạn quota của một tính năng cụ thể.
-* Chỉ gọi API từ backend hoặc server được kiểm soát.
-* Không đưa API Key vào frontend hoặc mã nguồn công khai.
+- Các field quota là tùy chọn và có thể khác nhau giữa các gói.
+- Không nên hard-code hạn mức trong ứng dụng.
+- Luôn sử dụng dữ liệu mới nhất từ API trước các tác vụ quan trọng.
+- `total_credits` không thay thế cho quota của từng tính năng.
+- Một tài khoản còn Credits vẫn có thể đạt giới hạn quota của một tính năng cụ thể.
+- Chỉ gọi API từ backend hoặc server được kiểm soát.
+- Không đưa API Key vào frontend hoặc mã nguồn công khai.

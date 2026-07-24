@@ -1,8 +1,10 @@
 ---
-
 title: Presigned URL
-description: Upload file lên Notex và nhận file URL để sử dụng với Notes API và các API xử lý nội dung khác.
-------------------------------------------------------------------------------------------------------------
+description: >-
+  Upload file lên Notex và nhận file URL để sử dụng với Notes API và các API xử
+  lý nội dung khác.
+---
+---
 
 # Presigned URL
 
@@ -132,10 +134,10 @@ Header `Content-Type` phải phù hợp với file đang upload.
 
 Nếu upload thất bại, hãy kiểm tra:
 
-* Presigned URL đã hết hạn hay chưa.
-* `Content-Type` có đúng với file không.
-* File binary có được gửi nguyên vẹn không.
-* URL upload có bị thay đổi hoặc encode lại không.
+- Presigned URL đã hết hạn hay chưa.
+- `Content-Type` có đúng với file không.
+- File binary có được gửi nguyên vẹn không.
+- URL upload có bị thay đổi hoặc encode lại không.
 
 > Không chỉnh sửa `upload_url`. Hãy sử dụng nguyên giá trị API trả về.
 
@@ -261,47 +263,22 @@ Giá trị trả về từ `uploadFileToNotex` có thể được truyền trự
 
 ## TypeScript types
 
-<details>
-<summary>View TypeScript types</summary>
-
-```typescript
-export interface GetPresignedUrlQueryParams {
-  file_name: string;
-  is_public?: boolean;
-  user_id?: string;
-}
-
-export interface PresignedUrlData {
-  upload_url: string;
-  file_url: string;
-  file_name?: string;
-  full_path?: string;
-  presigned_url?: string;
-}
-
-export interface GetPresignedUrlResponse {
-  statusCode: number;
-  message?: string;
-  data: PresignedUrlData;
-}
-```
-
-</details>
+<details><p><summary>View TypeScript types</summary></p></details>
 
 ---
 
 ## Important notes
 
-* Chỉ gửi API Key khi gọi `/v1/presigned-url`.
-* Không gửi API Key tới `upload_url`.
-* Upload file bằng phương thức `PUT`.
-* Gửi file binary trực tiếp trong request body.
-* Sử dụng đúng `Content-Type`.
-* Dùng `file_url`, không dùng `upload_url`, với các API xử lý nội dung.
-* Presigned URL chỉ có hiệu lực trong một khoảng thời gian giới hạn.
-* Nếu URL hết hạn, hãy gọi lại `/v1/presigned-url`.
-* Không lưu hoặc tái sử dụng `upload_url` trong thời gian dài.
-* Nên giữ API Key và toàn bộ luồng tích hợp ở phía server.
+- Chỉ gửi API Key khi gọi `/v1/presigned-url`.
+- Không gửi API Key tới `upload_url`.
+- Upload file bằng phương thức `PUT`.
+- Gửi file binary trực tiếp trong request body.
+- Sử dụng đúng `Content-Type`.
+- Dùng `file_url`, không dùng `upload_url`, với các API xử lý nội dung.
+- Presigned URL chỉ có hiệu lực trong một khoảng thời gian giới hạn.
+- Nếu URL hết hạn, hãy gọi lại `/v1/presigned-url`.
+- Không lưu hoặc tái sử dụng `upload_url` trong thời gian dài.
+- Nên giữ API Key và toàn bộ luồng tích hợp ở phía server.
 
 ## Next step
 
