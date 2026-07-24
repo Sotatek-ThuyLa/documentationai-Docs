@@ -1,68 +1,275 @@
 ---
 title: Presigned URL
-description: >-
-  Obtain a presigned URL to upload a file (e.g. audio/document) before creating
-  a note.
-
-
-  Accepts an API key (X-API-Key or Authorization: Bearer ntx_...), a user JWT,
-  and also
-
-  device/service credentials.
-
-
-  Base URL: https://api.notexapp.com
+description: Upload a local file to Notex and receive a file URL that can be used by Notes and other content-processing APIs.
 ---
-## Get presigned URL — `GET /v1/presigned-url`
 
-| Parameter   | In    | Type    | Required     | Description                                         |
-| ----------- | ----- | ------- | ------------ | --------------------------------------------------- |
-| `file_name` | query | string  | **required** | Name of the file to upload                          |
-| `is_public` | query | boolean | optional     | Whether the object should be publicly accessible    |
-| `user_id`   | query | string  | optional     | Target user id (used with service/device auth only) |
+# Presigned URL
 
-```bash
-curl "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
-  -H "X-API-Key: ntx_live_..."
+A presigned URL allows your application to upload a file directly to Notex storage without sending the file through the main API server.
+
+The upload flow has three steps:
+
+```text
+Get an upload URL
+        ↓
+Upload the file with PUT
+        ↓
+Use file_url with another API
 ```
 
-Response:
+After uploading an audio file, document, or image, you can pass the returned `file_url` to the [Notes API](./notes.mdx#create-note).
+
+Base URL:
+
+```text
+https://api.notexapp.com
+```
+
+Send the API key through `X-API-Key` when requesting a presigned URL:
+
+```bash
+-H "X-API-Key: ntx_live_..."
+```
+
+---
+
+## Get a presigned URL
+
+```http
+GET /v1/presigned-url
+```
+
+Creates a temporary URL that accepts a direct `PUT` upload.
+
+### Query parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `file_name` | `string` | Yes | File name, including its extension |
+| `is_public` | `boolean` | No | Whether the stored object should be publicly accessible |
+| `user_id` | `string` | No | Target user ID for special device or service integrations |
+
+When using a normal API key, omit `user_id`. The uploaded file is associated with the account that created the key.
+
+### Example request
+
+```bash
+curl --get "https://api.notexapp.com/v1/presigned-url" \
+  -H "X-API-Key: ntx_live_..." \
+  --data-urlencode "file_name=lecture.mp3"
+```
+
+`--data-urlencode` safely handles spaces and special characters in file names.
+
+### Example response
 
 ```json
 {
   "statusCode": 200,
   "data": {
-    "upload_url": "https://...",
+    "upload_url": "https://storage.example.com/temporary-upload-url",
     "file_url": "https://cdn.notexapp.com/uploads/lecture.mp3"
   }
 }
 ```
 
+### Response fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `upload_url` | `string` | Temporary URL used to upload the file with `PUT` |
+| `file_url` | `string` | File reference passed to another Notex API |
+| `file_name` | `string` | Original file name, when returned |
+| `full_path` | `string` | Internal storage path, when returned |
+| `presigned_url` | `string` | Legacy name or alias for `upload_url`, when returned |
+
+For new integrations, prefer:
+
+```text
+upload_url → upload the file
+file_url   → use the uploaded file
+```
+
 ---
 
-## Upload flow
+## Upload the file
 
-1. `GET /v1/presigned-url?file_name=lecture.mp3` → receive `upload_url` and `file_url`.
-2. `PUT <upload_url>` with your file as the request body (no auth header needed).
-3. Pass `file_url` as the `file_url` field in [`POST /v9/create/note`](./notes.mdx#create-note--post-v9createnote).
+Send the file binary directly to `upload_url` with a `PUT` request.
+
+Do not include the Notex API key in this request.
 
 ```bash
-# Step 1 — get upload URL
-RESPONSE=$(curl -s "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
-  -H "X-API-Key: ntx_live_...")
-
-UPLOAD_URL=$(echo $RESPONSE | jq -r '.data.upload_url')
-FILE_URL=$(echo $RESPONSE | jq -r '.data.file_url')
-
-# Step 2 — upload the file
 curl -X PUT "$UPLOAD_URL" \
   -H "Content-Type: audio/mpeg" \
   --data-binary @lecture.mp3
+```
 
-# Step 3 — create the note
+### Content types
+
+| File | Content-Type |
+| --- | --- |
+| `.mp3` | `audio/mpeg` |
+| `.wav` | `audio/wav` |
+| `.m4a` | `audio/mp4` |
+| `.mp4` | `video/mp4` |
+| `.pdf` | `application/pdf` |
+| `.docx` | `application/vnd.openxmlformats-officedocument.wordprocessingml.document` |
+| `.txt` | `text/plain` |
+| `.jpg`, `.jpeg` | `image/jpeg` |
+| `.png` | `image/png` |
+
+If the upload fails, check:
+
+- Whether the presigned URL has expired.
+- Whether the `Content-Type` matches the uploaded file.
+- Whether the request body contains the unmodified binary file.
+- Whether the upload URL was changed or encoded again.
+
+Do not modify `upload_url`. Use it exactly as returned.
+
+---
+
+## Use the uploaded file
+
+After the `PUT` request succeeds, pass `file_url` to the next API.
+
+Example:
+
+```bash
 curl -X POST https://api.notexapp.com/v9/create/note \
   -H "X-API-Key: ntx_live_..." \
   -H "Content-Type: application/json" \
-  -d "{\"file_url\": \"$FILE_URL\", \"language_hints\": [\"en\"]}"
+  -d '{
+    "file_url": "https://cdn.notexapp.com/uploads/lecture.mp3",
+    "language_hints": ["en"]
+  }'
 ```
 
+Do not pass `upload_url` to the Create Note endpoint.
+
+| Value | Purpose |
+| --- | --- |
+| `upload_url` | Used only for the direct `PUT` upload |
+| `file_url` | Used as input for Notes and other content APIs |
+
+---
+
+## Complete upload flow
+
+```bash
+# Step 1: Get an upload URL
+RESPONSE=$(curl -s --get \
+  "https://api.notexapp.com/v1/presigned-url" \
+  -H "X-API-Key: ntx_live_..." \
+  --data-urlencode "file_name=lecture.mp3")
+
+UPLOAD_URL=$(echo "$RESPONSE" | jq -r '.data.upload_url')
+FILE_URL=$(echo "$RESPONSE" | jq -r '.data.file_url')
+
+# Step 2: Upload the file
+curl --fail -X PUT "$UPLOAD_URL" \
+  -H "Content-Type: audio/mpeg" \
+  --data-binary @lecture.mp3
+
+# Step 3: Create a note
+curl -X POST https://api.notexapp.com/v9/create/note \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"file_url\": \"$FILE_URL\",
+    \"language_hints\": [\"en\"]
+  }"
+```
+
+`curl --fail` causes the command to return an error for unsuccessful HTTP responses.
+
+## JavaScript example
+
+```typescript
+interface PresignedUrlResponse {
+  statusCode: number;
+  message?: string;
+  data: {
+    upload_url: string;
+    file_url: string;
+  };
+}
+
+async function uploadFileToNotex(
+  file: File,
+  apiKey: string,
+): Promise<string> {
+  const params = new URLSearchParams({
+    file_name: file.name,
+  });
+
+  const presignedResponse = await fetch(
+    `https://api.notexapp.com/v1/presigned-url?${params}`,
+    {
+      headers: {
+        'X-API-Key': apiKey,
+      },
+    },
+  );
+
+  if (!presignedResponse.ok) {
+    throw new Error('Failed to get a presigned URL');
+  }
+
+  const result =
+    (await presignedResponse.json()) as PresignedUrlResponse;
+
+  const uploadResponse = await fetch(result.data.upload_url, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': file.type || 'application/octet-stream',
+    },
+    body: file,
+  });
+
+  if (!uploadResponse.ok) {
+    throw new Error('Failed to upload the file');
+  }
+
+  return result.data.file_url;
+}
+```
+
+<details>
+<summary>TypeScript types</summary>
+
+```typescript
+export interface GetPresignedUrlQueryParams {
+  file_name: string;
+  is_public?: boolean;
+  user_id?: string;
+}
+
+export interface PresignedUrlData {
+  upload_url: string;
+  file_url: string;
+  file_name?: string;
+  full_path?: string;
+  presigned_url?: string;
+}
+
+export interface GetPresignedUrlResponse {
+  statusCode: number;
+  message?: string;
+  data: PresignedUrlData;
+}
+```
+
+</details>
+
+## Important notes
+
+- Send the API key only when requesting `/v1/presigned-url`.
+- Do not send the API key to `upload_url`.
+- Upload with `PUT`.
+- Send the raw file binary in the request body.
+- Use the correct `Content-Type`.
+- Use `file_url`, not `upload_url`, with content-processing APIs.
+- Presigned URLs expire.
+- Request a new URL when an existing one expires.
+- Keep the API key and upload orchestration on a controlled backend.

@@ -1,164 +1,572 @@
 ---
-title: Ghi chú (Notes)
-description: >-
-  Tạo ghi chú bằng AI và xem danh sách ghi chú của bạn. Tất cả các endpoint bên
-  dưới đều hỗ trợ API Key
 
-  (X-API-Key hoặc Authorization: Bearer ntx_...).
+title: Notes
+description: Tạo ghi chú bằng AI từ URL hoặc tệp, kiểm tra đầu vào và lấy danh sách ghi chú bằng API Key.
+---------------------------------------------------------------------------------------------------------
 
+# Notes
 
-  Base URL: https://api.notexapp.com
----
-## Tạo ghi chú — `POST /v9/create/note`
+Notes API cho phép bạn:
 
-Tạo ghi chú/tóm tắt từ một URL hoặc một tệp đã tải lên.
+* Tạo ghi chú từ website hoặc video YouTube.
+* Tạo ghi chú từ tệp audio, tài liệu hoặc hình ảnh.
+* Kiểm tra đầu vào trước khi bắt đầu xử lý.
+* Lấy danh sách ghi chú của tài khoản.
+* Theo dõi tiến độ tạo ghi chú thông qua Tasks API.
 
-Cũng hỗ trợ: User JWT, Device Token.
+Base URL:
 
-Content-Type: `application/json`
-
-| Field               | Type      | Required | Description                                           |
-| ------------------- | --------- | -------- | ----------------------------------------------------- |
-| `web_url`           | string    | optional | URL trang web hoặc YouTube nguồn                      |
-| `file_url`          | string    | optional | URL của tệp đã tải lên (xem Tải tệp lên ở bên dưới)   |
-| `language_hints`    | string\[] | optional | Ngôn ngữ đầu ra ưu tiên, ví dụ: `["en"]`              |
-| `use_ocr`           | boolean   | optional | Chạy OCR cho tài liệu hoặc hình ảnh                   |
-| `summary_style`     | string    | optional | Kiểu tóm tắt                                          |
-| `writing_style`     | string    | optional | Kiểu viết                                             |
-| `human_style`       | string    | optional | Tùy chọn văn phong tự nhiên hơn                       |
-| `is_record`         | boolean   | optional | Nguồn có phải là bản ghi âm hay không                 |
-| `bot_id`            | string    | optional | ID bot cuộc họp (đối với bản ghi từ bot)              |
-| `record_session_id` | string    | optional | ID phiên ghi âm                                       |
-| `device_meeting_id` | string    | optional | ID cuộc họp từ thiết bị                               |
-| `target_language`   | string    | optional | Đã ngừng sử dụng — hãy dùng `language_hints` thay thế |
-
-Phải cung cấp **một trong hai** `web_url` hoặc `file_url` (không được cung cấp cả hai).
-
-```bash
-# Từ URL YouTube
-curl -X POST https://api.notexapp.com/v9/create/note \
-  -H "X-API-Key: ntx_live_..." \
-  -H "Content-Type: application/json" \
-  -d '{ "web_url": "https://youtu.be/xxxx", "language_hints": ["en"] }'
-
-# Từ tệp đã tải lên
-curl -X POST https://api.notexapp.com/v9/create/note \
-  -H "X-API-Key: ntx_live_..." \
-  -H "Content-Type: application/json" \
-  -d '{ "file_url": "https://cdn.notexapp.com/uploads/lecture.mp3", "language_hints": ["en"] }'
+```text
+https://api.notexapp.com
 ```
 
-Trả về `task_id`. Theo dõi [Tasks](/apitasks) để lấy ghi chú đã hoàn thành.
+Gửi API Key trong header `X-API-Key`:
+
+```bash
+-H "X-API-Key: ntx_live_..."
+```
+
+## Response format
+
+Các response thông thường sử dụng wrapper:
+
+```typescript
+interface ApiResponse<T> {
+  statusCode: number;
+  message?: string;
+  data: T;
+}
+```
+
+Trạng thái của tác vụ xử lý có thể là:
+
+```typescript
+type TaskStatus =
+  | 'PENDING'
+  | 'PROCESSING'
+  | 'SUCCESS'
+  | 'FAIL';
+```
 
 ---
 
-## Xác thực đầu vào — `POST /v9/create/validate`
+## Create note
 
-Kiểm tra nguồn trước khi tạo ghi chú — hữu ích để xác nhận URL hoặc tệp có được hỗ trợ trước khi sử dụng credit.
+```http
+POST /v9/create/note
+```
 
-Cũng hỗ trợ: User JWT.
+Tạo ghi chú và nội dung tóm tắt bằng AI từ một URL hoặc tệp đã upload.
 
-Content-Type: `application/json`
+Request sử dụng:
 
-| Field      | Type   | Required | Description                         |
-| ---------- | ------ | -------- | ----------------------------------- |
-| `web_url`  | string | optional | URL nguồn cần xác thực              |
-| `file_url` | string | optional | URL của tệp đã tải lên cần xác thực |
+```http
+Content-Type: application/json
+```
+
+Bạn phải truyền **một trong hai** field:
+
+* `web_url`: dùng cho website hoặc YouTube.
+* `file_url`: dùng cho tệp đã upload.
+
+Không truyền đồng thời cả hai field trong cùng một request.
+
+### Request body
+
+| Field               | Type             | Required    | Description                                         |
+| ------------------- | ---------------- | ----------- | --------------------------------------------------- |
+| `web_url`           | `string`         | Conditional | URL website hoặc video YouTube                      |
+| `file_url`          | `string`         | Conditional | Đường dẫn tệp nhận được sau khi upload              |
+| `language_hints`    | `string[]`       | No          | Ngôn ngữ đầu ra mong muốn, ví dụ `["vi"]`, `["en"]` |
+| `use_ocr`           | `boolean`        | No          | Bật OCR cho tài liệu hoặc hình ảnh                  |
+| `summary_style`     | `string`         | No          | Preset kiểu tóm tắt                                 |
+| `writing_style`     | `string`         | No          | Preset phong cách viết                              |
+| `human_style`       | `string \| null` | No          | Tùy chọn phong cách viết tự nhiên                   |
+| `is_record`         | `boolean`        | No          | Cho biết nguồn là một bản ghi âm                    |
+| `duration`          | `number`         | No          | Thời lượng nội dung tính bằng giây                  |
+| `bot_id`            | `string`         | No          | ID của meeting bot                                  |
+| `record_session_id` | `string`         | No          | ID phiên ghi âm                                     |
+| `device_meeting_id` | `string`         | No          | ID cuộc họp trên thiết bị                           |
+| `target_language`   | `string`         | No          | Deprecated, dùng `language_hints` thay thế          |
+
+### Tạo note từ URL
+
+```bash
+curl -X POST https://api.notexapp.com/v9/create/note \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "web_url": "https://youtu.be/xxxx",
+    "language_hints": ["vi"]
+  }'
+```
+
+### Tạo note từ file đã upload
+
+```bash
+curl -X POST https://api.notexapp.com/v9/create/note \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "file_url": "audio/user-id/lecture.mp3",
+    "language_hints": ["vi"],
+    "is_record": true,
+    "duration": 1800
+  }'
+```
+
+### Example response
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "task_123456",
+    "user_id": "665f...",
+    "step": "transcribing",
+    "progress": 10,
+    "estimated_time": 120,
+    "timestamp": 1784011200
+  }
+}
+```
+
+### Response fields
+
+| Field                 | Type                 | Description                                     |
+| --------------------- | -------------------- | ----------------------------------------------- |
+| `status`              | `TaskStatus \| null` | Trạng thái khởi tạo tác vụ                      |
+| `data.task_id`        | `string`             | ID dùng để kiểm tra tiến độ qua Tasks API       |
+| `data.user_id`        | `string`             | ID tài khoản tạo tác vụ                         |
+| `data.note_id`        | `string`             | ID ghi chú, nếu đã được tạo                     |
+| `data.step`           | `string`             | Bước xử lý hiện tại                             |
+| `data.progress`       | `number`             | Tiến độ xử lý theo phần trăm                    |
+| `data.estimated_time` | `number`             | Thời gian dự kiến còn lại, tính bằng giây       |
+| `data.timestamp`      | `number`             | Thời điểm tác vụ được tạo                       |
+| `data.stream_sse`     | `string`             | URL SSE để theo dõi theo thời gian thực, nếu có |
+| `folder_id`           | `string`             | ID thư mục của ghi chú, nếu có                  |
+
+Sau khi nhận `task_id`, sử dụng [Tasks API](./tasks.mdx) để kiểm tra cho đến khi tác vụ có trạng thái `SUCCESS` hoặc `FAIL`.
+
+<details>
+<summary>TypeScript types</summary>
+
+```typescript
+export interface CreateNoteV9RequestBody {
+  web_url?: string;
+  file_url?: string;
+  language_hints?: string[];
+  use_ocr?: boolean;
+  summary_style?: string;
+  writing_style?: string;
+  human_style?: string | null;
+  is_record?: boolean;
+  duration?: number;
+  bot_id?: string;
+  record_session_id?: string;
+  device_meeting_id?: string;
+  target_language?: string;
+}
+
+export interface CreateNoteResType {
+  status: TaskStatus | null;
+  data: {
+    task_id: string;
+    user_id: string;
+    note_id?: string;
+    step?: string;
+    progress?: number;
+    estimated_time?: number;
+    timestamp?: number;
+    stream_sse?: string;
+  };
+  folder_id?: string;
+  stream_sse?: string;
+}
+```
+
+</details>
+
+---
+
+## Validate input
+
+```http
+POST /v9/create/validate
+```
+
+Kiểm tra URL hoặc đường dẫn file trước khi tạo note.
+
+Endpoint này hữu ích khi bạn muốn:
+
+* Kiểm tra nguồn có được Notex hỗ trợ hay không.
+* Xác định loại nội dung đầu vào.
+* Đọc metadata như thời lượng video hoặc ngôn ngữ phụ đề.
+* Tránh gửi tác vụ không hợp lệ và tiêu tốn tài nguyên không cần thiết.
+
+### Request body
+
+| Field      | Type     | Required    | Description                           |
+| ---------- | -------- | ----------- | ------------------------------------- |
+| `web_url`  | `string` | Conditional | URL website hoặc YouTube cần kiểm tra |
+| `file_url` | `string` | Conditional | Đường dẫn file đã upload cần kiểm tra |
+
+Truyền một trong hai field trên.
+
+### Example request
 
 ```bash
 curl -X POST https://api.notexapp.com/v9/create/validate \
   -H "X-API-Key: ntx_live_..." \
   -H "Content-Type: application/json" \
-  -d '{ "web_url": "https://youtu.be/xxxx" }'
+  -d '{
+    "web_url": "https://youtu.be/xxxx"
+  }'
 ```
+
+### Valid input response
+
+```json
+{
+  "is_valid": true,
+  "input_type": "youtube",
+  "metadata": {
+    "video_id": "xxxx",
+    "status": "available",
+    "duration": 1260,
+    "has_captions": true,
+    "available_languages": ["en", "vi"]
+  }
+}
+```
+
+### Invalid input response
+
+```json
+{
+  "is_valid": false,
+  "input_type": "youtube",
+  "error_key": "unsupported_source",
+  "error_message": "The provided source is not supported."
+}
+```
+
+### Response fields
+
+| Field                          | Type       | Description                          |
+| ------------------------------ | ---------- | ------------------------------------ |
+| `is_valid`                     | `boolean`  | Cho biết đầu vào có hợp lệ hay không |
+| `input_type`                   | `string`   | Loại nội dung được nhận diện         |
+| `error_key`                    | `string`   | Mã lỗi khi đầu vào không hợp lệ      |
+| `error_message`                | `string`   | Thông báo chi tiết về lỗi            |
+| `metadata.video_id`            | `string`   | ID video YouTube                     |
+| `metadata.status`              | `string`   | Trạng thái của nguồn                 |
+| `metadata.duration`            | `number`   | Thời lượng tính bằng giây            |
+| `metadata.has_captions`        | `boolean`  | Nguồn có phụ đề hay không            |
+| `metadata.available_languages` | `string[]` | Các ngôn ngữ có sẵn                  |
+
+<details>
+<summary>TypeScript types</summary>
+
+```typescript
+export interface ValidateLinkBodyType {
+  web_url?: string;
+  file_url?: string;
+}
+
+export interface ValidateLinkResType {
+  is_valid: boolean;
+  input_type: string;
+  error_key?: string;
+  error_message?: string;
+  metadata?: {
+    video_id?: string;
+    status?: string;
+    duration?: number;
+    has_captions?: boolean;
+    available_languages?: string[];
+  };
+}
+```
+
+</details>
 
 ---
 
-## Danh sách ghi chú của tôi — `GET /v2/user/notes`
+## Upload a file
 
-Trả về danh sách ghi chú của người dùng đã xác thực theo dạng phân trang.
+Trước khi tạo note từ file trên máy, bạn cần:
 
-Cũng hỗ trợ: User JWT.
+1. Lấy presigned URL.
+2. Upload file trực tiếp lên storage.
+3. Dùng `full_path` làm `file_url` khi tạo note.
 
-| Parameter    | In    | Type    | Required | Description                                 |
-| ------------ | ----- | ------- | -------- | ------------------------------------------- |
-| `type`       | query | string  | optional | Lọc theo loại ghi chú                       |
-| `tab`        | query | string  | optional | Lọc theo tab                                |
-| `limit`      | query | integer | optional | Số lượng kết quả mỗi trang                  |
-| `cursor`     | query | string  | optional | Cursor dùng cho phân trang theo cursor      |
-| `page`       | query | integer | optional | Số trang (phân trang theo trang)            |
-| `sort_field` | query | string  | optional | Trường dùng để sắp xếp (ví dụ: `createdAt`) |
-| `sort_order` | query | integer | optional | Thứ tự sắp xếp: `1` tăng dần, `-1` giảm dần |
+### Get presigned URL
 
-```bash
-curl "https://api.notexapp.com/v2/user/notes?limit=20&sort_field=createdAt&sort_order=-1" \
-  -H "X-API-Key: ntx_live_..."
+```http
+GET /v1/presigned-url
 ```
 
----
+Tạo một URL tạm thời để upload file trực tiếp.
 
-## Tải tệp lên
+### Query parameters
 
-Trước khi tạo ghi chú từ tệp trên máy, bạn phải tải tệp lên và lấy `file_url`.
+| Parameter   | Type      | Required | Description                                   |
+| ----------- | --------- | -------- | --------------------------------------------- |
+| `file_name` | `string`  | Yes      | Tên file cần upload                           |
+| `is_public` | `boolean` | No       | Cho biết file có được lưu công khai hay không |
 
-### Lấy Presigned URL — `GET /v1/presigned-url`
+Tên file nên được URL encode trước khi truyền vào query string.
 
-Cũng hỗ trợ: User JWT, Device/Service Credentials.
-
-| Parameter   | In    | Type    | Required     | Description                              |
-| ----------- | ----- | ------- | ------------ | ---------------------------------------- |
-| `file_name` | query | string  | **required** | Tên tệp cần tải lên                      |
-| `is_public` | query | boolean | optional     | Tệp có được truy cập công khai hay không |
+### Example request
 
 ```bash
 curl "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
   -H "X-API-Key: ntx_live_..."
 ```
 
-Response:
+### Example response
 
 ```json
 {
   "status": "SUCCESS",
   "data": {
-    "presigned_url": "https://...",
     "file_name": "lecture.mp3",
-    "full_path": "audio/<user_id>/lecture.mp3"
+    "full_path": "audio/665f.../lecture.mp3",
+    "presigned_url": "https://storage.example.com/..."
   }
 }
 ```
 
-### Quy trình tải tệp đầy đủ
+### Response fields
+
+| Field                | Type                 | Description                                  |
+| -------------------- | -------------------- | -------------------------------------------- |
+| `status`             | `TaskStatus \| null` | Trạng thái tạo upload URL                    |
+| `data.file_name`     | `string`             | Tên file gốc                                 |
+| `data.full_path`     | `string`             | Đường dẫn truyền vào `file_url` khi tạo note |
+| `data.presigned_url` | `string`             | URL tạm thời dùng để upload file bằng `PUT`  |
+
+<details>
+<summary>TypeScript types</summary>
+
+```typescript
+export interface GetPresignedUrlQueryParams {
+  file_name: string;
+  is_public?: boolean;
+}
+
+export interface PresignedUrlResType {
+  status: TaskStatus | null;
+  data: {
+    file_name: string;
+    full_path: string;
+    presigned_url: string;
+  };
+}
+```
+
+</details>
+
+### Upload file bằng presigned URL
+
+Không gửi API Key khi upload trực tiếp tới `presigned_url`.
 
 ```bash
-# Bước 1 — lấy URL tải lên
-RESPONSE=$(curl -s "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
+curl -X PUT "$PRESIGNED_URL" \
+  -H "Content-Type: audio/mpeg" \
+  --data-binary @lecture.mp3
+```
+
+Content-Type phải phù hợp với loại file đang upload.
+
+| File            | Content-Type                                                              |
+| --------------- | ------------------------------------------------------------------------- |
+| `.mp3`          | `audio/mpeg`                                                              |
+| `.wav`          | `audio/wav`                                                               |
+| `.m4a`          | `audio/mp4`                                                               |
+| `.pdf`          | `application/pdf`                                                         |
+| `.docx`         | `application/vnd.openxmlformats-officedocument.wordprocessingml.document` |
+| `.txt`          | `text/plain`                                                              |
+| `.jpg`, `.jpeg` | `image/jpeg`                                                              |
+| `.png`          | `image/png`                                                               |
+
+### Full upload flow
+
+```bash
+# 1. Lấy presigned URL
+RESPONSE=$(curl -s \
+  "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
   -H "X-API-Key: ntx_live_...")
 
-PRESIGNED_URL=$(echo $RESPONSE | jq -r '.data.presigned_url')
-FULL_PATH=$(echo $RESPONSE | jq -r '.data.full_path')
+PRESIGNED_URL=$(echo "$RESPONSE" | jq -r '.data.presigned_url')
+FULL_PATH=$(echo "$RESPONSE" | jq -r '.data.full_path')
 
-# Bước 2 — tải tệp trực tiếp (không cần header xác thực)
+# 2. Upload file trực tiếp
 curl -X PUT "$PRESIGNED_URL" \
   -H "Content-Type: audio/mpeg" \
   --data-binary @lecture.mp3
 
-# Bước 3 — tạo ghi chú
+# 3. Tạo note từ file đã upload
 curl -X POST https://api.notexapp.com/v9/create/note \
   -H "X-API-Key: ntx_live_..." \
   -H "Content-Type: application/json" \
-  -d "{\"file_url\": \"$FULL_PATH\", \"language_hints\": [\"en\"]}"
+  -d "{
+    \"file_url\": \"$FULL_PATH\",
+    \"language_hints\": [\"vi\"],
+    \"is_record\": true
+  }"
 ```
 
-Các định dạng tệp được hỗ trợ: âm thanh (`.mp3`, `.wav`, `.m4a`, …), tài liệu (`.pdf`, `.docx`, `.txt`, …),
-và hình ảnh (`.jpg`, `.png`, `.pdf`, …).
+> `presigned_url` chỉ dùng để upload. Khi tạo note, hãy truyền `full_path` vào `file_url`.
 
 ---
 
-## Quy trình thông thường
+## List my notes
 
-1. _(Chỉ với nguồn là tệp)_ Tải tệp lên theo các bước trên để lấy `file_url`.
-2. `POST /v9/create/note` → nhận `task_id`.
-3. Theo dõi [Tasks](/apitasks) cho đến khi `status` là `SUCCESS`.
-4. Sử dụng `note_id` nhận được với các endpoint tính năng khác (flashcards, quiz, mindmap, v.v.).
+```http
+GET /v2/user/notes
+```
 
+Trả về danh sách ghi chú thuộc tài khoản đã tạo API Key.
+
+### Query parameters
+
+| Parameter    | Type      | Required | Description                      |
+| ------------ | --------- | -------- | -------------------------------- |
+| `type`       | `string`  | No       | Lọc theo loại ghi chú            |
+| `tab`        | `string`  | No       | Lọc theo tab                     |
+| `limit`      | `number`  | No       | Số lượng ghi chú trong một trang |
+| `cursor`     | `string`  | No       | Cursor của trang tiếp theo       |
+| `page`       | `number`  | No       | Số trang cần lấy                 |
+| `sort_field` | `string`  | No       | Trường dùng để sắp xếp           |
+| `sort_order` | `1 \| -1` | No       | `1` tăng dần, `-1` giảm dần      |
+
+### Example request
+
+Lấy 20 ghi chú mới nhất:
+
+```bash
+curl "https://api.notexapp.com/v2/user/notes?limit=20&sort_field=createdAt&sort_order=-1" \
+  -H "X-API-Key: ntx_live_..."
+```
+
+### Example response
+
+```json
+{
+  "statusCode": 200,
+  "data": [
+    {
+      "note_id": "note_123456",
+      "title": "Introduction to AI agents",
+      "folder_id": null,
+      "type": "youtube",
+      "duration": 1260,
+      "short_summary": "An introduction to AI agent architecture...",
+      "is_public": false,
+      "is_password_protected": false,
+      "share_link": null,
+      "createdAt": "2026-07-24T02:00:00Z",
+      "updatedAt": "2026-07-24T02:10:00Z"
+    }
+  ]
+}
+```
+
+### Note fields
+
+| Field                   | Type             | Description                                    |
+| ----------------------- | ---------------- | ---------------------------------------------- |
+| `note_id`               | `string`         | ID duy nhất của ghi chú                        |
+| `title`                 | `string`         | Tiêu đề ghi chú                                |
+| `folder_id`             | `string \| null` | ID thư mục hoặc `null` nếu nằm ở thư mục gốc   |
+| `type`                  | `string`         | Loại ghi chú                                   |
+| `duration`              | `number`         | Thời lượng tính bằng giây, nếu có              |
+| `short_summary`         | `string`         | Nội dung tóm tắt ngắn                          |
+| `is_public`             | `boolean`        | Ghi chú có được chia sẻ công khai hay không    |
+| `is_password_protected` | `boolean`        | Ghi chú có được bảo vệ bằng mật khẩu hay không |
+| `share_link`            | `string \| null` | Đường dẫn chia sẻ, nếu có                      |
+| `createdAt`             | `string`         | Thời điểm tạo theo ISO 8601 UTC                |
+| `updatedAt`             | `string`         | Thời điểm cập nhật gần nhất theo ISO 8601 UTC  |
+
+<details>
+<summary>TypeScript types</summary>
+
+```typescript
+export interface ListMyNotesQueryParams {
+  type?: string;
+  tab?: string;
+  limit?: number;
+  cursor?: string;
+  page?: number;
+  sort_field?: string;
+  sort_order?: 1 | -1;
+}
+
+export interface NoteItemData {
+  note_id: string;
+  title: string;
+  folder_id: string | null;
+  type: string;
+  duration?: number;
+  short_summary?: string;
+  is_public?: boolean;
+  is_password_protected?: boolean;
+  share_link?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type ListMyNotesResponse =
+  ApiResponse<NoteItemData[]>;
+```
+
+</details>
+
+Xem thêm chi tiết tại [User API](./user.mdx#list-my-notes).
+
+---
+
+## Typical flows
+
+### Create note from URL
+
+```text
+Validate URL
+    ↓
+Create note
+    ↓
+Receive task_id
+    ↓
+Poll Tasks API
+    ↓
+Receive note_id
+```
+
+### Create note from local file
+
+```text
+Get presigned URL
+    ↓
+Upload file with PUT
+    ↓
+Create note using full_path
+    ↓
+Receive task_id
+    ↓
+Poll Tasks API
+    ↓
+Receive note_id
+```
+
+## Notes
+
+* Chỉ truyền một trong hai field `web_url` hoặc `file_url`.
+* Nên gọi Validate API trước khi xử lý URL từ người dùng.
+* Không gửi API Key tới `presigned_url`.
+* Khi tạo note từ file, dùng `full_path`, không dùng `presigned_url`.
+* `target_language` đã deprecated; dùng `language_hints`.
+* Một số tác vụ có thể hoàn thành ngay và trả về `note_id`, nhưng tích hợp vẫn nên hỗ trợ luồng bất đồng bộ qua `task_id`.
+* Các field trạng thái và tiến độ có thể không xuất hiện trong mọi response.
+* Chỉ gọi Notex API từ backend hoặc server được kiểm soát.

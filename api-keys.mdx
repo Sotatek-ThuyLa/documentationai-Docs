@@ -1,169 +1,134 @@
 ---
-title: API Keys
-description: Programmatic access to the AI NoteX API using user-generated API keys.
+title: API Key
+description: Connect your application, backend, or automation workflow to Notex using an API key.
 ---
-## Overview
 
-An API key lets you call the API on behalf of your own account without a login/JWT
-flow — ideal for scripts, integrations, and server-to-server automation.
+# Integrate with Notex using an API key
 
-- Keys are created and managed from your account (see [Managing keys](#managing-keys)).
-- A key acts **as its owner** — it has exactly the access that user has.
-- The raw key is shown **once**, at creation. Store it securely; it cannot be retrieved again.
-- Keys can optionally **expire**; by default they never expire.
+An API key allows an application, script, or internal system to call the Notex API without requiring a user to sign in for every request.
 
-Base URL: `https://api.notexapp.com`
+You can use an API key to create notes, process files, and generate content such as flashcards, quizzes, mind maps, slides, podcasts, videos, and translations.
 
-> This documentation covers **only the latest version** of each endpoint that accepts
-> API keys. Older versions of the same endpoint (e.g. `/v1/create/note`) remain available
-> but are not documented here.
+## When should you use an API key?
 
-## Authenticating with an API key
+API keys are designed for backend and server-to-server integrations.
 
-Send your key on every request using **either** header:
+Common use cases include:
 
-```typescript
-X-API-Key: ntx_live_xxxxxxxxxxxxxxxxxxxx
+- Creating a note automatically when a new document is added to your system.
+- Adding Notex summarization to another product.
+- Sending URLs or files from an internal system to Notex.
+- Generating flashcards, quizzes, slides, or podcasts from existing notes.
+- Connecting Notex to scripts and automation workflows.
+
+An API key acts with the permissions of the account that created it. Data created through the API belongs to that account, and any applicable plan limits or Credits are charged to it.
+
+## Get an API key
+
+To create an API key:
+
+1. Sign in to your Notex account.
+2. Open **Settings**.
+3. Select **API Keys**.
+4. Select **Create API Key**.
+5. Enter a name and, optionally, an expiration date.
+6. Copy and save the API key immediately.
+
+A Notex API key looks like this:
+
+```text
+ntx_live_xxxxxxxxxxxxxxxxxxxx
 ```
 
-or
+The complete key is displayed only once when it is created. You cannot view it again after closing the dialog.
 
-```typescript
-Authorization: Bearer ntx_live_xxxxxxxxxxxxxxxxxxxx
-```
+## Store your API key securely
 
-A key always starts with the prefix `ntx_` (e.g. `ntx_live_...`, `ntx_stg_...`,
-`ntx_test_...` depending on environment). That prefix is how the server tells an API key
-apart from a normal user JWT.
-
-Endpoints that accept API keys are grouped by feature:
-
-- [Notes](./notes.mdx) — create notes from URLs/files, upload files, list notes
-- [Tasks](./tasks.mdx) — poll the result of any async operation
-- [Flashcards](./flashcards.mdx) — generate flashcard sets from a note
-- [Quiz](./quiz.mdx) — generate quiz sets from a note
-- [Mindmap](./mindmap.mdx) — generate mindmaps from a note
-- [Slide](./slide.mdx) — generate slide decks from a note
-- [Podcast](./podcast.mdx) — generate podcast audio from a note
-- [Shorts & Quiz Video](./shorts.mdx) — generate short video clips or quiz videos from a note
-- [Translate](./translate.mdx) — translate a note into another language
-- [Credits](./credits.mdx) — read credit balance and quota
-- [User](./user.mdx) — read profile and list notes
-
-Some of these endpoints also accept a user JWT or (for a few) device/service credentials.
-Wherever this documentation shows an endpoint, an API key is a valid credential for it.
-
-## Scopes
-
-Each key has a `scopes` list.
-
-- An **empty list&#x20;****`[]`** (or omitting `scopes`) means **full access** — the key can do
-  anything its owner can.
-- A non-empty list is intended to **restrict** the key to specific scopes
-  (e.g. `note:read`, `note:write`, `credit:read`, `folder:read`, `folder:write`).
-
-> **Current status:** scope _enforcement is not yet implemented_. Scopes are stored and
-> returned for reference, but every key currently behaves as full-access regardless of the
-> `scopes` value. Do not rely on scopes for access control yet.
-
-## Managing keys
-
-Key management endpoints require a **user JWT** (`Authorization: Bearer <jwt>`).
-**API keys cannot manage API keys** — you cannot create, list, or delete keys using an API key.
-
-### Create a key — `POST /v1/api-keys`
-
-Request body:
-
-| Field        | Type           | Required | Description                                        |
-| ------------ | -------------- | -------- | -------------------------------------------------- |
-| `name`       | string         | optional | Human-readable label (max 100 chars)               |
-| `scopes`     | string\[]      | optional | Permission scopes. `[]` = full access              |
-| `expires_at` | datetime (UTC) | optional | Expiration date; omit for a key that never expires |
+Store the key in a secret manager or a server-side environment variable:
 
 ```bash
-curl -X POST https://api.notexapp.com/v1/api-keys \
-  -H "Authorization: Bearer <your-jwt>" \
+NOTEX_API_KEY=ntx_live_xxxxxxxxxxxxxxxxxxxx
+```
+
+Do not:
+
+- Place the key in frontend source code.
+- Commit the key to Git.
+- Send the key through email or chat.
+- Write the complete key to application logs.
+- Share one key across unrelated systems.
+
+Create a separate key for each application and environment, such as development, staging, and production.
+
+If a key is exposed, revoke it immediately from **Settings → API Keys**, then create a replacement.
+
+## Send your first request
+
+Base URL:
+
+```text
+https://api.notexapp.com
+```
+
+Send the key through the `X-API-Key` request header:
+
+```bash
+curl https://api.notexapp.com/v1/user/profile \
+  -H "X-API-Key: $NOTEX_API_KEY"
+```
+
+## Basic example
+
+The following example creates a note from a YouTube URL:
+
+```bash
+curl -X POST https://api.notexapp.com/v9/create/note \
+  -H "X-API-Key: $NOTEX_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "My API key",
-    "scopes": [],
-    "expires_at": null
+    "web_url": "https://youtu.be/xxxx",
+    "language_hints": ["en"]
   }'
 ```
 
-Response (`201`) — the **only** time the full key is returned:
+Most content-generation operations are asynchronous. The create endpoint returns a `task_id`, which you can poll through the [Tasks API](./tasks.mdx).
 
-```json
-{
-  "statusCode": 201,
-  "message": "API key created. Store it now — it will not be shown again.",
-  "data": {
-    "id": "665f...",
-    "name": "My API key",
-    "key_prefix": "ntx_live_9f8a",
-    "scopes": [],
-    "last_used_at": null,
-    "expires_at": null,
-    "created_at": "2026-07-14T12:00:00Z",
-    "api_key": "ntx_live_9f8a1c...full-secret..."
-  }
-}
+```text
+Create content
+      ↓
+Receive task_id
+      ↓
+Poll the task
+      ↓
+Receive the result
 ```
 
-### List keys — `GET /v1/api-keys`
+## Features available through API keys
 
-Returns metadata only (never the secret):
+| Feature | Description | Documentation |
+| --- | --- | --- |
+| Notes | Create notes from URLs or files and list existing notes | [View documentation](./notes.mdx) |
+| Presigned URL | Upload local files for use with other APIs | [View documentation](./presigned-url.mdx) |
+| Tasks | Track asynchronous processing and retrieve results | [View documentation](./tasks.mdx) |
+| Flashcards | Generate flashcard sets from a note | [View documentation](/apiflashcards) |
+| Quiz | Generate multiple-choice quizzes from a note | [View documentation](/apikeysquiz) |
+| Mind map | Generate a mind map from a note | [View documentation](/apimindmap) |
+| Slides | Generate a slide deck from a note | [View documentation](/apikeysslideshow) |
+| Podcast | Generate a podcast from a note | [View documentation](/apikeyspodcast) |
+| Shorts and quiz video | Generate short-form or quiz videos | [View documentation](/apishorts) |
+| Translate | Translate a note into another language | [View documentation](/apikeystranslate) |
+| Credits | Read the current credit balance and account quota | [View documentation](./credits.mdx) |
+| User | Read the current profile and note list | [View documentation](./user.mdx) |
 
-```json
-{
-  "statusCode": 200,
-  "data": {
-    "items": [
-      {
-        "id": "665f...",
-        "name": "My API key",
-        "key_prefix": "ntx_live_9f8a",
-        "scopes": [],
-        "last_used_at": "2026-07-14T12:30:00Z",
-        "expires_at": null,
-        "created_at": "2026-07-14T12:00:00Z"
-      }
-    ],
-    "total": 1
-  }
-}
-```
+## Important notes
 
-### Delete a key — `DELETE /v1/api-keys/{api_key_id}`
+- Keep API keys on a controlled backend or server.
+- Do not expose API keys in browser or mobile application code.
+- Plan restrictions and Credit usage still apply.
+- Some operations consume Credits.
+- Revoke keys that are no longer in use.
+- Create separate keys for separate applications and environments.
 
-Permanently deletes the key (hard delete). The key stops working immediately (within a
-short cache window of up to 60s).
+## Next step
 
-```json
-{
-  "statusCode": 200,
-  "message": "API key deleted",
-  "data": { "id": "665f...", "deleted": true }
-}
-```
-
-## Errors
-
-| Status | `error_key`          | Meaning                                                     |
-| ------ | -------------------- | ----------------------------------------------------------- |
-| 401    | `invalid_api_key`    | Key is unknown, revoked (deleted), or expired               |
-| 401    | `not_authenticated`  | No credential provided                                      |
-| 403    | `permission_denied`  | Authenticated, but not allowed (e.g. free-plan restriction) |
-| 400    | `invalid_expiration` | `expires_at` is in the past (on key creation)               |
-
-Example:
-
-```json
-{
-  "statusCode": 401,
-  "message": "Invalid API key",
-  "error_key": "invalid_api_key"
-}
-```
-
+Create an API key, store it in an environment variable, and try a request with the [Notes API](./notes.mdx).

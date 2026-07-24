@@ -178,9 +178,29 @@
                         "icon": "key-round"
                       },
                       {
+                        "title": "User",
+                        "path": "user",
+                        "icon": "hand-heart-icon"
+                      },
+                      {
                         "title": "Credits",
                         "path": "apikeyscredits",
                         "icon": "hand-coins"
+                      },
+                      {
+                        "title": "Notes",
+                        "path": "notes",
+                        "icon": "lucide-sticky-note"
+                      },
+                      {
+                        "title": "Presigned URL",
+                        "path": "presigned-url",
+                        "icon": "curly-braces"
+                      },
+                      {
+                        "title": "Tasks",
+                        "path": "tasks",
+                        "icon": "check-square-icon"
                       },
                       {
                         "title": "Mindmap",
@@ -216,26 +236,6 @@
                         "title": "Translate",
                         "path": "apitranslate",
                         "icon": "notebook-pen-icon"
-                      },
-                      {
-                        "title": "Tasks",
-                        "path": "tasks",
-                        "icon": "check-square-icon"
-                      },
-                      {
-                        "title": "User",
-                        "path": "user",
-                        "icon": "hand-heart-icon"
-                      },
-                      {
-                        "title": "Notes",
-                        "path": "notes",
-                        "icon": "lucide-sticky-note"
-                      },
-                      {
-                        "title": "Presigned URL",
-                        "path": "presigned-url",
-                        "icon": "curly-braces"
                       }
                     ],
                     "icon": "key-round"
@@ -748,9 +748,29 @@
                         "icon": "key-round"
                       },
                       {
+                        "title": "Người dùng",
+                        "path": "apiuser",
+                        "icon": "lucide-hand-heart"
+                      },
+                      {
                         "title": "Credits",
                         "path": "apicredits",
                         "icon": "lucide-hand-coins"
+                      },
+                      {
+                        "title": "Ghi chú",
+                        "path": "apinotes",
+                        "icon": "sticky-note"
+                      },
+                      {
+                        "title": "Presigned URL",
+                        "path": "apipresigned-url",
+                        "icon": "curly-braces"
+                      },
+                      {
+                        "title": "Tasks",
+                        "path": "apitasks",
+                        "icon": "check-square-icon"
                       },
                       {
                         "title": "Sơ đồ tư duy",
@@ -786,26 +806,6 @@
                         "title": "Dịch ghi chú",
                         "path": "apikeystranslate",
                         "icon": "notebook-pen"
-                      },
-                      {
-                        "title": "Tasks",
-                        "path": "apitasks",
-                        "icon": "check-square-icon"
-                      },
-                      {
-                        "title": "Người dùng",
-                        "path": "apiuser",
-                        "icon": "lucide-hand-heart"
-                      },
-                      {
-                        "title": "Ghi chú",
-                        "path": "apinotes",
-                        "icon": "sticky-note"
-                      },
-                      {
-                        "title": "Presigned URL",
-                        "path": "apipresigned-url",
-                        "icon": "curly-braces"
                       }
                     ]
                   }

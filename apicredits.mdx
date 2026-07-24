@@ -1,31 +1,462 @@
 ---
+
 title: Credits
-description: |-
-  Xem số dư Credits và hạn mức sử dụng. Cả hai endpoint đều hỗ trợ API Key
-  (X-API-Key hoặc Authorization: Bearer ntx_...) hoặc User JWT.
+description: Kiểm tra số dư Credits, gói tài khoản, hạn mức sử dụng và quyền truy cập tính năng bằng API Key.
+-------------------------------------------------------------------------------------------------------------
 
-  Base URL: https://api.notexapp.com
+# Credits
+
+Credits API giúp bạn kiểm tra tài khoản còn đủ tài nguyên để thực hiện các tác vụ trên Notex hay không.
+
+Bạn có thể sử dụng API này để:
+
+* Hiển thị số Credits hiện có.
+* Xác định gói tài khoản hiện tại.
+* Theo dõi lượng tài nguyên đã sử dụng.
+* Kiểm tra giới hạn của từng loại tác vụ.
+* Xác định tính năng nào được bật trong gói hiện tại.
+
+Base URL:
+
+```text
+https://api.notexapp.com
+```
+
+Gửi API Key trong header `X-API-Key`:
+
+```bash
+-H "X-API-Key: ntx_live_..."
+```
+
+Mọi thông tin Credits và quota trả về đều thuộc tài khoản đã tạo API Key.
+
+## Response format
+
+Các endpoint sử dụng response wrapper chung:
+
+```typescript
+interface ApiResponse<T> {
+  statusCode: number;
+  message?: string;
+  data: T;
+}
+```
+
 ---
-## Credits của tôi — `GET /v2/credits/me`
 
-Trả về thông tin Credits của người dùng đã xác thực (số dư, gói/người dùng, v.v.).
+## Get credit information
+
+```http
+GET /v2/credits/me
+```
+
+Trả về thông tin tổng quan về gói tài khoản và số Credits hiện có.
+
+Endpoint này phù hợp khi bạn cần:
+
+* Hiển thị số dư Credits.
+* Kiểm tra tài khoản có phải người dùng trả phí hay không.
+* Xác định gói đang sử dụng.
+* Kiểm tra thời điểm gia hạn tiếp theo.
+* Kiểm tra trước khi gửi một tác vụ cần dùng Credits.
+
+### Request
+
+Endpoint không yêu cầu query parameter hoặc request body.
 
 ```bash
 curl https://api.notexapp.com/v2/credits/me \
   -H "X-API-Key: ntx_live_..."
 ```
 
-Không có tham số.
+### Example response
+
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "plan_code": "pro",
+    "plan_name": "Pro",
+    "total_credits": 1250,
+    "reward_credits": 200,
+    "purchased_credits": 500,
+    "has_purchased": true,
+    "is_paid_user": true,
+    "renew_date": "2026-08-01T00:00:00Z"
+  }
+}
+```
+
+### Response fields
+
+| Field               | Type             | Description                                             |
+| ------------------- | ---------------- | ------------------------------------------------------- |
+| `plan_code`         | `string`         | Mã gói tài khoản hiện tại                               |
+| `plan_name`         | `string`         | Tên hiển thị của gói, nếu có                            |
+| `total_credits`     | `number`         | Tổng số Credits khả dụng hiện tại                       |
+| `reward_credits`    | `number`         | Credits thưởng hoặc tích lũy, nếu có                    |
+| `purchased_credits` | `number`         | Credits được mua thêm, nếu có                           |
+| `has_purchased`     | `boolean`        | Tài khoản đã từng mua gói hoặc Credits hay chưa         |
+| `is_paid_user`      | `boolean`        | Tài khoản có quyền truy cập tính năng trả phí hay không |
+| `renew_date`        | `string \| null` | Thời điểm gia hạn hoặc làm mới gói theo ISO 8601 UTC    |
+
+### Plan codes
+
+Một số mã gói phổ biến:
+
+| `plan_code`     | Gói           |
+| --------------- | ------------- |
+| `free`          | Free          |
+| `pro_lite`      | Pro Lite      |
+| `pro`           | Pro           |
+| `plus`          | Plus          |
+| `business`      | Business      |
+| `business_plus` | Business Plus |
+| `lifetime`      | Lifetime      |
+
+Hệ thống có thể bổ sung thêm mã gói mới trong tương lai. Không nên giới hạn logic tích hợp chỉ trong danh sách trên.
+
+<details>
+<summary>TypeScript types</summary>
+
+```typescript
+export type KnownPlanCode =
+  | 'free'
+  | 'pro_lite'
+  | 'pro'
+  | 'business'
+  | 'plus'
+  | 'business_plus'
+  | 'lifetime';
+
+export type PlanCode = KnownPlanCode | (string & {});
+
+export interface UserCreditsMeData {
+  plan_code: PlanCode;
+  plan_name?: string;
+  total_credits: number;
+  reward_credits?: number;
+  purchased_credits?: number;
+  has_purchased: boolean;
+  is_paid_user: boolean;
+  renew_date?: string | null;
+}
+
+export type GetCreditsMeResponse =
+  ApiResponse<UserCreditsMeData>;
+```
+
+</details>
 
 ---
 
-## Hạn mức — `GET /v2/credits/quota`
+## Get quota usage
 
-Trả về mức sử dụng hạn mức hiện tại của người dùng đã xác thực.
+```http
+GET /v2/credits/quota
+```
+
+Trả về hạn mức, mức sử dụng và quyền truy cập tính năng của tài khoản trong gói hiện tại.
+
+Endpoint này phù hợp khi bạn cần:
+
+* Kiểm tra tài khoản còn bao nhiêu lượt hoặc phút sử dụng.
+* Hiển thị tiến độ sử dụng quota.
+* Kiểm tra giới hạn tối đa cho một note.
+* Xác định tính năng nào được gói hiện tại hỗ trợ.
+* Ngăn request vượt quá giới hạn trước khi gửi lên Notex.
+
+### Request
+
+Endpoint không yêu cầu query parameter hoặc request body.
 
 ```bash
 curl https://api.notexapp.com/v2/credits/quota \
   -H "X-API-Key: ntx_live_..."
 ```
 
-Không có tham số.
+### Response structure
+
+Quota được chia thành nhiều nhóm:
+
+| Field                     | Ý nghĩa                                            |
+| ------------------------- | -------------------------------------------------- |
+| `quota_snapshot`          | Hạn mức được cấp trong chu kỳ hiện tại             |
+| `quota_per_note_snapshot` | Số lần có thể sử dụng từng tính năng trên một note |
+| `quota_lifetime_snapshot` | Hạn mức được tính trong toàn bộ vòng đời tài khoản |
+| `per_note_caps`           | Giới hạn tối đa cho một note hoặc một đầu vào      |
+| `period_usage_counter`    | Số tài nguyên đã sử dụng trong chu kỳ              |
+| `features_snapshot`       | Tính năng được bật hoặc tắt theo gói               |
+
+### Example response
+
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "plan_code": "pro",
+    "quota_snapshot": {
+      "notes": 200,
+      "recording_minutes": 1000,
+      "meeting_minutes": 500,
+      "nova_chat_single_note": 300
+    },
+    "quota_per_note_snapshot": {
+      "create_mindmap": 3,
+      "create_slideshow": 2,
+      "create_flashcards_sets": 5,
+      "create_quizzes_sets": 5,
+      "create_podcast": 1,
+      "note_translation": 3
+    },
+    "quota_lifetime_snapshot": {
+      "live_transcribe": 100
+    },
+    "per_note_caps": {
+      "recording_minutes_per_note": 180,
+      "youtube_max_duration": 7200,
+      "document_max_megabytes": 100,
+      "images_max_input": 20
+    },
+    "period_usage_counter": {
+      "recording_minutes_used": 320,
+      "meeting_minutes_used": 120,
+      "notes_created": 46,
+      "nova_chat_single_note": 80
+    },
+    "periodStartDate": "2026-07-01T00:00:00Z",
+    "resetDate": "2026-08-01T00:00:00Z",
+    "features_snapshot": {
+      "integrate_notion": true,
+      "live_transcribe": true,
+      "share_note_public": true,
+      "connect_google_calendar": true
+    },
+    "hasPurchased": true
+  }
+}
+```
+
+> Các field bên trong từng nhóm có thể thay đổi tùy theo gói tài khoản. Field không áp dụng có thể không xuất hiện trong response.
+
+## Quota theo chu kỳ
+
+`quota_snapshot` chứa hạn mức được cấp trong chu kỳ hiện tại.
+
+| Field                       | Đơn vị      | Description                     |
+| --------------------------- | ----------- | ------------------------------- |
+| `notes`                     | số note     | Số note có thể tạo              |
+| `notes_with_multiple_files` | số note     | Số note có thể chứa nhiều file  |
+| `recording_minutes`         | phút        | Tổng thời lượng ghi âm          |
+| `meeting_minutes`           | phút        | Tổng thời lượng cuộc họp        |
+| `live_meeting`              | số cuộc họp | Số cuộc họp trực tiếp           |
+| `nova_chat_single_note`     | số lượt     | Lượt AI Chat trên một note      |
+| `nova_chat_all_notes`       | số lượt     | Lượt AI Chat trên toàn bộ notes |
+
+Số lượng đã sử dụng được trả về trong `period_usage_counter`.
+
+Ví dụ tính số phút ghi âm còn lại:
+
+```typescript
+const remainingRecordingMinutes =
+  (quota.quota_snapshot.recording_minutes ?? 0) -
+  (quota.period_usage_counter.recording_minutes_used ?? 0);
+```
+
+## Quota theo từng note
+
+`quota_per_note_snapshot` mô tả số lần một tính năng có thể được sử dụng trên mỗi note.
+
+Các tính năng có thể bao gồm:
+
+| Field                    | Description              |
+| ------------------------ | ------------------------ |
+| `create_mindmap`         | Tạo mindmap              |
+| `create_slideshow`       | Tạo slideshow            |
+| `create_flashcards_sets` | Tạo bộ flashcards        |
+| `create_quizzes_sets`    | Tạo bộ quiz              |
+| `create_shorts`          | Tạo video ngắn           |
+| `create_podcast`         | Tạo podcast              |
+| `regenerate_summary`     | Tạo lại nội dung tóm tắt |
+| `note_translation`       | Dịch note                |
+
+Ví dụ, giá trị sau cho biết mỗi note có thể tạo tối đa hai slideshow:
+
+```json
+{
+  "create_slideshow": 2
+}
+```
+
+## Giới hạn trên mỗi note
+
+`per_note_caps` chứa các giới hạn cứng áp dụng cho một note hoặc một đầu vào.
+
+| Field                        | Đơn vị | Description                            |
+| ---------------------------- | ------ | -------------------------------------- |
+| `recording_minutes_per_note` | phút   | Thời lượng ghi âm tối đa cho một note  |
+| `meeting_minutes_per_note`   | phút   | Thời lượng meeting tối đa cho một note |
+| `youtube_max_duration`       | giây   | Thời lượng tối đa của video YouTube    |
+| `document_max_megabytes`     | MB     | Dung lượng tối đa của tài liệu         |
+| `images_max_input`           | số ảnh | Số ảnh tối đa trong một request        |
+| `short_max_seconds`          | giây   | Độ dài tối đa của video ngắn           |
+| `podcast_max_seconds`        | giây   | Độ dài tối đa của podcast              |
+
+Nên kiểm tra các giá trị này trước khi upload file hoặc tạo nội dung để tránh request thất bại.
+
+## Feature access
+
+`features_snapshot` cho biết tài khoản có được phép sử dụng một tính năng hay không.
+
+```json
+{
+  "integrate_notion": true,
+  "bot_auto_join": false,
+  "share_note_public": true
+}
+```
+
+| Giá trị        | Ý nghĩa                                     |
+| -------------- | ------------------------------------------- |
+| `true`         | Tài khoản được phép sử dụng tính năng       |
+| `false`        | Tính năng không khả dụng trong gói hiện tại |
+| Không có field | Không nên giả định tính năng được hỗ trợ    |
+
+Một số feature flags hiện có:
+
+| Field                        | Tính năng                     |
+| ---------------------------- | ----------------------------- |
+| `integrate_notion`           | Tích hợp Notion               |
+| `integrate_google_docs`      | Tích hợp Google Docs          |
+| `live_transcribe`            | Phiên âm trực tiếp            |
+| `bot_auto_join`              | Bot tự động tham gia meeting  |
+| `share_note_public`          | Chia sẻ note công khai        |
+| `share_note_specific`        | Chia sẻ note với người cụ thể |
+| `share_note_organization`    | Chia sẻ note trong tổ chức    |
+| `summary_note_with_template` | Tóm tắt theo template         |
+| `connect_google_calendar`    | Kết nối Google Calendar       |
+| `connect_outlook_calendar`   | Kết nối Outlook Calendar      |
+
+## Quota reset
+
+Hai field sau mô tả chu kỳ quota hiện tại:
+
+| Field             | Type     | Description                            |
+| ----------------- | -------- | -------------------------------------- |
+| `periodStartDate` | `string` | Thời điểm bắt đầu chu kỳ               |
+| `resetDate`       | `string` | Thời điểm quota được làm mới tiếp theo |
+
+Cả hai sử dụng định dạng ISO 8601 UTC.
+
+<details>
+<summary>TypeScript types</summary>
+
+```typescript
+export type PeriodQuotaBucket =
+  | 'notes'
+  | 'notes_with_multiple_files'
+  | 'recording_minutes'
+  | 'meeting_minutes'
+  | 'live_meeting'
+  | 'nova_chat_single_note'
+  | 'nova_chat_all_notes';
+
+export type PerNoteQuotaBucket =
+  | 'create_mindmap'
+  | 'create_slideshow'
+  | 'create_flashcards_sets'
+  | 'create_quizzes_sets'
+  | 'create_shorts'
+  | 'create_podcast'
+  | 'regenerate_summary'
+  | 'note_translation';
+
+export type LifetimeQuotaBucket =
+  | 'live_transcribe';
+
+export type PerNoteCapKey =
+  | 'recording_minutes_per_note'
+  | 'meeting_minutes_per_note'
+  | 'youtube_max_duration'
+  | 'document_max_megabytes'
+  | 'images_max_input'
+  | 'short_max_seconds'
+  | 'podcast_max_seconds';
+
+export type FeatureFlag =
+  | 'integrate_notion'
+  | 'integrate_google_docs'
+  | 'live_transcribe'
+  | 'bot_auto_join'
+  | 'share_note_public'
+  | 'share_note_specific'
+  | 'share_note_organization'
+  | 'summary_note_with_template'
+  | 'connect_google_calendar'
+  | 'connect_outlook_calendar';
+
+export type QuotaSnapshot =
+  Partial<Record<PeriodQuotaBucket, number>>;
+
+export type QuotaPerNoteSnapshot =
+  Partial<Record<PerNoteQuotaBucket, number>>;
+
+export type QuotaLifetimeSnapshot =
+  Partial<Record<LifetimeQuotaBucket, number>>;
+
+export type PerNoteCapsSnapshot =
+  Partial<Record<PerNoteCapKey, number>>;
+
+export type FeaturesSnapshot =
+  Partial<Record<FeatureFlag, boolean>>;
+
+export interface PeriodUsageCounter {
+  recording_minutes_used?: number;
+  meeting_minutes_used?: number;
+  notes_created?: number;
+  live_meeting?: number;
+  nova_chat_single_note?: number;
+  nova_chat_all_notes?: number;
+}
+
+export interface QuotaData {
+  plan_code: PlanCode;
+  quota_snapshot: QuotaSnapshot;
+  quota_per_note_snapshot: QuotaPerNoteSnapshot;
+  quota_lifetime_snapshot: QuotaLifetimeSnapshot;
+  per_note_caps: PerNoteCapsSnapshot;
+  period_usage_counter: PeriodUsageCounter;
+  periodStartDate?: string;
+  resetDate?: string;
+  features_snapshot: FeaturesSnapshot;
+  hasPurchased?: boolean;
+}
+
+export type GetQuotaResponse =
+  ApiResponse<QuotaData>;
+```
+
+</details>
+
+## Credits và quota khác nhau như thế nào?
+
+| Endpoint                | Dùng để kiểm tra                                           |
+| ----------------------- | ---------------------------------------------------------- |
+| `GET /v2/credits/me`    | Gói tài khoản và số dư Credits hiện tại                    |
+| `GET /v2/credits/quota` | Hạn mức, mức đã dùng, giới hạn và quyền truy cập tính năng |
+
+Trong phần lớn tích hợp, bạn chỉ cần:
+
+1. Gọi `/v2/credits/me` để hiển thị số Credits.
+2. Gọi `/v2/credits/quota` trước tác vụ cần kiểm tra giới hạn cụ thể.
+3. Tải lại dữ liệu sau khi tác vụ hoàn tất.
+
+## Notes
+
+* Các field quota là tùy chọn và có thể khác nhau giữa các gói.
+* Không nên hard-code hạn mức trong ứng dụng.
+* Luôn sử dụng dữ liệu mới nhất từ API trước các tác vụ quan trọng.
+* `total_credits` không thay thế cho quota của từng tính năng.
+* Một tài khoản còn Credits vẫn có thể đạt giới hạn quota của một tính năng cụ thể.
+* Chỉ gọi API từ backend hoặc server được kiểm soát.
+* Không đưa API Key vào frontend hoặc mã nguồn công khai.

@@ -1,26 +1,69 @@
 ---
-title: Người dùng (User)
-description: >-
-  Đọc thông tin hồ sơ và danh sách ghi chú của bạn. Cả hai endpoint đều hỗ trợ
-  API Key
 
-  (X-API-Key hoặc Authorization: Bearer ntx_...) hoặc User JWT.
+title: User
+description: Lấy thông tin tài khoản và danh sách ghi chú bằng API Key.
+-----------------------------------------------------------------------
 
+# User
 
-  Base URL: https://api.notexapp.com
+User API cho phép bạn:
+
+* Lấy thông tin tài khoản đang sở hữu API Key.
+* Lấy danh sách ghi chú của tài khoản đó.
+* Lọc, sắp xếp và phân trang danh sách ghi chú.
+
+Base URL:
+
+```text
+https://api.notexapp.com
+```
+
+Gửi API Key trong header `X-API-Key`:
+
+```bash
+-H "X-API-Key: ntx_live_..."
+```
+
+Mọi dữ liệu trả về đều thuộc tài khoản đã tạo API Key đang được sử dụng.
+
+## Response format
+
+Các endpoint trong tài liệu này sử dụng response wrapper chung:
+
+```typescript
+interface ApiResponse<T> {
+  statusCode: number;
+  message?: string;
+  data: T;
+}
+```
+
 ---
-## Lấy thông tin hồ sơ — `GET /v1/user/profile`
 
-Trả về thông tin hồ sơ của người dùng đã xác thực.
+## Get profile
+
+```http
+GET /v1/user/profile
+```
+
+Lấy thông tin tài khoản đang được API Key đại diện.
+
+Endpoint này hữu ích khi bạn cần:
+
+* Kiểm tra API Key thuộc tài khoản nào.
+* Hiển thị thông tin người dùng trong hệ thống tích hợp.
+* Đọc các thiết lập ngôn ngữ của tài khoản.
+
+### Request
+
+Endpoint không yêu cầu query parameter hoặc request body.
 
 ```bash
 curl https://api.notexapp.com/v1/user/profile \
   -H "X-API-Key: ntx_live_..."
 ```
 
-Không có tham số.
-
-Ví dụ phản hồi:
+### Example response
 
 ```json
 {
@@ -41,25 +84,205 @@ Ví dụ phản hồi:
 }
 ```
 
+### Response fields
+
+| Field         | Type             | Description                               |
+| ------------- | ---------------- | ----------------------------------------- |
+| `user_id`     | `string`         | ID của tài khoản Notex                    |
+| `email`       | `string`         | Địa chỉ email của tài khoản               |
+| `name`        | `string`         | Tên hiển thị của người dùng               |
+| `image`       | `string \| null` | URL ảnh đại diện                          |
+| `role`        | `string`         | Vai trò hiện tại của tài khoản            |
+| `preferences` | `object`         | Các thiết lập ngôn ngữ của người dùng     |
+| `createdAt`   | `string`         | Thời điểm tạo tài khoản theo ISO 8601 UTC |
+
+### Preferences
+
+| Field                    | Type     | Description                             |
+| ------------------------ | -------- | --------------------------------------- |
+| `display_language`       | `string` | Ngôn ngữ hiển thị trên Notex            |
+| `transcription_language` | `string` | Ngôn ngữ mặc định khi phiên âm          |
+| `ai_notes_language`      | `string` | Ngôn ngữ mặc định của ghi chú do AI tạo |
+
+<details>
+<summary>TypeScript types</summary>
+
+```typescript
+export interface UserPreferences {
+  display_language: string;
+  transcription_language: string;
+  ai_notes_language: string;
+}
+
+export interface UserProfileData {
+  user_id: string;
+  email: string;
+  name: string;
+  image: string | null;
+  role: string;
+  preferences: UserPreferences;
+  createdAt: string;
+}
+
+export type GetUserProfileResponse =
+  ApiResponse<UserProfileData>;
+```
+
+</details>
+
 ---
 
-## Danh sách ghi chú của tôi — `GET /v2/user/notes`
+## List my notes
 
-Trả về danh sách ghi chú của người dùng đã xác thực theo dạng phân trang.
-Xem [Notes](/apinotes) để biết đầy đủ các tham số.
+```http
+GET /v2/user/notes
+```
 
-| Parameter    | In    | Type    | Required | Description                                 |
-| ------------ | ----- | ------- | -------- | ------------------------------------------- |
-| `type`       | query | string  | optional | Lọc theo loại ghi chú                       |
-| `tab`        | query | string  | optional | Lọc theo tab                                |
-| `limit`      | query | integer | optional | Số lượng kết quả mỗi trang                  |
-| `cursor`     | query | string  | optional | Cursor dùng cho phân trang theo cursor      |
-| `page`       | query | integer | optional | Số trang                                    |
-| `sort_field` | query | string  | optional | Trường dùng để sắp xếp (ví dụ: `createdAt`) |
-| `sort_order` | query | integer | optional | `1` tăng dần, `-1` giảm dần                 |
+Lấy danh sách ghi chú thuộc tài khoản đang sử dụng API Key.
+
+Endpoint hỗ trợ:
+
+* Lọc theo loại ghi chú.
+* Lọc theo tab.
+* Sắp xếp danh sách.
+* Phân trang theo số trang hoặc cursor.
+
+### Request
+
+Ví dụ lấy 20 ghi chú mới nhất:
 
 ```bash
 curl "https://api.notexapp.com/v2/user/notes?limit=20&sort_field=createdAt&sort_order=-1" \
   -H "X-API-Key: ntx_live_..."
 ```
 
+### Query parameters
+
+| Parameter    | Type      | Required | Description                                                       |
+| ------------ | --------- | -------- | ----------------------------------------------------------------- |
+| `type`       | `string`  | No       | Lọc theo loại ghi chú, ví dụ `youtube`, `pdf`, `audio`, `website` |
+| `tab`        | `string`  | No       | Lọc theo tab, ví dụ `summary`, `transcript`, `mindmap`            |
+| `limit`      | `number`  | No       | Số ghi chú tối đa trong một trang                                 |
+| `cursor`     | `string`  | No       | Cursor được trả về từ request trước                               |
+| `page`       | `number`  | No       | Số trang cần lấy                                                  |
+| `sort_field` | `string`  | No       | Trường dùng để sắp xếp, ví dụ `createdAt`, `updatedAt`, `title`   |
+| `sort_order` | `1 \| -1` | No       | `1` tăng dần, `-1` giảm dần                                       |
+
+### Common examples
+
+#### Lọc theo loại ghi chú
+
+```bash
+curl "https://api.notexapp.com/v2/user/notes?type=pdf&limit=20" \
+  -H "X-API-Key: ntx_live_..."
+```
+
+#### Sắp xếp mới nhất trước
+
+```bash
+curl "https://api.notexapp.com/v2/user/notes?sort_field=createdAt&sort_order=-1" \
+  -H "X-API-Key: ntx_live_..."
+```
+
+#### Lấy trang tiếp theo bằng cursor
+
+```bash
+curl "https://api.notexapp.com/v2/user/notes?limit=20&cursor=<next_cursor>" \
+  -H "X-API-Key: ntx_live_..."
+```
+
+Hãy sử dụng nguyên giá trị `next_cursor` được trả về từ request trước. Không tự chỉnh sửa cursor.
+
+### Note fields
+
+Mỗi ghi chú trong danh sách có thể chứa các field sau:
+
+| Field                   | Type             | Description                                    |
+| ----------------------- | ---------------- | ---------------------------------------------- |
+| `note_id`               | `string`         | ID duy nhất của ghi chú                        |
+| `title`                 | `string`         | Tiêu đề ghi chú                                |
+| `folder_id`             | `string \| null` | ID thư mục, hoặc `null` nếu ghi chú nằm ở root |
+| `type`                  | `string`         | Loại ghi chú                                   |
+| `duration`              | `number`         | Thời lượng tính bằng giây, nếu có              |
+| `short_summary`         | `string`         | Nội dung tóm tắt ngắn                          |
+| `is_public`             | `boolean`        | Ghi chú có đang công khai hay không            |
+| `is_password_protected` | `boolean`        | Ghi chú có được bảo vệ bằng mật khẩu hay không |
+| `share_link`            | `string \| null` | Đường dẫn chia sẻ, nếu có                      |
+| `createdAt`             | `string`         | Thời điểm tạo theo ISO 8601 UTC                |
+| `updatedAt`             | `string`         | Thời điểm cập nhật gần nhất theo ISO 8601 UTC  |
+
+### Pagination fields
+
+Tùy theo cơ chế phân trang, response có thể bao gồm:
+
+| Field         | Type             | Description                          |
+| ------------- | ---------------- | ------------------------------------ |
+| `notes`       | `NoteItem[]`     | Danh sách ghi chú                    |
+| `total_notes` | `number`         | Tổng số ghi chú                      |
+| `next_cursor` | `string \| null` | Cursor của trang tiếp theo           |
+| `has_more`    | `boolean`        | Có còn dữ liệu ở trang sau hay không |
+| `page`        | `number`         | Trang hiện tại                       |
+| `limit`       | `number`         | Số item trên mỗi trang               |
+
+<details>
+<summary>TypeScript types</summary>
+
+```typescript
+export interface ListMyNotesQueryParams {
+  type?: string;
+  tab?: string;
+  limit?: number;
+  cursor?: string;
+  page?: number;
+  sort_field?: string;
+  sort_order?: 1 | -1;
+}
+
+export interface NoteItemData {
+  note_id: string;
+  title: string;
+  folder_id: string | null;
+  type: string;
+  duration?: number;
+  short_summary?: string;
+  is_public?: boolean;
+  is_password_protected?: boolean;
+  share_link?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ListMyNotesData {
+  notes: NoteItemData[];
+  total_notes?: number;
+  next_cursor?: string | null;
+  has_more?: boolean;
+  page?: number;
+  limit?: number;
+}
+
+export type ListMyNotesResponse =
+  | ApiResponse<NoteItemData[]>
+  | ApiResponse<ListMyNotesData>;
+```
+
+</details>
+
+## Pagination
+
+API hỗ trợ hai kiểu phân trang:
+
+| Kiểu         | Parameters        | Phù hợp khi                             |
+| ------------ | ----------------- | --------------------------------------- |
+| Page-based   | `page`, `limit`   | Cần điều hướng đến một trang cụ thể     |
+| Cursor-based | `cursor`, `limit` | Tải tiếp danh sách hoặc infinite scroll |
+
+Không nên truyền đồng thời `page` và `cursor` trong cùng một request.
+
+## Notes
+
+* Chỉ gọi API từ backend hoặc server được kiểm soát.
+* Không đưa API Key vào frontend hoặc mã nguồn công khai.
+* Dùng `sort_order=-1` để lấy ghi chú mới nhất trước.
+* Các field tùy chọn có thể không xuất hiện trong mọi ghi chú.
+* Giá trị hợp lệ của `type` và `tab` phụ thuộc vào các loại nội dung Notex đang hỗ trợ.

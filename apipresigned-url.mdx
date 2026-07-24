@@ -1,67 +1,310 @@
 ---
+
 title: Presigned URL
-description: >-
-  Lấy Presigned URL để tải tệp lên (ví dụ: âm thanh hoặc tài liệu) trước khi tạo
-  ghi chú.
+description: Upload file lên Notex và nhận file URL để sử dụng với Notes API và các API xử lý nội dung khác.
+------------------------------------------------------------------------------------------------------------
 
+# Presigned URL
 
-  Hỗ trợ API Key (X-API-Key hoặc Authorization: Bearer ntx_...), User JWT, và cả
+Presigned URL cho phép bạn upload file trực tiếp lên hệ thống lưu trữ của Notex mà không cần gửi dữ liệu file qua API server chính.
 
-  Device/Service Credentials.
+Luồng upload gồm ba bước:
 
-
-  Base URL: https://api.notexapp.com
----
-## Lấy Presigned URL — `GET /v1/presigned-url`
-
-| Parameter   | In    | Type    | Required     | Description                                                  |
-| ----------- | ----- | ------- | ------------ | ------------------------------------------------------------ |
-| `file_name` | query | string  | **required** | Tên của tệp cần tải lên                                      |
-| `is_public` | query | boolean | optional     | Tệp có được truy cập công khai hay không                     |
-| `user_id`   | query | string  | optional     | ID người dùng đích (chỉ dùng với Device/Service Credentials) |
-
-```bash
-curl "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
-  -H "X-API-Key: ntx_live_..."
+```text
+Lấy upload URL
+      ↓
+Upload file bằng PUT
+      ↓
+Dùng file_url với API khác
 ```
 
-Response:
+Ví dụ, sau khi upload một file audio hoặc PDF, bạn có thể dùng `file_url` để tạo note bằng [Notes API](./notes.mdx#create-note).
+
+Base URL:
+
+```text
+https://api.notexapp.com
+```
+
+Gửi API Key trong header `X-API-Key` khi lấy presigned URL:
+
+```bash
+-H "X-API-Key: ntx_live_..."
+```
+
+---
+
+## Get presigned URL
+
+```http
+GET /v1/presigned-url
+```
+
+Endpoint này tạo một URL tạm thời để upload file trực tiếp bằng phương thức `PUT`.
+
+### Query parameters
+
+| Parameter   | Type      | Required | Description                                            |
+| ----------- | --------- | -------- | ------------------------------------------------------ |
+| `file_name` | `string`  | Yes      | Tên file cần upload, bao gồm phần mở rộng              |
+| `is_public` | `boolean` | No       | Cho biết file có thể được truy cập công khai hay không |
+| `user_id`   | `string`  | No       | Chỉ dùng cho tích hợp device hoặc service đặc biệt     |
+
+Khi sử dụng API Key thông thường, bạn không cần truyền `user_id`. File sẽ được liên kết với tài khoản đã tạo API Key.
+
+Tên file nên bao gồm đúng phần mở rộng, ví dụ:
+
+```text
+lecture.mp3
+report.pdf
+meeting-recording.m4a
+document.docx
+```
+
+### Example request
+
+```bash
+curl --get "https://api.notexapp.com/v1/presigned-url" \
+  -H "X-API-Key: ntx_live_..." \
+  --data-urlencode "file_name=lecture.mp3"
+```
+
+Sử dụng `--data-urlencode` giúp xử lý đúng tên file có khoảng trắng hoặc ký tự đặc biệt.
+
+### Example response
 
 ```json
 {
   "statusCode": 200,
   "data": {
-    "upload_url": "https://...",
+    "upload_url": "https://storage.example.com/temporary-upload-url",
     "file_url": "https://cdn.notexapp.com/uploads/lecture.mp3"
   }
 }
 ```
 
+### Response fields
+
+| Field           | Type     | Description                                               |
+| --------------- | -------- | --------------------------------------------------------- |
+| `upload_url`    | `string` | URL tạm thời dùng để upload file bằng phương thức `PUT`   |
+| `file_url`      | `string` | Đường dẫn file dùng làm input cho các API khác            |
+| `file_name`     | `string` | Tên file gốc, nếu được trả về                             |
+| `full_path`     | `string` | Đường dẫn lưu trữ nội bộ, nếu được trả về                 |
+| `presigned_url` | `string` | Tên field cũ hoặc alias của `upload_url`, nếu được trả về |
+
+Trong tích hợp mới, nên ưu tiên sử dụng:
+
+```text
+upload_url → dùng để upload
+file_url   → dùng với API khác
+```
+
 ---
 
-## Quy trình tải tệp
+## Upload the file
 
-1. `GET /v1/presigned-url?file_name=lecture.mp3` → nhận `upload_url` và `file_url`.
-2. `PUT <upload_url>` với nội dung yêu cầu là tệp của bạn (không cần header xác thực).
-3. Truyền `file_url` vào trường `file_url` của `POST /v9/create/note`
+Sau khi nhận được `upload_url`, gửi nội dung file trực tiếp tới URL đó bằng phương thức `PUT`.
+
+Không gửi API Key trong request upload này.
 
 ```bash
-# Bước 1 — lấy URL tải lên
-RESPONSE=$(curl -s "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
-  -H "X-API-Key: ntx_live_...")
-
-UPLOAD_URL=$(echo $RESPONSE | jq -r '.data.upload_url')
-FILE_URL=$(echo $RESPONSE | jq -r '.data.file_url')
-
-# Bước 2 — tải tệp lên
 curl -X PUT "$UPLOAD_URL" \
   -H "Content-Type: audio/mpeg" \
   --data-binary @lecture.mp3
+```
 
-# Bước 3 — tạo ghi chú
+### Content-Type
+
+Header `Content-Type` phải phù hợp với file đang upload.
+
+| File type       | Content-Type                                                              |
+| --------------- | ------------------------------------------------------------------------- |
+| `.mp3`          | `audio/mpeg`                                                              |
+| `.wav`          | `audio/wav`                                                               |
+| `.m4a`          | `audio/mp4`                                                               |
+| `.mp4`          | `video/mp4`                                                               |
+| `.pdf`          | `application/pdf`                                                         |
+| `.docx`         | `application/vnd.openxmlformats-officedocument.wordprocessingml.document` |
+| `.txt`          | `text/plain`                                                              |
+| `.jpg`, `.jpeg` | `image/jpeg`                                                              |
+| `.png`          | `image/png`                                                               |
+
+Nếu upload thất bại, hãy kiểm tra:
+
+* Presigned URL đã hết hạn hay chưa.
+* `Content-Type` có đúng với file không.
+* File binary có được gửi nguyên vẹn không.
+* URL upload có bị thay đổi hoặc encode lại không.
+
+> Không chỉnh sửa `upload_url`. Hãy sử dụng nguyên giá trị API trả về.
+
+---
+
+## Use the uploaded file
+
+Sau khi request `PUT` hoàn tất thành công, sử dụng `file_url` nhận được ở bước đầu làm input cho API tiếp theo.
+
+Ví dụ tạo note từ file đã upload:
+
+```bash
 curl -X POST https://api.notexapp.com/v9/create/note \
   -H "X-API-Key: ntx_live_..." \
   -H "Content-Type: application/json" \
-  -d "{\"file_url\": \"$FILE_URL\", \"language_hints\": [\"en\"]}"
+  -d '{
+    "file_url": "https://cdn.notexapp.com/uploads/lecture.mp3",
+    "language_hints": ["en"]
+  }'
 ```
 
+Không truyền `upload_url` vào Create Note API.
+
+| Giá trị      | Mục đích                                          |
+| ------------ | ------------------------------------------------- |
+| `upload_url` | Chỉ dùng để upload file bằng `PUT`                |
+| `file_url`   | Dùng làm input cho Notes API và các API liên quan |
+
+---
+
+## Full upload flow
+
+Ví dụ hoàn chỉnh dưới đây:
+
+1. Lấy `upload_url` và `file_url`.
+2. Upload file.
+3. Tạo note từ file đã upload.
+
+```bash
+# Step 1: Get a presigned URL
+RESPONSE=$(curl -s --get \
+  "https://api.notexapp.com/v1/presigned-url" \
+  -H "X-API-Key: ntx_live_..." \
+  --data-urlencode "file_name=lecture.mp3")
+
+UPLOAD_URL=$(echo "$RESPONSE" | jq -r '.data.upload_url')
+FILE_URL=$(echo "$RESPONSE" | jq -r '.data.file_url')
+
+# Step 2: Upload the file directly
+curl --fail -X PUT "$UPLOAD_URL" \
+  -H "Content-Type: audio/mpeg" \
+  --data-binary @lecture.mp3
+
+# Step 3: Create a note from the uploaded file
+curl -X POST https://api.notexapp.com/v9/create/note \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"file_url\": \"$FILE_URL\",
+    \"language_hints\": [\"en\"]
+  }"
+```
+
+`curl --fail` giúp command trả về lỗi khi storage phản hồi HTTP status không thành công.
+
+---
+
+## JavaScript example
+
+```typescript
+interface PresignedUrlResponse {
+  statusCode: number;
+  message?: string;
+  data: {
+    upload_url: string;
+    file_url: string;
+  };
+}
+
+async function uploadFileToNotex(
+  file: File,
+  apiKey: string,
+): Promise<string> {
+  const params = new URLSearchParams({
+    file_name: file.name,
+  });
+
+  const presignedResponse = await fetch(
+    `https://api.notexapp.com/v1/presigned-url?${params}`,
+    {
+      headers: {
+        'X-API-Key': apiKey,
+      },
+    },
+  );
+
+  if (!presignedResponse.ok) {
+    throw new Error('Failed to get presigned URL');
+  }
+
+  const result =
+    (await presignedResponse.json()) as PresignedUrlResponse;
+
+  const uploadResponse = await fetch(result.data.upload_url, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': file.type || 'application/octet-stream',
+    },
+    body: file,
+  });
+
+  if (!uploadResponse.ok) {
+    throw new Error('Failed to upload file');
+  }
+
+  return result.data.file_url;
+}
+```
+
+Giá trị trả về từ `uploadFileToNotex` có thể được truyền trực tiếp vào field `file_url` của Notes API.
+
+---
+
+## TypeScript types
+
+<details>
+<summary>View TypeScript types</summary>
+
+```typescript
+export interface GetPresignedUrlQueryParams {
+  file_name: string;
+  is_public?: boolean;
+  user_id?: string;
+}
+
+export interface PresignedUrlData {
+  upload_url: string;
+  file_url: string;
+  file_name?: string;
+  full_path?: string;
+  presigned_url?: string;
+}
+
+export interface GetPresignedUrlResponse {
+  statusCode: number;
+  message?: string;
+  data: PresignedUrlData;
+}
+```
+
+</details>
+
+---
+
+## Important notes
+
+* Chỉ gửi API Key khi gọi `/v1/presigned-url`.
+* Không gửi API Key tới `upload_url`.
+* Upload file bằng phương thức `PUT`.
+* Gửi file binary trực tiếp trong request body.
+* Sử dụng đúng `Content-Type`.
+* Dùng `file_url`, không dùng `upload_url`, với các API xử lý nội dung.
+* Presigned URL chỉ có hiệu lực trong một khoảng thời gian giới hạn.
+* Nếu URL hết hạn, hãy gọi lại `/v1/presigned-url`.
+* Không lưu hoặc tái sử dụng `upload_url` trong thời gian dài.
+* Nên giữ API Key và toàn bộ luồng tích hợp ở phía server.
+
+## Next step
+
+Sau khi upload thành công, sử dụng `file_url` để tạo note:
+
+[Create a note from an uploaded file](./notes.mdx#create-note)

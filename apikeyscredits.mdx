@@ -1,31 +1,435 @@
 ---
 title: Credits
-description: |-
-  Read your credit balance and quota. Both endpoints accept an API key
-  (X-API-Key or Authorization: Bearer ntx_...) or a user JWT.
-
-  Base URL: https://api.notexapp.com
+description: Read the current Credit balance, account plan, quota usage, feature access, and per-note limits.
 ---
-## My credits — `GET /v2/credits/me`
 
-Returns the authenticated user's credit information (balance, plan/user type, etc.).
+# Credits
+
+The Credits API helps your integration determine whether an account has enough resources to perform an operation.
+
+You can use it to:
+
+- Display the current Credit balance.
+- Identify the account plan.
+- Track quota usage.
+- Check per-feature and per-note limits.
+- Determine which features are enabled for the current plan.
+
+Base URL:
+
+```text
+https://api.notexapp.com
+```
+
+Send the API key through the `X-API-Key` header:
+
+```bash
+-H "X-API-Key: ntx_live_..."
+```
+
+All Credit and quota information belongs to the account that created the API key.
+
+## Response format
+
+```typescript
+interface ApiResponse<T> {
+  statusCode: number;
+  message?: string;
+  data: T;
+}
+```
+
+---
+
+## Get credit information
+
+```http
+GET /v2/credits/me
+```
+
+Returns the current plan and Credit balance.
+
+Use this endpoint to:
+
+- Display the current Credit balance.
+- Check whether the account is a paid user.
+- Identify the current plan.
+- Read the next renewal date.
+- Check the account before starting a Credit-consuming operation.
+
+### Request
+
+This endpoint does not require query parameters or a request body.
 
 ```bash
 curl https://api.notexapp.com/v2/credits/me \
   -H "X-API-Key: ntx_live_..."
 ```
 
-No parameters.
+### Example response
+
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "plan_code": "pro",
+    "plan_name": "Pro",
+    "total_credits": 1250,
+    "reward_credits": 200,
+    "purchased_credits": 500,
+    "has_purchased": true,
+    "is_paid_user": true,
+    "renew_date": "2026-08-01T00:00:00Z"
+  }
+}
+```
+
+### Response fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `plan_code` | `string` | Current plan code |
+| `plan_name` | `string` | Human-readable plan name, when available |
+| `total_credits` | `number` | Total Credits currently available |
+| `reward_credits` | `number` | Legacy reward Credits, when available |
+| `purchased_credits` | `number` | Credits purchased separately, when available |
+| `has_purchased` | `boolean` | Whether the account has purchased a plan or Credits |
+| `is_paid_user` | `boolean` | Whether the account has paid-feature access |
+| `renew_date` | `string \| null` | Plan renewal date in ISO 8601 UTC format |
+
+### Plan codes
+
+| `plan_code` | Plan |
+| --- | --- |
+| `free` | Free |
+| `pro_lite` | Pro Lite |
+| `pro` | Pro |
+| `plus` | Plus |
+| `business` | Business |
+| `business_plus` | Business Plus |
+| `lifetime` | Lifetime |
+
+New plan codes may be added in the future. Avoid restricting your integration to this list.
+
+<details>
+<summary>TypeScript types</summary>
+
+```typescript
+export type KnownPlanCode =
+  | 'free'
+  | 'pro_lite'
+  | 'pro'
+  | 'business'
+  | 'plus'
+  | 'business_plus'
+  | 'lifetime';
+
+export type PlanCode = KnownPlanCode | (string & {});
+
+export interface UserCreditsMeData {
+  plan_code: PlanCode;
+  plan_name?: string;
+  total_credits: number;
+  reward_credits?: number;
+  purchased_credits?: number;
+  has_purchased: boolean;
+  is_paid_user: boolean;
+  renew_date?: string | null;
+}
+
+export type GetCreditsMeResponse =
+  ApiResponse<UserCreditsMeData>;
+```
+
+</details>
 
 ---
 
-## Quota — `GET /v2/credits/quota`
+## Get quota usage
 
-Returns the authenticated user's current quota usage.
+```http
+GET /v2/credits/quota
+```
+
+Returns the account's quota, usage counters, per-note limits, and enabled features.
+
+Use this endpoint to:
+
+- Check how many uses or minutes remain.
+- Display quota progress.
+- Validate an input against per-note limits.
+- Check whether a feature is available on the current plan.
+- Prevent requests that would exceed a known limit.
+
+### Request
+
+This endpoint does not require query parameters or a request body.
 
 ```bash
 curl https://api.notexapp.com/v2/credits/quota \
   -H "X-API-Key: ntx_live_..."
 ```
 
-No parameters.
+### Response structure
+
+| Field | Meaning |
+| --- | --- |
+| `quota_snapshot` | Quota granted for the current billing or usage period |
+| `quota_per_note_snapshot` | Feature limits applied to each note |
+| `quota_lifetime_snapshot` | Lifetime quota |
+| `per_note_caps` | Hard limits for one note or input |
+| `period_usage_counter` | Usage recorded during the current period |
+| `features_snapshot` | Features enabled or disabled for the current plan |
+
+### Example response
+
+```json
+{
+  "statusCode": 200,
+  "data": {
+    "plan_code": "pro",
+    "quota_snapshot": {
+      "notes": 200,
+      "recording_minutes": 1000,
+      "meeting_minutes": 500,
+      "nova_chat_single_note": 300
+    },
+    "quota_per_note_snapshot": {
+      "create_mindmap": 3,
+      "create_slideshow": 2,
+      "create_flashcards_sets": 5,
+      "create_quizzes_sets": 5,
+      "create_podcast": 1,
+      "note_translation": 3
+    },
+    "quota_lifetime_snapshot": {
+      "live_transcribe": 100
+    },
+    "per_note_caps": {
+      "recording_minutes_per_note": 180,
+      "youtube_max_duration": 7200,
+      "document_max_megabytes": 100,
+      "images_max_input": 20
+    },
+    "period_usage_counter": {
+      "recording_minutes_used": 320,
+      "meeting_minutes_used": 120,
+      "notes_created": 46,
+      "nova_chat_single_note": 80
+    },
+    "periodStartDate": "2026-07-01T00:00:00Z",
+    "resetDate": "2026-08-01T00:00:00Z",
+    "features_snapshot": {
+      "integrate_notion": true,
+      "live_transcribe": true,
+      "share_note_public": true,
+      "connect_google_calendar": true
+    },
+    "hasPurchased": true
+  }
+}
+```
+
+Fields inside each quota group depend on the account plan. Fields that do not apply may be omitted.
+
+## Period quota
+
+`quota_snapshot` contains quota granted for the current period.
+
+| Field | Unit | Description |
+| --- | --- | --- |
+| `notes` | notes | Number of notes that can be created |
+| `notes_with_multiple_files` | notes | Number of multi-file notes allowed |
+| `recording_minutes` | minutes | Total recording time |
+| `meeting_minutes` | minutes | Total meeting time |
+| `live_meeting` | meetings | Number of live meetings |
+| `nova_chat_single_note` | requests | AI chat requests for a single note |
+| `nova_chat_all_notes` | requests | AI chat requests across all notes |
+
+Usage is returned in `period_usage_counter`.
+
+```typescript
+const remainingRecordingMinutes =
+  (quota.quota_snapshot.recording_minutes ?? 0) -
+  (quota.period_usage_counter.recording_minutes_used ?? 0);
+```
+
+## Per-note feature quota
+
+`quota_per_note_snapshot` describes limits for features used on an individual note.
+
+| Field | Description |
+| --- | --- |
+| `create_mindmap` | Generate a mind map |
+| `create_slideshow` | Generate a slideshow |
+| `create_flashcards_sets` | Generate flashcard sets |
+| `create_quizzes_sets` | Generate quiz sets |
+| `create_shorts` | Generate short-form videos |
+| `create_podcast` | Generate a podcast |
+| `regenerate_summary` | Regenerate the summary |
+| `note_translation` | Translate the note |
+
+## Per-note caps
+
+`per_note_caps` contains hard limits for a single note or input.
+
+| Field | Unit | Description |
+| --- | --- | --- |
+| `recording_minutes_per_note` | minutes | Maximum recording duration for one note |
+| `meeting_minutes_per_note` | minutes | Maximum meeting duration for one note |
+| `youtube_max_duration` | seconds | Maximum YouTube video duration |
+| `document_max_megabytes` | MB | Maximum document size |
+| `images_max_input` | images | Maximum number of input images |
+| `short_max_seconds` | seconds | Maximum short-video duration |
+| `podcast_max_seconds` | seconds | Maximum podcast duration |
+
+Check these values before uploading or processing content.
+
+## Feature access
+
+`features_snapshot` indicates whether a feature is available:
+
+```json
+{
+  "integrate_notion": true,
+  "bot_auto_join": false,
+  "share_note_public": true
+}
+```
+
+| Value | Meaning |
+| --- | --- |
+| `true` | The feature is available |
+| `false` | The feature is not available for the current plan |
+| Field omitted | Do not assume the feature is available |
+
+Supported feature flags include:
+
+| Field | Feature |
+| --- | --- |
+| `integrate_notion` | Notion integration |
+| `integrate_google_docs` | Google Docs integration |
+| `live_transcribe` | Live transcription |
+| `bot_auto_join` | Meeting bot auto-join |
+| `share_note_public` | Public note sharing |
+| `share_note_specific` | Share with specific users |
+| `share_note_organization` | Organization-wide sharing |
+| `summary_note_with_template` | Template-based summaries |
+| `connect_google_calendar` | Google Calendar integration |
+| `connect_outlook_calendar` | Outlook Calendar integration |
+
+## Quota reset
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `periodStartDate` | `string` | Start of the current quota period |
+| `resetDate` | `string` | Next quota reset time |
+
+Both fields use ISO 8601 UTC format.
+
+<details>
+<summary>TypeScript types</summary>
+
+```typescript
+export type PeriodQuotaBucket =
+  | 'notes'
+  | 'notes_with_multiple_files'
+  | 'recording_minutes'
+  | 'meeting_minutes'
+  | 'live_meeting'
+  | 'nova_chat_single_note'
+  | 'nova_chat_all_notes';
+
+export type PerNoteQuotaBucket =
+  | 'create_mindmap'
+  | 'create_slideshow'
+  | 'create_flashcards_sets'
+  | 'create_quizzes_sets'
+  | 'create_shorts'
+  | 'create_podcast'
+  | 'regenerate_summary'
+  | 'note_translation';
+
+export type LifetimeQuotaBucket =
+  | 'live_transcribe';
+
+export type PerNoteCapKey =
+  | 'recording_minutes_per_note'
+  | 'meeting_minutes_per_note'
+  | 'youtube_max_duration'
+  | 'document_max_megabytes'
+  | 'images_max_input'
+  | 'short_max_seconds'
+  | 'podcast_max_seconds';
+
+export type FeatureFlag =
+  | 'integrate_notion'
+  | 'integrate_google_docs'
+  | 'live_transcribe'
+  | 'bot_auto_join'
+  | 'share_note_public'
+  | 'share_note_specific'
+  | 'share_note_organization'
+  | 'summary_note_with_template'
+  | 'connect_google_calendar'
+  | 'connect_outlook_calendar';
+
+export type QuotaSnapshot =
+  Partial<Record<PeriodQuotaBucket, number>>;
+
+export type QuotaPerNoteSnapshot =
+  Partial<Record<PerNoteQuotaBucket, number>>;
+
+export type QuotaLifetimeSnapshot =
+  Partial<Record<LifetimeQuotaBucket, number>>;
+
+export type PerNoteCapsSnapshot =
+  Partial<Record<PerNoteCapKey, number>>;
+
+export type FeaturesSnapshot =
+  Partial<Record<FeatureFlag, boolean>>;
+
+export interface PeriodUsageCounter {
+  recording_minutes_used?: number;
+  meeting_minutes_used?: number;
+  notes_created?: number;
+  live_meeting?: number;
+  nova_chat_single_note?: number;
+  nova_chat_all_notes?: number;
+}
+
+export interface QuotaData {
+  plan_code: PlanCode;
+  quota_snapshot: QuotaSnapshot;
+  quota_per_note_snapshot: QuotaPerNoteSnapshot;
+  quota_lifetime_snapshot: QuotaLifetimeSnapshot;
+  per_note_caps: PerNoteCapsSnapshot;
+  period_usage_counter: PeriodUsageCounter;
+  periodStartDate?: string;
+  resetDate?: string;
+  features_snapshot: FeaturesSnapshot;
+  hasPurchased?: boolean;
+}
+
+export type GetQuotaResponse =
+  ApiResponse<QuotaData>;
+```
+
+</details>
+
+## Credits and quota
+
+| Endpoint | Use it to check |
+| --- | --- |
+| `GET /v2/credits/me` | Current plan and available Credit balance |
+| `GET /v2/credits/quota` | Usage, limits, caps, and feature access |
+
+An account may still have Credits while already reaching a feature-specific quota.
+
+## Important notes
+
+- Do not hard-code plan limits.
+- Read the latest quota before important operations.
+- Optional quota fields may differ between plans.
+- Reload Credit and quota data after completing a resource-consuming task.
+- Keep the API key on a controlled backend or server.

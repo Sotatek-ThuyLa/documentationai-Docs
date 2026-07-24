@@ -1,23 +1,68 @@
 ---
 title: User
-description: |-
-  Read your profile and note list. Both endpoints accept an API key
-  (X-API-Key or Authorization: Bearer ntx_...) or a user JWT.
-
-  Base URL: https://api.notexapp.com
+description: Read the account profile and notes owned by the account associated with an API key.
 ---
-## Get profile — `GET /v1/user/profile`
 
-Returns the authenticated user's profile.
+# User
+
+The User API lets you:
+
+- Read the profile associated with the current API key.
+- List notes owned by that account.
+- Filter, sort, and paginate the note list.
+
+Base URL:
+
+```text
+https://api.notexapp.com
+```
+
+Send the API key through the `X-API-Key` header:
+
+```bash
+-H "X-API-Key: ntx_live_..."
+```
+
+All returned data belongs to the account that created the API key.
+
+## Response format
+
+These endpoints use a common response envelope:
+
+```typescript
+interface ApiResponse<T> {
+  statusCode: number;
+  message?: string;
+  data: T;
+}
+```
+
+---
+
+## Get profile
+
+```http
+GET /v1/user/profile
+```
+
+Returns the profile associated with the current API key.
+
+Use this endpoint to:
+
+- Verify which account owns an API key.
+- Display account information in your integration.
+- Read the account's language preferences.
+
+### Request
+
+This endpoint does not require query parameters or a request body.
 
 ```bash
 curl https://api.notexapp.com/v1/user/profile \
   -H "X-API-Key: ntx_live_..."
 ```
 
-No parameters.
-
-Example response:
+### Example response
 
 ```json
 {
@@ -38,25 +83,202 @@ Example response:
 }
 ```
 
+### Response fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `user_id` | `string` | Notex account ID |
+| `email` | `string` | Account email address |
+| `name` | `string` | User display name |
+| `image` | `string \| null` | Profile image URL |
+| `role` | `string` | Current account role |
+| `preferences` | `object` | User language preferences |
+| `createdAt` | `string` | Account creation time in ISO 8601 UTC format |
+
+### Preferences
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `display_language` | `string` | Language used by the Notex interface |
+| `transcription_language` | `string` | Default transcription language |
+| `ai_notes_language` | `string` | Default language for AI-generated note content |
+
+<details>
+<summary>TypeScript types</summary>
+
+```typescript
+export interface UserPreferences {
+  display_language: string;
+  transcription_language: string;
+  ai_notes_language: string;
+}
+
+export interface UserProfileData {
+  user_id: string;
+  email: string;
+  name: string;
+  image: string | null;
+  role: string;
+  preferences: UserPreferences;
+  createdAt: string;
+}
+
+export type GetUserProfileResponse =
+  ApiResponse<UserProfileData>;
+```
+
+</details>
+
 ---
 
-## List my notes — `GET /v2/user/notes`
+## List my notes
 
-Returns a paginated list of notes belonging to the authenticated user.
-See [Notes](./notes.mdx#list-my-notes--get-v2usernotes) for full parameter reference.
+```http
+GET /v2/user/notes
+```
 
-| Parameter    | In    | Type    | Required | Description                         |
-| ------------ | ----- | ------- | -------- | ----------------------------------- |
-| `type`       | query | string  | optional | Filter by note type                 |
-| `tab`        | query | string  | optional | Tab filter                          |
-| `limit`      | query | integer | optional | Page size                           |
-| `cursor`     | query | string  | optional | Cursor for cursor-based pagination  |
-| `page`       | query | integer | optional | Page number                         |
-| `sort_field` | query | string  | optional | Field to sort by (e.g. `createdAt`) |
-| `sort_order` | query | integer | optional | `1` asc, `-1` desc                  |
+Returns notes owned by the account associated with the API key.
+
+The endpoint supports:
+
+- Filtering by note type.
+- Filtering by tab.
+- Sorting.
+- Page-based pagination.
+- Cursor-based pagination.
+
+### Request
+
+The following example returns up to 20 notes, ordered from newest to oldest:
 
 ```bash
 curl "https://api.notexapp.com/v2/user/notes?limit=20&sort_field=createdAt&sort_order=-1" \
   -H "X-API-Key: ntx_live_..."
 ```
 
+### Query parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `type` | `string` | No | Filter by note type, such as `youtube`, `pdf`, `audio`, or `website` |
+| `tab` | `string` | No | Filter by tab, such as `summary`, `transcript`, or `mindmap` |
+| `limit` | `number` | No | Maximum number of notes returned per page |
+| `cursor` | `string` | No | Cursor returned by the previous request |
+| `page` | `number` | No | Page number for page-based pagination |
+| `sort_field` | `string` | No | Field used for sorting, such as `createdAt`, `updatedAt`, or `title` |
+| `sort_order` | `1 \| -1` | No | `1` for ascending order and `-1` for descending order |
+
+### Common examples
+
+#### Filter by note type
+
+```bash
+curl "https://api.notexapp.com/v2/user/notes?type=pdf&limit=20" \
+  -H "X-API-Key: ntx_live_..."
+```
+
+#### Sort newest first
+
+```bash
+curl "https://api.notexapp.com/v2/user/notes?sort_field=createdAt&sort_order=-1" \
+  -H "X-API-Key: ntx_live_..."
+```
+
+#### Load the next page using a cursor
+
+```bash
+curl "https://api.notexapp.com/v2/user/notes?limit=20&cursor=<next_cursor>" \
+  -H "X-API-Key: ntx_live_..."
+```
+
+Use the `next_cursor` exactly as returned by the previous response. Do not modify it.
+
+### Note fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `note_id` | `string` | Unique note ID |
+| `title` | `string` | Note title |
+| `folder_id` | `string \| null` | Folder ID, or `null` when the note is stored at the root level |
+| `type` | `string` | Note type |
+| `duration` | `number` | Duration in seconds, when available |
+| `short_summary` | `string` | Short summary of the note |
+| `is_public` | `boolean` | Whether the note is publicly shared |
+| `is_password_protected` | `boolean` | Whether the note is password protected |
+| `share_link` | `string \| null` | Share URL, when available |
+| `createdAt` | `string` | Creation time in ISO 8601 UTC format |
+| `updatedAt` | `string` | Last update time in ISO 8601 UTC format |
+
+### Pagination fields
+
+Depending on the pagination mode, the response may contain:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `notes` | `NoteItemData[]` | Returned notes |
+| `total_notes` | `number` | Total number of notes |
+| `next_cursor` | `string \| null` | Cursor for the next page |
+| `has_more` | `boolean` | Whether another page is available |
+| `page` | `number` | Current page |
+| `limit` | `number` | Number of items per page |
+
+<details>
+<summary>TypeScript types</summary>
+
+```typescript
+export interface ListMyNotesQueryParams {
+  type?: string;
+  tab?: string;
+  limit?: number;
+  cursor?: string;
+  page?: number;
+  sort_field?: string;
+  sort_order?: 1 | -1;
+}
+
+export interface NoteItemData {
+  note_id: string;
+  title: string;
+  folder_id: string | null;
+  type: string;
+  duration?: number;
+  short_summary?: string;
+  is_public?: boolean;
+  is_password_protected?: boolean;
+  share_link?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ListMyNotesData {
+  notes: NoteItemData[];
+  total_notes?: number;
+  next_cursor?: string | null;
+  has_more?: boolean;
+  page?: number;
+  limit?: number;
+}
+
+export type ListMyNotesResponse =
+  | ApiResponse<NoteItemData[]>
+  | ApiResponse<ListMyNotesData>;
+```
+
+</details>
+
+## Pagination
+
+| Mode | Parameters | Best suited for |
+| --- | --- | --- |
+| Page-based | `page`, `limit` | Interfaces that allow navigation to a specific page |
+| Cursor-based | `cursor`, `limit` | Infinite scrolling or loading the next batch |
+
+Do not send `page` and `cursor` in the same request.
+
+## Important notes
+
+- All returned notes belong to the account that created the API key.
+- Keep the API key on a controlled backend or server.
+- Use `sort_order=-1` to return the newest notes first.
+- Optional fields may not appear on every note.
+- Supported `type` and `tab` values depend on the content types currently available in Notex.

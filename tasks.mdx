@@ -1,43 +1,114 @@
 ---
 title: Tasks
-description: >-
-  Poll for the result of any asynchronous operation. All create endpoints
-  (notes, flashcards,
-
-  quiz, mindmap, slide, podcast, shorts, translate) are asynchronous and return
-  a task_id.
-
-  Use this endpoint to check the outcome.
-
-
-  Accepts an API key (X-API-Key or Authorization: Bearer ntx_...), a user JWT,
-  or a
-
-  service key.
-
-
-  Base URL: https://api.notexapp.com
+description: Poll asynchronous operations and retrieve their final results using an API key.
 ---
-## Poll task result — `GET /v1/create/tasks/{task_id}/result`
 
-| Parameter | In   | Required     | Description                             |
-| --------- | ---- | ------------ | --------------------------------------- |
-| `task_id` | path | **required** | Task id returned by any create endpoint |
+# Tasks
+
+Many Notex APIs run asynchronously.
+
+Instead of waiting for an operation to finish in the initial request, the create endpoint returns a `task_id`. Use the Tasks API to check progress and retrieve the final result.
+
+Operations that commonly return a task include:
+
+- Note creation
+- Flashcards
+- Quiz
+- Mind map
+- Slides
+- Podcast
+- Shorts
+- Translation
+
+```text
+Create content
+      ↓
+Receive task_id
+      ↓
+Poll the task
+      ↓
+SUCCESS: use the result
+FAILURE: handle the error
+```
+
+Base URL:
+
+```text
+https://api.notexapp.com
+```
+
+Send the API key through `X-API-Key`:
 
 ```bash
-curl https://api.notexapp.com/v1/create/tasks/<task_id>/result \
+-H "X-API-Key: ntx_live_..."
+```
+
+---
+
+## Poll a task result
+
+```http
+GET /v1/create/tasks/{task_id}/result
+```
+
+Returns the current status and, when complete, the result of an asynchronous operation.
+
+### Path parameter
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `task_id` | `string` | Yes | Task ID returned by a create endpoint |
+
+### Example request
+
+```bash
+curl https://api.notexapp.com/v1/create/tasks/task_123456/result \
   -H "X-API-Key: ntx_live_..."
 ```
 
-### Responses
+Replace `task_123456` with the ID returned by the create request.
 
-Still processing:
+## Task statuses
+
+| Status | Meaning | Recommended action |
+| --- | --- | --- |
+| `PENDING` | The task is queued | Continue polling |
+| `PROCESSING` | The task is running | Continue polling |
+| `SUCCESS` | The task completed successfully | Read `data` and stop polling |
+| `FAILURE` | The task failed | Read the error and stop polling |
+| `FAIL` | The task failed | Handle it the same way as `FAILURE` |
+
+Support both `FAILURE` and `FAIL`.
+
+## Pending or processing
 
 ```json
-{ "status": "PROCESSING" }
+{
+  "status": "PROCESSING",
+  "step": "transcribing",
+  "progress": 35,
+  "estimated_time": 60
+}
 ```
 
-Completed successfully:
+| Field | Type | Description |
+| --- | --- | --- |
+| `status` | `"PENDING" \| "PROCESSING"` | Current task status |
+| `step` | `string` | Current processing step, when available |
+| `progress` | `number` | Estimated progress from `0` to `100` |
+| `estimated_time` | `number` | Estimated remaining time in seconds |
+
+Progress fields are optional.
+
+A minimal response may contain only:
+
+```json
+{
+  "status": "PROCESSING"
+}
+```
+
+## Successful result
 
 ```json
 {
@@ -45,32 +116,271 @@ Completed successfully:
   "data": {
     "note_id": "665f...",
     "title": "Introduction to Machine Learning",
-    "summary": "..."
+    "summary": "An overview of machine learning concepts..."
   }
 }
 ```
 
-Failed:
+Common result fields include:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `data.note_id` | `string` | Created or updated note ID |
+| `data.title` | `string` | Result title |
+| `data.summary` | `string` | Generated summary, when available |
+| `data.type` | `string` | Type of generated content |
+| `data.audio_url` | `string` | Audio URL for audio-producing operations |
+| `data.youtube_url` | `string` | Original YouTube URL, when available |
+| `data.views` | `string` | View statistics, when available |
+| `message` | `string` | Additional API message |
+
+The structure of `data` depends on the task type. Do not assume that all tasks return the same fields.
+
+## Failed result
 
 ```json
 {
   "status": "FAILURE",
-  "error": "Unsupported file format"
+  "error": "Unsupported file format",
+  "error_key": "unsupported_file_format",
+  "message": "The uploaded file format is not supported."
 }
 ```
 
-### Polling guidance
+| Field | Type | Description |
+| --- | --- | --- |
+| `status` | `"FAILURE" \| "FAIL"` | Failure status |
+| `error` | `string` | Short error description |
+| `error_key` | `string` | Stable machine-readable error code |
+| `message` | `string` | More detailed error message |
 
-- Recommended interval: every **3–5 seconds**.
-- Most operations complete within **30–120 seconds** depending on source length.
-- Stop polling once `status` is `SUCCESS` or `FAILURE`.
+When available, use `error_key` for application logic instead of comparing human-readable messages.
 
-### Status values
+## Polling guidance
 
-| Status       | Meaning                              |
-| ------------ | ------------------------------------ |
-| `PENDING`    | Task queued, not yet started         |
-| `PROCESSING` | Task is running                      |
-| `SUCCESS`    | Task completed — result is in `data` |
-| `FAILURE`    | Task failed — reason is in `error`   |
+| Setting | Recommendation |
+| --- | --- |
+| Polling interval | Every 3–5 seconds |
+| Stop condition | `SUCCESS`, `FAILURE`, or `FAIL` |
+| Timeout | Set an application-level timeout appropriate for the task |
+| Cancellation | Support `AbortSignal` when possible |
 
+Do not:
+
+- Poll multiple times per second.
+- Continue polling after a terminal status.
+- Treat a client-side timeout as proof that the task failed.
+- Create a duplicate task immediately after a temporary network error.
+
+A client timeout only means your application stopped waiting. The Notex task may still be running.
+
+## Bash polling example
+
+```bash
+TASK_ID="task_123456"
+
+while true; do
+  RESPONSE=$(curl -s \
+    "https://api.notexapp.com/v1/create/tasks/$TASK_ID/result" \
+    -H "X-API-Key: ntx_live_...")
+
+  STATUS=$(echo "$RESPONSE" | jq -r '.status')
+
+  if [ "$STATUS" = "SUCCESS" ]; then
+    echo "$RESPONSE"
+    break
+  fi
+
+  if [ "$STATUS" = "FAILURE" ] || [ "$STATUS" = "FAIL" ]; then
+    echo "$RESPONSE" >&2
+    exit 1
+  fi
+
+  sleep 5
+done
+```
+
+## JavaScript polling example
+
+```typescript
+type TaskStatus =
+  | 'PENDING'
+  | 'PROCESSING'
+  | 'SUCCESS'
+  | 'FAILURE'
+  | 'FAIL';
+
+interface TaskProcessingResponse {
+  status: 'PENDING' | 'PROCESSING';
+  step?: string;
+  progress?: number;
+  estimated_time?: number;
+}
+
+interface TaskSuccessResponse<T> {
+  status: 'SUCCESS';
+  data: T;
+  message?: string;
+}
+
+interface TaskFailureResponse {
+  status: 'FAILURE' | 'FAIL';
+  error?: string;
+  error_key?: string;
+  message?: string;
+}
+
+type TaskResultResponse<T> =
+  | TaskProcessingResponse
+  | TaskSuccessResponse<T>
+  | TaskFailureResponse;
+
+interface PollTaskOptions {
+  intervalMs?: number;
+  timeoutMs?: number;
+  signal?: AbortSignal;
+  onProgress?: (task: TaskProcessingResponse) => void;
+}
+
+async function pollTask<T>(
+  taskId: string,
+  apiKey: string,
+  options: PollTaskOptions = {},
+): Promise<T> {
+  const {
+    intervalMs = 4000,
+    timeoutMs = 120000,
+    signal,
+    onProgress,
+  } = options;
+
+  const startedAt = Date.now();
+
+  while (Date.now() - startedAt < timeoutMs) {
+    if (signal?.aborted) {
+      throw new DOMException('Task polling was cancelled', 'AbortError');
+    }
+
+    const response = await fetch(
+      `https://api.notexapp.com/v1/create/tasks/${encodeURIComponent(taskId)}/result`,
+      {
+        headers: {
+          'X-API-Key': apiKey,
+        },
+        signal,
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to poll task: HTTP ${response.status}`);
+    }
+
+    const result = (await response.json()) as TaskResultResponse<T>;
+
+    if (result.status === 'SUCCESS') {
+      return result.data;
+    }
+
+    if (result.status === 'FAILURE' || result.status === 'FAIL') {
+      throw new Error(
+        result.message ??
+          result.error ??
+          result.error_key ??
+          'Task failed',
+      );
+    }
+
+    onProgress?.(result);
+
+    await new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(resolve, intervalMs);
+
+      signal?.addEventListener(
+        'abort',
+        () => {
+          clearTimeout(timer);
+          reject(new DOMException('Task polling was cancelled', 'AbortError'));
+        },
+        { once: true },
+      );
+    });
+  }
+
+  throw new Error('Task polling timed out');
+}
+```
+
+<details>
+<summary>TypeScript types</summary>
+
+```typescript
+export type TaskStatus =
+  | 'PENDING'
+  | 'PROCESSING'
+  | 'SUCCESS'
+  | 'FAILURE'
+  | 'FAIL';
+
+export interface PollTaskResultPathParams {
+  task_id: string;
+}
+
+export interface TaskProcessingResponse {
+  status: 'PENDING' | 'PROCESSING';
+  step?: string;
+  progress?: number;
+  estimated_time?: number;
+}
+
+export interface TaskSuccessResultData {
+  note_id?: string;
+  title?: string;
+  summary?: string;
+  type?: string;
+  audio_url?: string;
+  youtube_url?: string;
+  views?: string;
+  [key: string]: unknown;
+}
+
+export interface TaskSuccessResponse<
+  T = TaskSuccessResultData,
+> {
+  status: 'SUCCESS';
+  data: T;
+  message?: string;
+}
+
+export interface TaskFailureResponse {
+  status: 'FAILURE' | 'FAIL';
+  error?: string;
+  error_key?: string;
+  message?: string;
+}
+
+export type TaskResultResponse<
+  T = TaskSuccessResultData,
+> =
+  | TaskProcessingResponse
+  | TaskSuccessResponse<T>
+  | TaskFailureResponse;
+```
+
+</details>
+
+## Integration flow
+
+1. Call a content-creation endpoint.
+2. Save the returned `task_id`.
+3. Poll the Tasks API every 3–5 seconds.
+4. Display `step` or `progress` when available.
+5. Stop on `SUCCESS`, `FAILURE`, or `FAIL`.
+6. Use `data` when the task succeeds.
+
+## Important notes
+
+- Result fields differ by task type.
+- Progress information may be omitted.
+- Support both `FAILURE` and `FAIL`.
+- Retry temporary network failures without assuming the task failed.
+- Keep the API key on a controlled backend or server.

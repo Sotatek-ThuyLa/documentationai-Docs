@@ -1,165 +1,427 @@
 ---
 title: Notes
-description: >-
-  Create AI-generated notes and list your notes. All endpoints below accept an
-  API key
-
-  (X-API-Key or Authorization: Bearer ntx_...).
-
-
-  Base URL: https://api.notexapp.com
+description: Create AI-generated notes from URLs or files, validate inputs, and list existing notes using an API key.
 ---
-## Create note — `POST /v9/create/note`
 
-Generate a note/summary from a web URL or an uploaded file.
+# Notes
 
-Also accepts: user JWT, device token.
+The Notes API lets you:
 
-Content-Type: `application/json`
+- Create notes from websites or YouTube videos.
+- Create notes from audio files, documents, or images.
+- Validate an input before processing it.
+- List notes owned by the current account.
+- Track note generation through the Tasks API.
 
-| Field               | Type      | Required | Description                                                   |
-| ------------------- | --------- | -------- | ------------------------------------------------------------- |
-| `web_url`           | string    | optional | Source web or YouTube URL                                     |
-| `file_url`          | string    | optional | URL of an uploaded file (see [Upload a file](#upload-a-file)) |
-| `language_hints`    | string\[] | optional | Preferred output language(s), e.g. `["en"]`                   |
-| `use_ocr`           | boolean   | optional | Run OCR on document/image sources                             |
-| `summary_style`     | string    | optional | Summary style preset                                          |
-| `writing_style`     | string    | optional | Writing style preset                                          |
-| `human_style`       | string    | optional | Humanized writing style option                                |
-| `is_record`         | boolean   | optional | Whether the source is a recording                             |
-| `bot_id`            | string    | optional | Meeting bot id (for bot recordings)                           |
-| `record_session_id` | string    | optional | Recording session id                                          |
-| `device_meeting_id` | string    | optional | Device meeting id                                             |
-| `target_language`   | string    | optional | Deprecated — use `language_hints` instead                     |
+Base URL:
 
-Either `web_url` or `file_url` must be provided (not both).
-
-```bash
-# From a YouTube URL
-curl -X POST https://api.notexapp.com/v9/create/note \
-  -H "X-API-Key: ntx_live_..." \
-  -H "Content-Type: application/json" \
-  -d '{ "web_url": "https://youtu.be/xxxx", "language_hints": ["en"] }'
-
-# From an uploaded file
-curl -X POST https://api.notexapp.com/v9/create/note \
-  -H "X-API-Key: ntx_live_..." \
-  -H "Content-Type: application/json" \
-  -d '{ "file_url": "https://cdn.notexapp.com/uploads/lecture.mp3", "language_hints": ["en"] }'
+```text
+https://api.notexapp.com
 ```
 
-Returns a `task_id`. Poll [Tasks](./tasks.mdx) to get the completed note.
+Send the API key through `X-API-Key`:
+
+```bash
+-H "X-API-Key: ntx_live_..."
+```
+
+## Response format
+
+```typescript
+interface ApiResponse<T> {
+  statusCode: number;
+  message?: string;
+  data: T;
+}
+```
+
+Task status values:
+
+```typescript
+type TaskStatus =
+  | 'PENDING'
+  | 'PROCESSING'
+  | 'SUCCESS'
+  | 'FAIL';
+```
 
 ---
 
-## Validate input — `POST /v9/create/validate`
+## Create a note
 
-Validate a source before generating a note — useful to check that a URL or file is
-supported before spending credits.
+```http
+POST /v9/create/note
+```
 
-Also accepts: user JWT.
+Creates an AI-generated note and summary from a URL or an uploaded file.
 
-Content-Type: `application/json`
+Request content type:
 
-| Field      | Type   | Required | Description                   |
-| ---------- | ------ | -------- | ----------------------------- |
-| `web_url`  | string | optional | Source web URL to validate    |
-| `file_url` | string | optional | Uploaded file URL to validate |
+```http
+Content-Type: application/json
+```
+
+Provide exactly one source:
+
+- `web_url` for a website or YouTube video.
+- `file_url` for a previously uploaded file.
+
+Do not send both fields in the same request.
+
+### Request body
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `web_url` | `string` | Conditional | Website or YouTube URL |
+| `file_url` | `string` | Conditional | URL or path of a previously uploaded file |
+| `language_hints` | `string[]` | No | Preferred output languages, such as `["en"]` or `["vi"]` |
+| `use_ocr` | `boolean` | No | Run OCR for document or image sources |
+| `summary_style` | `string` | No | Summary-style preset |
+| `writing_style` | `string` | No | Writing-style preset |
+| `human_style` | `string \| null` | No | Humanized writing-style option |
+| `is_record` | `boolean` | No | Whether the input is a recording |
+| `duration` | `number` | No | Input duration in seconds |
+| `bot_id` | `string` | No | Meeting bot ID |
+| `record_session_id` | `string` | No | Recording session ID |
+| `device_meeting_id` | `string` | No | Device meeting ID |
+| `target_language` | `string` | No | Deprecated. Use `language_hints` instead |
+
+### Create a note from a URL
+
+```bash
+curl -X POST https://api.notexapp.com/v9/create/note \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "web_url": "https://youtu.be/xxxx",
+    "language_hints": ["en"]
+  }'
+```
+
+### Create a note from an uploaded file
+
+```bash
+curl -X POST https://api.notexapp.com/v9/create/note \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/json" \
+  -d '{
+    "file_url": "https://cdn.notexapp.com/uploads/lecture.mp3",
+    "language_hints": ["en"],
+    "is_record": true,
+    "duration": 1800
+  }'
+```
+
+### Example response
+
+```json
+{
+  "status": "PROCESSING",
+  "data": {
+    "task_id": "task_123456",
+    "user_id": "665f...",
+    "step": "transcribing",
+    "progress": 10,
+    "estimated_time": 120,
+    "timestamp": 1784011200
+  }
+}
+```
+
+### Response fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `status` | `TaskStatus \| null` | Initial task status |
+| `data.task_id` | `string` | ID used to poll the Tasks API |
+| `data.user_id` | `string` | Account ID that created the task |
+| `data.note_id` | `string` | Note ID, when immediately available |
+| `data.step` | `string` | Current processing step |
+| `data.progress` | `number` | Estimated progress percentage |
+| `data.estimated_time` | `number` | Estimated remaining time in seconds |
+| `data.timestamp` | `number` | Task creation timestamp |
+| `data.stream_sse` | `string` | SSE URL, when available |
+| `folder_id` | `string` | Destination folder ID, when available |
+
+After receiving `task_id`, poll the [Tasks API](./tasks.mdx) until the task reaches `SUCCESS`, `FAILURE`, or `FAIL`.
+
+<details>
+<summary>TypeScript types</summary>
+
+```typescript
+export interface CreateNoteV9RequestBody {
+  web_url?: string;
+  file_url?: string;
+  language_hints?: string[];
+  use_ocr?: boolean;
+  summary_style?: string;
+  writing_style?: string;
+  human_style?: string | null;
+  is_record?: boolean;
+  duration?: number;
+  bot_id?: string;
+  record_session_id?: string;
+  device_meeting_id?: string;
+  target_language?: string;
+}
+
+export interface CreateNoteResType {
+  status: TaskStatus | null;
+  data: {
+    task_id: string;
+    user_id: string;
+    note_id?: string;
+    step?: string;
+    progress?: number;
+    estimated_time?: number;
+    timestamp?: number;
+    stream_sse?: string;
+  };
+  folder_id?: string;
+  stream_sse?: string;
+}
+```
+
+</details>
+
+---
+
+## Validate an input
+
+```http
+POST /v9/create/validate
+```
+
+Validates a URL or uploaded file before creating a note.
+
+Use this endpoint to:
+
+- Check whether Notex supports the source.
+- Detect the input type.
+- Read metadata such as duration or caption languages.
+- Avoid creating an invalid task.
+
+### Request body
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `web_url` | `string` | Conditional | Website or YouTube URL |
+| `file_url` | `string` | Conditional | Previously uploaded file URL |
+
+Provide one source field.
+
+### Example request
 
 ```bash
 curl -X POST https://api.notexapp.com/v9/create/validate \
   -H "X-API-Key: ntx_live_..." \
   -H "Content-Type: application/json" \
-  -d '{ "web_url": "https://youtu.be/xxxx" }'
+  -d '{
+    "web_url": "https://youtu.be/xxxx"
+  }'
 ```
+
+### Valid input response
+
+```json
+{
+  "is_valid": true,
+  "input_type": "youtube",
+  "metadata": {
+    "video_id": "xxxx",
+    "status": "available",
+    "duration": 1260,
+    "has_captions": true,
+    "available_languages": ["en", "vi"]
+  }
+}
+```
+
+### Invalid input response
+
+```json
+{
+  "is_valid": false,
+  "input_type": "youtube",
+  "error_key": "unsupported_source",
+  "error_message": "The provided source is not supported."
+}
+```
+
+### Response fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `is_valid` | `boolean` | Whether the input is valid |
+| `input_type` | `string` | Detected input type |
+| `error_key` | `string` | Machine-readable validation error |
+| `error_message` | `string` | Human-readable error message |
+| `metadata.video_id` | `string` | YouTube video ID |
+| `metadata.status` | `string` | Source status |
+| `metadata.duration` | `number` | Duration in seconds |
+| `metadata.has_captions` | `boolean` | Whether captions are available |
+| `metadata.available_languages` | `string[]` | Available source languages |
+
+<details>
+<summary>TypeScript types</summary>
+
+```typescript
+export interface ValidateLinkBodyType {
+  web_url?: string;
+  file_url?: string;
+}
+
+export interface ValidateLinkResType {
+  is_valid: boolean;
+  input_type: string;
+  error_key?: string;
+  error_message?: string;
+  metadata?: {
+    video_id?: string;
+    status?: string;
+    duration?: number;
+    has_captions?: boolean;
+    available_languages?: string[];
+  };
+}
+```
+
+</details>
 
 ---
 
-## List my notes — `GET /v2/user/notes`
+## Upload a local file
 
-Returns a paginated list of notes belonging to the authenticated user.
+Before creating a note from a local file:
 
-Also accepts: user JWT.
+1. Request a presigned upload URL.
+2. Upload the file directly with `PUT`.
+3. Pass the returned `file_url` to Create Note.
 
-| Parameter    | In    | Type    | Required | Description                         |
-| ------------ | ----- | ------- | -------- | ----------------------------------- |
-| `type`       | query | string  | optional | Filter by note type                 |
-| `tab`        | query | string  | optional | Tab filter                          |
-| `limit`      | query | integer | optional | Page size                           |
-| `cursor`     | query | string  | optional | Cursor for cursor-based pagination  |
-| `page`       | query | integer | optional | Page number (page-based pagination) |
-| `sort_field` | query | string  | optional | Field to sort by (e.g. `createdAt`) |
-| `sort_order` | query | integer | optional | Sort direction: `1` asc, `-1` desc  |
+See the complete [Presigned URL guide](./presigned-url.mdx).
+
+### Short example
+
+```bash
+# 1. Get the upload URL
+RESPONSE=$(curl -s --get \
+  "https://api.notexapp.com/v1/presigned-url" \
+  -H "X-API-Key: ntx_live_..." \
+  --data-urlencode "file_name=lecture.mp3")
+
+UPLOAD_URL=$(echo "$RESPONSE" | jq -r '.data.upload_url')
+FILE_URL=$(echo "$RESPONSE" | jq -r '.data.file_url')
+
+# 2. Upload the file
+curl --fail -X PUT "$UPLOAD_URL" \
+  -H "Content-Type: audio/mpeg" \
+  --data-binary @lecture.mp3
+
+# 3. Create the note
+curl -X POST https://api.notexapp.com/v9/create/note \
+  -H "X-API-Key: ntx_live_..." \
+  -H "Content-Type: application/json" \
+  -d "{
+    \"file_url\": \"$FILE_URL\",
+    \"language_hints\": [\"en\"]
+  }"
+```
+
+Do not send the API key to `upload_url`.
+
+---
+
+## List my notes
+
+```http
+GET /v2/user/notes
+```
+
+Returns notes owned by the account that created the API key.
+
+### Query parameters
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `type` | `string` | No | Filter by note type |
+| `tab` | `string` | No | Filter by tab |
+| `limit` | `number` | No | Maximum number of notes per page |
+| `cursor` | `string` | No | Cursor for the next page |
+| `page` | `number` | No | Page number |
+| `sort_field` | `string` | No | Field used for sorting |
+| `sort_order` | `1 \| -1` | No | `1` ascending, `-1` descending |
+
+### Example request
 
 ```bash
 curl "https://api.notexapp.com/v2/user/notes?limit=20&sort_field=createdAt&sort_order=-1" \
   -H "X-API-Key: ntx_live_..."
 ```
 
----
-
-## Upload a file
-
-Before creating a note from a local file, you must upload it and obtain a `file_url`.
-
-### Get presigned URL — `GET /v1/presigned-url`
-
-Also accepts: user JWT, device/service credentials.
-
-| Parameter   | In    | Type    | Required     | Description                                      |
-| ----------- | ----- | ------- | ------------ | ------------------------------------------------ |
-| `file_name` | query | string  | **required** | Name of the file to upload                       |
-| `is_public` | query | boolean | optional     | Whether the object should be publicly accessible |
-
-```bash
-curl "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
-  -H "X-API-Key: ntx_live_..."
-```
-
-Response:
+### Example response
 
 ```json
 {
-  "status": "SUCCESS",
-  "data": {
-    "presigned_url": "https://...",
-    "file_name": "lecture.mp3",
-    "full_path": "audio/<user_id>/lecture.mp3"
-  }
+  "statusCode": 200,
+  "data": [
+    {
+      "note_id": "note_123456",
+      "title": "Introduction to AI agents",
+      "folder_id": null,
+      "type": "youtube",
+      "duration": 1260,
+      "short_summary": "An introduction to AI agent architecture...",
+      "is_public": false,
+      "is_password_protected": false,
+      "share_link": null,
+      "createdAt": "2026-07-24T02:00:00Z",
+      "updatedAt": "2026-07-24T02:10:00Z"
+    }
+  ]
 }
 ```
 
-### Full upload flow
+See [User API](./user.mdx#list-my-notes) for detailed field definitions.
 
-```bash
-# Step 1 — get upload URL
-RESPONSE=$(curl -s "https://api.notexapp.com/v1/presigned-url?file_name=lecture.mp3" \
-  -H "X-API-Key: ntx_live_...")
+## Typical flows
 
-PRESIGNED_URL=$(echo $RESPONSE | jq -r '.data.presigned_url')
-FULL_PATH=$(echo $RESPONSE | jq -r '.data.full_path')
+### Create from a URL
 
-# Step 2 — upload the file directly (no auth header needed)
-curl -X PUT "$PRESIGNED_URL" \
-  -H "Content-Type: audio/mpeg" \
-  --data-binary @lecture.mp3
-
-# Step 3 — create the note
-curl -X POST https://api.notexapp.com/v9/create/note \
-  -H "X-API-Key: ntx_live_..." \
-  -H "Content-Type: application/json" \
-  -d "{\"file_url\": \"$FULL_PATH\", \"language_hints\": [\"en\"]}"
+```text
+Validate the URL
+       ↓
+Create the note
+       ↓
+Receive task_id
+       ↓
+Poll the Tasks API
+       ↓
+Receive note_id
 ```
 
-Supported file types: audio (`.mp3`, `.wav`, `.m4a`, …), documents (`.pdf`, `.docx`, `.txt`, …),
-and images (`.jpg`, `.png`, `.pdf`, …).
+### Create from a local file
 
----
+```text
+Get a presigned URL
+       ↓
+Upload the file with PUT
+       ↓
+Create the note with file_url
+       ↓
+Receive task_id
+       ↓
+Poll the Tasks API
+       ↓
+Receive note_id
+```
 
-## Typical flow
+## Important notes
 
-1. _(File sources only)_ Upload file using the steps above to get a `file_url`.
-2. `POST /v9/create/note` → receive `task_id`.
-3. Poll [Tasks](./tasks.mdx) until `status` is `SUCCESS`.
-4. Use the returned `note_id` with other feature endpoints (flashcards, quiz, mindmap, etc.).
-
+- Send either `web_url` or `file_url`, not both.
+- Validate user-provided URLs before creating a task.
+- Do not send the API key to a presigned upload URL.
+- Use `file_url`, not `upload_url`, when creating a note.
+- `target_language` is deprecated; use `language_hints`.
+- A task may occasionally return `note_id` immediately, but integrations should still support the asynchronous `task_id` flow.
+- Optional progress fields may be omitted.
+- Keep the API key on a controlled backend or server.
