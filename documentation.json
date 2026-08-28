@@ -165,6 +165,11 @@
                         "title": "Additional Instructions",
                         "path": "additional-instructions-en",
                         "icon": "a-large-small"
+                      },
+                      {
+                        "title": "Recently Deleted",
+                        "path": "delete",
+                        "icon": "lucide-trash2"
                       }
                     ],
                     "icon": "badge-plus"
@@ -736,6 +741,11 @@
                         "title": "Yêu cầu AI bổ sung",
                         "path": "additional-instructions",
                         "icon": "app-window"
+                      },
+                      {
+                        "title": "Thùng rác",
+                        "path": "thng-rc",
+                        "icon": "lucide-trash2"
                       }
                     ]
                   },
@@ -1002,6 +1012,11 @@
                         "title": "追加のAI指示",
                         "path": "yu-cu-ai-b-sung",
                         "icon": "lucide-menu-square"
+                      },
+                      {
+                        "title": "最近削除した項目",
+                        "path": "最近削除した項目",
+                        "icon": "lucide-trash2"
                       }
                     ],
                     "icon": "alert-circle"
