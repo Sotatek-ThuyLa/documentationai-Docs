@@ -743,7 +743,7 @@
                         "icon": "app-window"
                       },
                       {
-                        "title": "Thùng rác",
+                        "title": "Đã xoá gần đây",
                         "path": "thng-rc",
                         "icon": "lucide-trash2"
                       }
